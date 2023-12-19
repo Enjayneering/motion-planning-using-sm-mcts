@@ -1,0 +1,8 @@
+reward_progress: 0.02
+penalty_collision_now: -100
+penalty_collision_future: -0.02
+reward_lead: 10
+penalty_center: -1
+num_iter: 600
+c_param: 1.4142135623730951
+timehorizon: 19
