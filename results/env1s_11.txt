@@ -1,0 +1,9 @@
+penalty_collision_now: 0
+penalty_collision_future: 0
+reward_lead: 0
+reward_progress: 1
+penalty_center: 0
+num_iter: 6000
+c_param: 141.4213562373095
+timehorizon: 8
+rollout_horizon: 8
