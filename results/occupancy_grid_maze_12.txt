@@ -1,0 +1,11 @@
+penalty_collision_now: -1
+penalty_collision_future: -0.01
+reward_lead: 20
+reward_progress: 0
+penalty_centerline: -5
+num_iter: 600
+c_param: 1.4142135623730951
+timehorizon: 18
+rollout_horizon: 18
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-0.7853981633974483, 0.0, 0.7853981633974483]}
+action_set_1: {'velocity_1': [0.0, 1.5, 3.0], 'ang_velocity_1': [-0.7853981633974483, 0.0, 0.7853981633974483]}
