@@ -1,8 +1,6 @@
 import numpy as np
 import itertools
 from shapely import LineString
-from sympy import symbols, solve
-from sympy.matrices import Matrix
 
 from common import *
 from environment import *
