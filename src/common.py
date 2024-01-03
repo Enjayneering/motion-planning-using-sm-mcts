@@ -8,7 +8,8 @@ from environment import *
 path_to_repository = "/home/enjay/0_thesis/01_MCTS/"
 path_to_data = path_to_repository+"data/"
 path_to_src = path_to_repository+"src/"
-path_to_tree = path_to_repository+"data/tree_{}.csv"
+path_to_trees = path_to_repository+"data/trees/"
+path_to_tree = path_to_repository+"data/trees/tree_{}.csv"
 path_to_global_state = path_to_repository+"data/global_state.csv"
 path_to_rollout_curr = path_to_repository+"data/rollout_curr.csv"
 path_to_rollout_last = path_to_repository+"data/rollout_last.csv"
@@ -25,11 +26,8 @@ def get_next_video_name(path_to_results, environment_name=None):
 
 next_video_name = get_next_video_name(path_to_results, environment_name=env.env_name_trigger[0][1])
 
-# state and action space
-state_space = ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
-action_space = ['x0', 'y0', 'x1', 'y1']
-
 # initialization parameters
+
 #normalization parameters for UCB
 max_payoff = 0
 min_payoff = 0
@@ -45,13 +43,28 @@ delta_t = 1
 freq_stat_data = 4
 # Tuning parameters (weights for payoffs)
 
+# state and action space
+state_space = ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+action_space = ['x0', 'y0', 'x1', 'y1']
+
 Model_params = {
     "agents": [0, 1],
     "state_space": state_space,
     "action_space": action_space,
-    "payoff_vector": {"intermediate_penalties": {"penalty_collision_0": {"weight": 0.1, "pos": 0, "agent": 0}, "penalty_collision_1": {"weight": 0.1, "pos": 1, "agent": 1},},
-                      "final_rewards": {"reward_lead_0": {"weight": 1, "pos": 2, "agent": 0}, "reward_lead_1": {"weight": 1, "pos": 3, "agent": 1},},
-                },
+    "payoff_vector": {
+        "intermediate_penalties": {
+            "penalty_collision_0": {"pos": 0, "weight": 4, "agent": 0},
+            "penalty_collision_1": {"pos": 1, "weight": 0.5, "agent": 1},
+        },
+        "intermediate_rewards": {
+            "reward_progress_0": {"pos": 2, "weight": 0.1, "agent": 0},
+            "reward_progress_1": {"pos": 3, "weight": 0.1, "agent": 1},
+        },
+        "final_rewards": {
+            "reward_lead_0": {"pos": 4, "weight": 1, "agent": 0},
+            "reward_lead_1": {"pos": 5, "weight": 1, "agent": 1},
+        },
+    },
     }
 Model_params["len_payoff_vector"] = sum(len(component) for component in Model_params["payoff_vector"].values())
 
@@ -76,9 +89,10 @@ MCTS_params = {
 
 def is_terminal(state):
         # terminal condition
-        if state.x0 >= env.dynamic_grid[state.timestep]['x_max']-1 or state.x1 >= env.dynamic_grid[state.timestep]['x_max']-1 or state.timestep >= env.max_timehorizon:
+        if state.x0 >= env.get_current_grid_dict(state.timestep)['x_max']-1 or state.x1 >= env.get_current_grid_dict(state.timestep)['x_max']-1 or state.timestep >= env.max_timehorizon:
             return True
-        return False
+        else:
+            return False
 
 def generate_bernoulli(p):
     choices = [0, 1]

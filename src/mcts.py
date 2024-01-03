@@ -125,11 +125,12 @@ class MCTSNode:
         # Note: we need to choose the most promising action, but ensuring that they are also collisionfree
         weights_0 = [self.calc_UCT(action_stat, payoff_range, MCTS_params['c_param']) for action_stat in self.action_stats_0]
         weights_1 = [self.calc_UCT(action_stat, payoff_range, MCTS_params['c_param']) for action_stat in self.action_stats_1]
+        print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
 
         action_select_0 = self.action_stats_0[np.argmax(weights_0)]["action"]
         action_select_1 = self.action_stats_1[np.argmax(weights_1)]["action"]
         selected_action = action_select_0 + action_select_1
-        #print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
+        
         return selected_action
 
     def select_child(self, payoff_range):
@@ -157,15 +158,17 @@ class MCTSNode:
 
     def X(self, agent=None):
         # get sum of payoffs for agent index
-        p_coll = self.aggr_payoff_vector[agent,0]
-        p_lead = self.aggr_payoff_vector[2+agent,0]
-        sum_payoffs = p_coll + p_lead
-        return sum_payoffs
+        payoff_agent = 0
+        for payoffs in Model_params["payoff_vector"].values():
+            for payoff in payoffs.values():
+                if payoff["agent"] == agent:
+                    payoff_agent += float(self.aggr_payoff_vector[payoff["pos"]])
+        return payoff_agent
 
     def is_fully_expanded(self):
         return len(self._untried_actions) == 0
 
-    def rollout(self, payoff_weights):
+    def rollout(self, payoff_weights= None):
         # rollout policy: random action selection
         current_rollout_node = self
 
@@ -207,10 +210,14 @@ class MCTSNode:
             next_rollout_node = MCTSNode(next_rollout_state, parent=current_rollout_node, parent_action=action)
 
             # updating intermediate payoffs
-            collision_penalty_0, collision_penalty_1 = get_intermediate_penalty(next_rollout_state, payoff_weights)
+            collision_penalty_0, collision_penalty_1 = get_intermediate_penalty(next_rollout_node.state)
             #TODO: Multi agent adjustment
             payoff_vector[0] += collision_penalty_0
             payoff_vector[1] += collision_penalty_1
+
+            progress_reward_0, progress_reward_1 = get_intermediate_reward(current_rollout_node.state, next_rollout_node.state)
+            payoff_vector[2] += progress_reward_0
+            payoff_vector[3] += progress_reward_1
 
             current_rollout_node = next_rollout_node
             rollout_trajectory.append(current_rollout_node.state)
@@ -219,8 +226,8 @@ class MCTSNode:
         if is_terminal(current_rollout_node.state):
             payoff_final_0, payoff_final_1 = get_final_payoffs(current_rollout_node.state)
             #TODO: Multi agent adjustment
-            payoff_vector[2] += payoff_final_0
-            payoff_vector[3] += payoff_final_1
+            payoff_vector[4] += payoff_final_0
+            payoff_vector[5] += payoff_final_1
 
         return rollout_trajectory, payoff_vector
     

@@ -2,6 +2,21 @@ import networkx as nx
 import pickle
 import networkx as nx
 import pickle
+import os
+
+from common import *
+import networkx as nx
+import pickle
+import os
+from common import *
+
+def init_tree_file():
+    # Delete all existing tree files
+    file_list = os.listdir(path_to_trees)
+    for file_name in file_list:
+        file_path = os.path.join(path_to_trees, file_name)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
 def save_tree_to_file(node_current_timestep, path_to_tree):
     tree = nx.DiGraph()

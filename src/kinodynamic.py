@@ -37,12 +37,12 @@ def is_collision(prev_state, joint_action, num_linesearch = 1):
         print("no collision")
         return False
 
-def is_in_free_space(state, action, init_timestep, num_linesearch = 4, safety_margin=0):
+def is_in_free_space(state, action, init_timestep, num_linesearch = 4):
     # state = [x, y, theta]
     # action = [x_steps, y_steps]
     x_next, y_next, theta_next = mm_unicycle(state, action)
 
-    if env.dynamic_grid[init_timestep+1]['x_min'] < x_next < env.dynamic_grid[init_timestep+1]['x_max'] and env.dynamic_grid[init_timestep+1]['y_min'] < y_next < env.dynamic_grid[init_timestep+1]['y_max']:
+    if env.get_current_grid_dict(init_timestep+1)['x_min'] < x_next < env.get_current_grid_dict(init_timestep+1)['x_max'] and env.get_current_grid_dict(init_timestep+1)['y_min'] < y_next < env.get_current_grid_dict(init_timestep+1)['y_max']:
         # create line inclusing discretized timestep
         line_points = np.linspace(state[:2]+[init_timestep], [x_next, y_next]+[init_timestep+1], num=num_linesearch).tolist()
 
@@ -63,18 +63,8 @@ def is_in_free_space(state, action, init_timestep, num_linesearch = 4, safety_ma
             time_int = int(time_point) # round down to nearest integer since environment changes at next increment
 
             # Check if points on obstacles now and in next step
-            if env.dynamic_grid[time_int]['grid'][y_round, x_round] == 1:
+            if env.get_current_grid_dict(time_int)['grid'][y_round, x_round] == 1:
                 return False  # Collision detected
-
-            """# Check if the point is within the safety margin of an obstacle
-            for dx in range(-1, 1):
-                for dy in range(-1, 1):
-                    dx = dx * safety_margin
-                    dy = dy * safety_margin
-                    if (env.x_min < x_point + dx < env.x_max and
-                        env.y_min < y_point + dy < env.y_max and
-                        env.dynamic_grid[int(np.round(y_point + dy)), int(np.round(x_point + dx))] == 1):
-                        return False  # Collision detected"""
     else:
         #print("collision outside grid")
         return False

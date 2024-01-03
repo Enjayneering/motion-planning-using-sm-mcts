@@ -6,18 +6,19 @@ from environment import *
 from kinodynamic import *
 from payoff_utilities import *
 from csv_utilities import *
-from networkx_utilities import save_tree_to_file
+from networkx_utilities import *
 
-def MCTS_play_subgame(node_current_timestep, max_payoff, min_payoff, payoff_range):
+def MCTS_play_subgame(simhorizon, node_current_timestep, max_payoff, min_payoff, payoff_range):
     #num_iter = int(1-node_current_timestep.state.timestep/timehorizon)*num_iter
     
     payoff_weights = init_payoff_weights(node_current_timestep)
 
     for iter in range(MCTS_params['num_iter']):
-        print("Starting tree policy")
+        print("Horizon {} | Iteration {}".format(simhorizon, iter))
+        #print("Starting tree policy")
         v = node_current_timestep._tree_policy(payoff_range)
 
-        print("Starting rollout")
+        #print("Starting rollout")
         rollout_trajectory, payoff_vector = v.rollout(payoff_weights)
         max_payoff, min_payoff, payoff_range = update_payoff_range(max_payoff, min_payoff, payoff_vector)
         
@@ -26,11 +27,11 @@ def MCTS_play_subgame(node_current_timestep, max_payoff, min_payoff, payoff_rang
         if iter % freq_stat_data == 0:
             csv_write_rollout_last(rollout_trajectory, timehorizon = node_current_timestep.state.timestep)
         
-        print("Backpropagating")
+        #print("Backpropagating")
         v.backpropagate(payoff_vector)
-        payoff_weights = update_weigths_payoff(node_current_timestep, payoff_weights)
-        print("Payoff weights: {}".format(payoff_weights))
-        #node_current_timestep.update_action_stats()
+        #payoff_weights = update_weigths_payoff(node_current_timestep, payoff_weights)
+        #print("Payoff weights: {}".format(payoff_weights))
+    
     #selected_action = node_current_timestep.select_action(payoff_range)
     #next_state = node_current_timestep.select_child(payoff_range).state
 
@@ -41,11 +42,12 @@ def MCTS_play_subgame(node_current_timestep, max_payoff, min_payoff, payoff_rang
 
 if __name__ == "__main__":
     # create a text trap and redirect stdout
-    text_trap = io.StringIO()
-    sys.stdout = text_trap
+    #text_trap = io.StringIO()
+    #sys.stdout = text_trap
 
     # initialize csv files
     csv_init_global_state()
+    init_tree_file()
 
     # initialize root node
     intial_state = State(x0=env.init_state['x0'], y0=env.init_state['y0'], theta0=env.init_state['theta0'],
@@ -61,22 +63,24 @@ if __name__ == "__main__":
     # initialize payoff vector
     payoff_0 = 0
     payoff_1 = 0
-    payoff_list_0 = []
-    payoff_list_1 = []
+    payoff_list_0 = [(0,0)]
+    payoff_list_1 = [(0,0)]
 
     while not is_terminal(node_current_horizon.state):
         simhorizon = node_current_horizon.state.timestep
-        print("\nSimulation horizon: {}\n".format(simhorizon))
         csv_init_rollout_last()
 
-        next_state, chosen_action = MCTS_play_subgame(node_current_horizon, max_payoff, min_payoff, payoff_range)
+        next_state, chosen_action = MCTS_play_subgame(simhorizon, node_current_horizon, max_payoff, min_payoff, payoff_range)
 
         # update payoffs global solution
-        payoff_0_new, payoff_1_new = get_intermediate_penalty(next_state, MCTS_params['penalty_collision_init'])
-        payoff_0 += payoff_0_new
-        payoff_list_0.append((simhorizon, payoff_0))
+        payoff_0_new, payoff_1_new = get_intermediate_penalty(next_state)
+        payoff_0 += payoff_0_new 
         payoff_1 += payoff_1_new
-        payoff_list_1.append((simhorizon, payoff_1))
+        payoff_0_new, payoff_1_new = get_intermediate_reward(node_current_horizon.state, next_state)
+        payoff_0 += payoff_0_new
+        payoff_1 += payoff_1_new
+        payoff_list_0.append((simhorizon+1, payoff_0))
+        payoff_list_1.append((simhorizon+1, payoff_1))
 
         trajectory.append(next_state.get_state_together())
 
@@ -86,11 +90,11 @@ if __name__ == "__main__":
     # update final payoffs global solution
     payoff_0_new, payoff_1_new = get_final_payoffs(node_current_horizon.state)
     payoff_0 += payoff_0_new
-    payoff_list_0.append((simhorizon, payoff_0))
+    payoff_list_0[-1] = (simhorizon+1, payoff_0)
     payoff_1 += payoff_1_new
-    payoff_list_1.append((simhorizon, payoff_1))
+    payoff_list_1[-1] = (simhorizon+1, payoff_1)
 
-    # save final payoffs to textfile
+# save final payoffs to textfile
     with open(os.path.join(path_to_results, next_video_name + ".txt"), 'a') as f:
         f.write(f"Environment trigger: {env.env_name_trigger}\n")
         f.write(f"Payoff Agent 0: {payoff_list_0}\n")
