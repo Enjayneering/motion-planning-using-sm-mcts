@@ -12,7 +12,6 @@ import multiprocessing
 import matplotlib.gridspec as gridspec
 
 from common import *
-from superparameter import *
 from environment import *
 from networkx_utilities import open_tree_from_file
 
@@ -33,7 +32,7 @@ class FigureV0:
         tree = get_last_tree(path_to_data)
 
         pos = graphviz_layout(tree, prog="twopi")
-        labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X_0(),0), round(node.X_1(),0)) for node in tree.nodes}
+        labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X(agent=0),0), round(node.X(agent=1),0)) for node in tree.nodes}
 
         # Create a list of node colors
         node_colors = []
@@ -170,7 +169,7 @@ def main(stop_event=None):
     figplot = FigureV0()
     interval = 1000
 
-    frames_max = game_horizon*MCTS_params['num_iter']*interval
+    frames_max = env.max_timehorizon*MCTS_params['num_iter']*interval
 
     animation_container = [None] # Container to store the animation object
 

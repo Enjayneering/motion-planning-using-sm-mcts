@@ -54,17 +54,25 @@ class MCTSNode:
         self.parent = parent
         self.parent_action = parent_action
         self.children = []
-        self._number_of_visits = 1
-        self._sum_of_payoffs_0 = 0
-        self._sum_of_payoffs_1 = 0
+        ########## MCTS parameters ##########
+        self.aggr_payoff_vector = np.ones((Model_params["len_payoff_vector"],1)) # [p_coll_0, p_lead_0, p_coll_1, p_lead_1].T
+        #self.aggr_max_payoff_vector = np.zeros(Model_params["len_payoff_vector"],1) # [p_coll_0, p_lead_0, p_coll_1, p_lead_1].T
+        
         self._untried_actions = self.untried_actions()
         self.action_stats_0, self.action_stats_1 = self.init_action_stats() # [action, number_count, sum of payoffs]
+        self._number_of_visits = 1
 
     def init_action_stats(self):
         legal_action_0, legal_action_1, _ = sample_legal_actions(self.state)
         self.action_stats_0 = [{"action": action, "num_count": 1, "sum_payoffs": 0} for action in legal_action_0]
         self.action_stats_1 = [{"action": action, "num_count": 1, "sum_payoffs": 0} for action in legal_action_1]
         return self.action_stats_0, self.action_stats_1
+
+    """def update_max_payoff_vector(self, max_payoff_vector):
+        for i, payoff in enumerate(max_payoff_vector):
+            if payoff > self.aggr_max_payoff_vector[i]:
+                self.aggr_max_payoff_vector[i] = payoff
+        pass"""
 
     def update_action_stats(self):
         # count at each node the number of children visited for the respective action and update that action's stats
@@ -75,7 +83,7 @@ class MCTSNode:
             for c in self.children:
                 if c.parent_action[:2] == action_stat["action"] and action_stat["action"] != -np.inf:
                     self.action_stats_0[i]["num_count"] += 1
-                    self.action_stats_0[i]["sum_payoffs"] += c.X_0()
+                    self.action_stats_0[i]["sum_payoffs"] += c.X(agent=0)
 
         for i, action_stat in enumerate(self.action_stats_1):
             self.action_stats_1[i]["num_count"] = 1
@@ -84,9 +92,10 @@ class MCTSNode:
             for c in self.children:
                 if c.parent_action[2:] == action_stat["action"] and action_stat["action"] != -np.inf:
                     self.action_stats_1[i]["num_count"] += 1
-                    self.action_stats_1[i]["sum_payoffs"] += c.X_1()
+                    self.action_stats_1[i]["sum_payoffs"] += c.X(agent=1)
+        pass
 
-    def expand(self, index=None):
+    def expand(self):
         action = self._untried_actions.pop(np.random.randint(len(self._untried_actions))) #pop random action out of the list
 
         next_state = self.state.move(action)
@@ -109,7 +118,7 @@ class MCTSNode:
     def select_action(self, payoff_range):
         # update action stats based on all possible and already visited childs
         #TODO: action stat update here?
-        print("Try to select action")
+        #print("Try to select action")
         self.update_action_stats()
 
         # UCT: returns the child with the highest UCB1 score
@@ -120,51 +129,8 @@ class MCTSNode:
         action_select_0 = self.action_stats_0[np.argmax(weights_0)]["action"]
         action_select_1 = self.action_stats_1[np.argmax(weights_1)]["action"]
         selected_action = action_select_0 + action_select_1
-        print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
-
-        # resolving immediate collisions by using risk parameter modelling the agents behaviour
-        """while is_collision(self.state, selected_action):
-            agent_being_considerate = generate_bernoulli(Competitive_params['risk_factor_0'])
-            if agent_being_considerate == 0:
-                weights_0[np.argmax(weights_0)] = -np.inf
-            elif agent_being_considerate == 1:
-                weights_1[np.argmax(weights_1)] = -np.inf
-
-            print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
-
-            action_select_0 = self.action_stats_0[np.argmax(weights_0)]["action"]
-            action_select_1 = self.action_stats_1[np.argmax(weights_1)]["action"]
-            selected_action = action_select_0 + action_select_1
-            print("Selected action: {}".format(selected_action))
-
-            if weights_0[np.argmax(weights_0)] == -np.inf:
-                print("Agent 0 stuck in environment")
-                if self.parent:
-                    action_0_stuck = self.parent_action[:2]
-                    # changing value of parent action stat of the action that led to the stuck state
-                    for action_stat in self.parent.action_stats_0:
-                        if np.array_equal(action_stat["action"], action_0_stuck):
-                            # Modify the sum_payoffs field
-                            action_stat["sum_payoffs"] = -np.inf  # prevent action from being chosen next time
-                    selected_action = None
-                break
-            if weights_1[np.argmax(weights_1)] == -np.inf:
-                print("Agent 1 stuck in environment")
-                if self.parent:
-                    action_1_stuck = self.parent_action[2:]
-                    # changing value of parent action stat of the action that led to the stuck state
-                    for action_stat in self.parent.action_stats_1:
-                        if np.array_equal(action_stat["action"], action_1_stuck):
-                            # Modify the sum_payoffs field
-                            action_stat["sum_payoffs"] = -np.inf # prevent action from being chosen next time
-                selected_action = None
-                break"""
+        #print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
         return selected_action
-
-
-        #print("Action stats 0: {}".format(self.action_stats_0))
-        #print("Action stats 1: {}".format(self.action_stats_1))
-        #print("Selected action: {}".format(selected_action))
 
     def select_child(self, payoff_range):
         # selects action that is itself a Nash Equilibrium
@@ -172,10 +138,10 @@ class MCTSNode:
 
         if selected_action:
             best_child = [child for child in self.children if child.parent_action == selected_action]
-            print("Selected Child: {}".format(best_child[0].state.get_state_together()))
+            #print("Selected Child: {}".format(best_child[0].state.get_state_together()))
             return best_child[0]
         else:
-            print("Return self")
+            #print("Return self")
             return self  # Return node to choose another joint action
 
 
@@ -184,56 +150,56 @@ class MCTSNode:
         robust_child = self.children[np.argmax(choices_weights)]
         return robust_child
 
-    #def optimal_child(self, payoff_range):
+    #TODO: def optimal_child(self, payoff_range):
 
     def n(self):
         return self._number_of_visits
 
-    def X_0(self):
-        return self._sum_of_payoffs_0
-
-    def X_1(self):
-        return self._sum_of_payoffs_1
+    def X(self, agent=None):
+        # get sum of payoffs for agent index
+        p_coll = self.aggr_payoff_vector[agent,0]
+        p_lead = self.aggr_payoff_vector[2+agent,0]
+        sum_payoffs = p_coll + p_lead
+        return sum_payoffs
 
     def is_fully_expanded(self):
         return len(self._untried_actions) == 0
 
-    def rollout(self, collision_weight):
+    def rollout(self, payoff_weights):
         # rollout policy: random action selection
         current_rollout_node = self
 
         rollout_trajectory = [current_rollout_node.state]
         
-        payoff_0, payoff_1 = 0, 0
-        intermediate_penalties, final_payoff = 0, 0
+        payoff_vector = np.zeros((Model_params["len_payoff_vector"],1))
 
         # intermediate timesteps
         while not is_terminal(current_rollout_node.state):
             #print("Rollout State: {}".format(current_rollout_node.state.get_state_together()))
-
             moves_0, moves_1, possible_moves = sample_legal_actions(current_rollout_node.state)
 
             #print("Moves 0: {}, Moves 1: {}".format(moves_0, moves_1))
             #print("Possible moves: {}".format(possible_moves))
 
+            #TODO: change parameter punishment when stuck (or pruning..?)
             if len(possible_moves) == 0:
                 print("No possible moves")
 
             if len(moves_0) == 0 and len(moves_1) == 0:
-                payoff_0 += MCTS_params['penalty_stuck_in_env']
-                payoff_1 += MCTS_params['penalty_stuck_in_env']
+                #payoff_0 += MCTS_params['penalty_stuck_in_env']
+                #payoff_1 += MCTS_params['penalty_stuck_in_env']
                 print("Both agents stuck in environment, break")
                 break
             elif len(moves_0) == 0:
-                payoff_0 += MCTS_params['penalty_stuck_in_env']
+                #payoff_0 += MCTS_params['penalty_stuck_in_env']
                 print("Agent 0 stuck in environment, break")
                 break
             elif len(moves_1) == 0:
-                payoff_1 += MCTS_params['penalty_stuck_in_env']
+                #payoff_1 += MCTS_params['penalty_stuck_in_env']
                 print("Agent 1 stuck in environment, break")
                 break
 
-            # choose random action
+            # choose action due to rollout policy
             action = self.rollout_policy(possible_moves)
 
             #print("Rollout Action: {}".format(action))
@@ -241,12 +207,10 @@ class MCTSNode:
             next_rollout_node = MCTSNode(next_rollout_state, parent=current_rollout_node, parent_action=action)
 
             # updating intermediate payoffs
-            collision_penalty_0, collision_penalty_1 = get_collision_penalty(next_rollout_state, collision_weight)
-            
-            payoff_0 += collision_penalty_0
-            payoff_1 += collision_penalty_1
-
-            intermediate_penalties += np.abs(max(collision_penalty_0, collision_penalty_1)) # should be equal for both agents
+            collision_penalty_0, collision_penalty_1 = get_intermediate_penalty(next_rollout_state, payoff_weights)
+            #TODO: Multi agent adjustment
+            payoff_vector[0] += collision_penalty_0
+            payoff_vector[1] += collision_penalty_1
 
             current_rollout_node = next_rollout_node
             rollout_trajectory.append(current_rollout_node.state)
@@ -254,14 +218,14 @@ class MCTSNode:
         # updating final payoffs
         if is_terminal(current_rollout_node.state):
             payoff_final_0, payoff_final_1 = get_final_payoffs(current_rollout_node.state)
-            payoff_0 += payoff_final_0
-            payoff_1 += payoff_final_1
-            final_payoff += np.abs(max(payoff_final_0, payoff_final_1))
+            #TODO: Multi agent adjustment
+            payoff_vector[2] += payoff_final_0
+            payoff_vector[3] += payoff_final_1
 
-        print(intermediate_penalties, final_payoff)
-        return rollout_trajectory, payoff_0, payoff_1, intermediate_penalties, final_payoff
+        return rollout_trajectory, payoff_vector
     
     def rollout_policy(self, possible_moves):
+            #TODO: Check informed rollout sampling
             # choose a random action to simulate rollout
             try:
                 action = possible_moves[np.random.randint(len(possible_moves))]
@@ -269,28 +233,25 @@ class MCTSNode:
             except:
                 return None
             
-    def backpropagate(self, payoff_0, payoff_1):
+    def backpropagate(self, payoff_vector):
         # backpropagate statistics of the node
         self._number_of_visits += 1
-        self._sum_of_payoffs_0 += payoff_0
-        self._sum_of_payoffs_1 += payoff_1
+        self.aggr_payoff_vector += payoff_vector
 
-        #TODO: check if here or somewhere else
-        #self.update_action_stats()
         if self.parent:
-            self.parent.backpropagate(payoff_0, payoff_1)
+            self.parent.backpropagate(payoff_vector)
 
     def _tree_policy(self, payoff_range):
         current_node = self
         while not is_terminal(current_node.state):
-            print("Tree policy current node: {}".format(current_node.state.get_state_together()))
-            print("Current node not terminal")
+            #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
+            #print("Current node not terminal")
             if not current_node.is_fully_expanded():
-                print("Current node not fully expanded")
+                #print("Current node not fully expanded")
                 return current_node.expand()
             else:
                 #print("Current node fully expanded, next child")
                 current_node = current_node.select_child(payoff_range)
                 # prevent parent from choosing the same action again
-        print("Tree policy current node: {}".format(current_node.state.get_state_together()))
+        #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
         return current_node

@@ -3,7 +3,6 @@ import numpy as np
 import glob
 
 from environment import *
-from superparameter import *
 
 # paths
 path_to_repository = "/home/enjay/0_thesis/01_MCTS/"
@@ -40,13 +39,21 @@ payoff_range = max_payoff - min_payoff
 aver_intermediate_penalties = 1
 aver_final_payoff = 0
 
-
-
 # motion parameters
 delta_t = 1
 
 freq_stat_data = 4
 # Tuning parameters (weights for payoffs)
+
+Model_params = {
+    "agents": [0, 1],
+    "state_space": state_space,
+    "action_space": action_space,
+    "payoff_vector": {"intermediate_penalties": {"penalty_collision_0": {"weight": 0.1, "pos": 0, "agent": 0}, "penalty_collision_1": {"weight": 0.1, "pos": 1, "agent": 1},},
+                      "final_rewards": {"reward_lead_0": {"weight": 1, "pos": 2, "agent": 0}, "reward_lead_1": {"weight": 1, "pos": 3, "agent": 1},},
+                },
+    }
+Model_params["len_payoff_vector"] = sum(len(component) for component in Model_params["payoff_vector"].values())
 
 Competitive_params = {
     "action_set_0": {"velocity_0": np.linspace(0, 2, 3).tolist(),
@@ -54,29 +61,22 @@ Competitive_params = {
     "action_set_1": {"velocity_1": np.linspace(0, 2, 3).tolist(),
                     "ang_velocity_1": np.linspace(-np.pi/2, np.pi/2, 3).tolist()},
     #"risk_factor_0": 0.1, #risk appetite agent1 = 1 - risk appetite agent0
-}
+    }
 
 MCTS_params = {
-    "num_iter": 3000, #max number of simulations, proportional to complexity of the game
+    "num_iter": 800, #max number of simulations, proportional to complexity of the game
+    "c_param": np.sqrt(2), # c_param: exploration parameter | 3.52 - Tuned from Paper by Perick, 2012
 
-    "penalty_collision_0": 1, # exp scale
-    "penalty_collision_1": 1,
     'penalty_collision_init': 0.1, # penalty at initial state
     'penalty_collision_delay': 1, # dynamic factor for ensuring reward is bigger than sum of penalties
 
-    "reward_lead": 1,
-    "reward_progress": 0,
-    "penalty_centerline": -0,
-
     "penalty_stuck_in_env": -1,
-
-    "c_param": np.sqrt(2), # c_param: exploration parameter | 3.52 - Tuned from Paper by Perick, 2012
     }
 
 
 def is_terminal(state):
         # terminal condition
-        if state.x0 >= env.dynamic_grid[state.timestep]['x_max']-1 or state.x1 >= env.dynamic_grid[state.timestep]['x_max']-1 or state.timestep >= game_horizon:
+        if state.x0 >= env.dynamic_grid[state.timestep]['x_max']-1 or state.x1 >= env.dynamic_grid[state.timestep]['x_max']-1 or state.timestep >= env.max_timehorizon:
             return True
         return False
 

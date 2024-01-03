@@ -4,9 +4,6 @@ import shutil
 
 from common import *
 from environment import *
-from superparameter import *
-
-
 
 def csv_init_global_state():
     # removing all files from data
@@ -57,7 +54,7 @@ def csv_write_rollout_last(rollout_trajectory, timehorizon = None):
         csv_file.seek(0)  # Move the file pointer to the beginning of the file
         lines = csv_file.readlines()[1:]
 
-    keep_num_data = int(MCTS_params['num_iter']*game_horizon/freq_stat_data)+1
+    keep_num_data = int(MCTS_params['num_iter']*env.max_timehorizon/freq_stat_data)+1
     lines = lines[-keep_num_data:]
 
     with open(path_to_rollout_tmp, 'w') as csv_file:
