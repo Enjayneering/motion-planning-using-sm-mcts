@@ -45,16 +45,16 @@ Model_params = {
     "state_space": ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep'],
     "action_space": ['x0', 'y0', 'x1', 'y1'],
     "interm_payoffs": {
-        "penalty_collision_0": {"pos": 0, "weight": -0.5, "agent": 0},
-        "penalty_collision_1": {"pos": 1, "weight": -0.5, "agent": 1},
-        "reward_progress_0": {"pos": 2, "weight": 0.5, "agent": 0},
-        "reward_progress_1": {"pos": 3, "weight": 0.5, "agent": 1},
+        "penalty_collision_0": {"pos": 0, "weight": -1, "agent": 0},
+        "penalty_collision_1": {"pos": 1, "weight": -1, "agent": 1},
+        "reward_progress_0": {"pos": 2, "weight": 1, "agent": 0},
+        "reward_progress_1": {"pos": 3, "weight": 1, "agent": 1},
     },
     "final_payoffs": {
-        "penalty_timestep_0": {"pos": 0, "weight": -0.1, "agent": 0},
-        "penalty_timestep_1": {"pos": 1, "weight": -0.1, "agent": 1},
-        "reward_lead_0": {"pos": 2, "weight": 1, "agent": 0},
-        "reward_lead_1": {"pos": 3, "weight": 1, "agent": 1},
+        "penalty_timestep_0": {"pos": 0, "weight": -0.05, "agent": 0},
+        "penalty_timestep_1": {"pos": 1, "weight": -0.05, "agent": 1},
+        "reward_lead_0": {"pos": 2, "weight": 5, "agent": 0},
+        "reward_lead_1": {"pos": 3, "weight": 5, "agent": 1},
     },
     }
 Model_params["len_interm_payoffs"] = len(Model_params["interm_payoffs"])

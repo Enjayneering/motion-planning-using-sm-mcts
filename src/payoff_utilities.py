@@ -4,26 +4,12 @@ from kinodynamic import *
 
 
 def update_intermediate_payoffs(prev_state_obj, next_state_obj, interm_payoff_vec, interm_weights_vec):
-
     dist_agents = distance(next_state_obj.get_state_0()[:2], next_state_obj.get_state_1()[:2])
+    advancement_0 = (next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0])/(next_state_obj.timestep/env.max_timehorizon)
+    advancement_1 = (next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0])/(next_state_obj.timestep/env.max_timehorizon)
 
-    advancement_0 = next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0]
-    advancement_1 = next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0]
     update_vec = np.array([[np.exp(-dist_agents)], [np.exp(-dist_agents)], [advancement_0], [advancement_1]])
     interm_payoff_vec += interm_weights_vec*update_vec
-    """# exponential penalty for collision
-    collision_0 = -Model_params["payoff_vector"]["intermediate_penalties"]["penalty_collision_0"]["weight"]*np.exp(-dist_agents)
-    collision_1 = -Model_params["payoff_vector"]["intermediate_penalties"]["penalty_collision_0"]["weight"]*np.exp(-dist_agents)
-
-    # reward for making progress
-    
-    
-    progress_0 = Model_params["payoff_vector"]["intermediate_rewards"]["reward_progress_0"]["weight"]*advancement_0
-    progress_1 = Model_params["payoff_vector"]["intermediate_rewards"]["reward_progress_1"]["weight"]*advancement_1
-
-    # payoff at every timestep
-    payoff_0 = collision_0+progress_0
-    payoff_1 = collision_1+progress_1"""
     return interm_payoff_vec
 
 def update_final_payoffs(final_state, final_payoff_vec, final_weights_vec):
@@ -31,19 +17,9 @@ def update_final_payoffs(final_state, final_payoff_vec, final_weights_vec):
     lead_1 = final_state.x1 - final_state.x0
     time_0 = final_state.timestep
     time_1 = final_state.timestep
+
     update_vec = np.array([[time_0], [time_1], [lead_0], [lead_1]])
     final_payoff_vec += final_weights_vec*update_vec
-
-    """# final utility at final timestep k=T
-    lead_0 = Model_params["payoff_vector"]["final_rewards"]["reward_lead_0"]["weight"]*(final_state.x0 - final_state.x1)
-    lead_1 = Model_params["payoff_vector"]["final_rewards"]["reward_lead_0"]["weight"]*(final_state.x1 - final_state.x0)
-
-    time_penalty_0 = -Model_params["payoff_vector"]["final_penalties"]["penalty_timestep_0"]["weight"]*final_state.timestep
-    time_penalty_1 = -Model_params["payoff_vector"]["final_penalties"]["penalty_timestep_1"]["weight"]*final_state.timestep
-
-    # payoff at final timestep
-    payoff_0 = lead_0+time_penalty_0
-    payoff_1 = lead_1+time_penalty_1"""
     return final_payoff_vec
 
 def get_total_payoffs_all_agents(interm_payoff_vec, final_payoff_vec):

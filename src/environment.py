@@ -3,7 +3,7 @@ import numpy as np
 class Environment:
     # define 2D environment with continuous free space and discretized obstacle space
     def __init__(self):
-        self.env_name_trigger = [(0,'benchmark_dynamic_small2'), (2, 'benchmark_dynamic_small2_1'), (5, 'benchmark_dynamic_small2_2')]
+        self.env_name_trigger = [(0,'benchmark_dynamic_small2'), (1, 'benchmark_dynamic_small2_1'), (5, 'benchmark_dynamic_small2_2')] #[(0,'racetrack_1')] 
         self.max_timehorizon = 10
         self.occupancy_grid_dict = {
             'box': """
@@ -11,6 +11,14 @@ class Environment:
             #..#
             #..#
             ####""",
+            'racetrack_1': """
+            ################
+            #..............#
+            #..............#
+            #01............#
+            #..............#
+            #..............#
+            ################""",
             'door_1_open': """
             #############
             #....########
@@ -42,9 +50,9 @@ class Environment:
             'benchmark_dynamic_small2': """
             ############
             #....##....#
-            #0.........#
+            #.0........#
             #....##....#
-            #.1........#
+            #1.........#
             #....##....#
             ############""",
             'benchmark_dynamic_small2_1': """

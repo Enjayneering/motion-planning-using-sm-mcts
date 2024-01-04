@@ -36,13 +36,11 @@ def is_collision(prev_state, joint_action):
         return False
 
 def is_in_free_space(state, action, init_timestep, num_linesearch = 4):
-    # state = [x, y, theta]
-    # action = [x_steps, y_steps]
     x_next, y_next, theta_next = mm_unicycle(state, action)
-
-    if env.get_current_grid_dict(init_timestep+1)['x_min'] < x_next < env.get_current_grid_dict(init_timestep+1)['x_max'] and env.get_current_grid_dict(init_timestep+1)['y_min'] < y_next < env.get_current_grid_dict(init_timestep+1)['y_max']:
+    dt = Model_params["delta_t"]
+    if env.get_current_grid_dict(init_timestep+dt)['x_min'] < x_next < env.get_current_grid_dict(init_timestep+dt)['x_max'] and env.get_current_grid_dict(init_timestep+dt)['y_min'] < y_next < env.get_current_grid_dict(init_timestep+dt)['y_max']:
         # create line inclusing discretized timestep
-        line_points = np.linspace(state[:2]+[init_timestep], [x_next, y_next]+[init_timestep+1], num=num_linesearch).tolist()
+        line_points = np.linspace(state[:2]+[init_timestep], [x_next, y_next]+[init_timestep+dt], num=num_linesearch).tolist()
 
         # If any of the points are on the edge of an obstacle, its fine
         #if any(isinstance(num, float) and num % 1 == 0.5 for num in line_points):
@@ -69,7 +67,16 @@ def is_in_free_space(state, action, init_timestep, num_linesearch = 4):
     #print("no collision")
     return True
 
-def sample_legal_actions(state_object):
+def is_in_forbidden_state(state, action, init_timestep, forbidden_states):
+    x_next, y_next, theta_next = mm_unicycle(state, action)
+    time_next = init_timestep+Model_params["delta_t"]
+    if [x_next, y_next, theta_next, time_next] in forbidden_states:
+        return True
+    else:
+        return False
+
+
+def sample_legal_actions(state_object, forbidden_states=None):
     # representing KINODYNAMIC CONSTRAINTS
     #print("STate object: {}".format(state_object.get_state_together()))
     state_0 = state_object.get_state_0()
@@ -91,6 +98,11 @@ def sample_legal_actions(state_object):
     # prune actions that lead to collision with environment
     sampled_actions_0_pruned = [action_0 for action_0 in sampled_actions_0 if is_in_free_space(state_0, action_0, state_object.timestep)]
     sampled_actions_1_pruned = [action_1 for action_1 in sampled_actions_1 if is_in_free_space(state_1, action_1, state_object.timestep)]
+
+    # prune actions that lead to forbidden states (where the agent cannot get out)
+    if forbidden_states:
+        sampled_actions_0_pruned = [action_0 for action_0 in sampled_actions_0_pruned if not is_in_forbidden_state(state_0, action_0, state_object.timestep, forbidden_states)]
+        sampled_actions_1_pruned = [action_1 for action_1 in sampled_actions_1_pruned if not is_in_forbidden_state(state_1, action_1, state_object.timestep, forbidden_states)]
 
     # combine both list elements in all possible combinations
     action_pair_pruned = list(itertools.product(sampled_actions_0_pruned, sampled_actions_1_pruned))
