@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import pandas as pd
 import sys
+import glob
 import multiprocessing
 import matplotlib.gridspec as gridspec
 
@@ -29,7 +30,7 @@ class FigureV0:
         self.ax1.clear()
 
     def visualize_tree(self):
-        tree = get_last_tree()
+        tree = get_last_tree(path_to_data)
 
         pos = graphviz_layout(tree, prog="twopi")
         labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X(agent=0),0), round(node.X(agent=1),0)) for node in tree.nodes}
@@ -70,7 +71,7 @@ class FigureV0:
             visited_configurations = {}
             for i in range(len(x0_longterm)):
                 configuration0 = (0, round(x0_longterm[i], 1), round(y0_longterm[i], 1), round(theta0_longterm[i], 1), timehorizon[i])
-                configuration1 = (1, round(x1_longterm[i], 1), round(y1_longterm[i], 1), round(theta1_longterm[i], 1), timehorizon[i])
+                configuration1 = (1, round(x1_longterm[i], 1), round(y1_longterm[i], 1), round(theta0_longterm[i], 1), timehorizon[i])
 
                 # count number of similar configurations
                 if configuration0 in visited_configurations:
@@ -143,18 +144,18 @@ def get_last_tree():
             print("Latest file: {}".format(latest_file))
             tree = open_tree_from_file(latest_file)
         except:
-            print("No tree file found")
             tree = nx.DiGraph()
             pass
         return tree
 
-def plot_together(i, figplot, stop_event=None, animation_container=None):
+def plot_together(i, figplot, stop_event=None, animation_container=None, start_time=0):
+    #print("running for {} seconds".format(time.time()-start_time))
     figplot.clear_ax()
     figplot.visualize_tree()
     figplot.update_trajectory()
 
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(MCTS_params['num_iter']))
-    figplot.ax1.set_title("Trajectory")
+    #figplot.ax1.set_title("Trajectory")
     figplot.ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
     figplot.ax1.set_xlim([0, env.get_current_grid_dict(0)['x_max']+1])
     figplot.ax1.set_ylim([0, env.get_current_grid_dict(0)['y_max']+1][::-1]) # invert y-axis to fit to the environment defined in the numpy array
@@ -165,6 +166,7 @@ def plot_together(i, figplot, stop_event=None, animation_container=None):
         sys.exit()
 
 def main(stop_event=None):
+    start_time = time.time()
     figplot = FigureV0()
     interval = 1000
 
@@ -172,10 +174,11 @@ def main(stop_event=None):
 
     animation_container = [None] # Container to store the animation object
 
-    animation = FuncAnimation(figplot.fig, plot_together, fargs=(figplot, stop_event, animation_container), frames=frames_max, interval=interval)
+    animation = FuncAnimation(figplot.fig, plot_together, fargs=(figplot, stop_event, animation_container, start_time), frames=frames_max, interval=interval)
     animation_container[0] = animation  # Store the animation in the container
     animation_container[0].save(os.path.join(path_to_results, next_video_name + ".mp4"), writer='ffmpeg', fps=5)
     #plt.show()
+    #animation.save(os.path.join(path_to_results, next_video_name + ".mp4"), writer='ffmpeg', fps=5)
 
 
 if __name__ == "__main__":

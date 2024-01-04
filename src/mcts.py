@@ -33,7 +33,7 @@ class State:
         x0_new, y0_new, theta0_new = mm_unicycle(state_0, action_0)
         x1_new, y1_new, theta1_new = mm_unicycle(state_1, action_1)
 
-        timestep_new = self.timestep + delta_t
+        timestep_new = self.timestep + Model_params["delta_t"]
         return State(x0_new, y0_new, theta0_new, x1_new, y1_new, theta1_new, timestep_new)
 
     def get_state_0(self):
@@ -54,13 +54,14 @@ class MCTSNode:
         self.parent = parent
         self.parent_action = parent_action
         self.children = []
+
         ########## MCTS parameters ##########
-        self.aggr_payoff_vector = np.ones((Model_params["len_payoff_vector"],1)) # [p_coll_0, p_lead_0, p_coll_1, p_lead_1].T
-        #self.aggr_max_payoff_vector = np.zeros(Model_params["len_payoff_vector"],1) # [p_coll_0, p_lead_0, p_coll_1, p_lead_1].T
-        
+        self._aggr_payoffs = [0]*len(Model_params["agents"])
+        self._number_of_visits = 1
+
         self._untried_actions = self.untried_actions()
         self.action_stats_0, self.action_stats_1 = self.init_action_stats() # [action, number_count, sum of payoffs]
-        self._number_of_visits = 1
+        
 
     def init_action_stats(self):
         legal_action_0, legal_action_1, _ = sample_legal_actions(self.state)
@@ -68,11 +69,6 @@ class MCTSNode:
         self.action_stats_1 = [{"action": action, "num_count": 1, "sum_payoffs": 0} for action in legal_action_1]
         return self.action_stats_0, self.action_stats_1
 
-    """def update_max_payoff_vector(self, max_payoff_vector):
-        for i, payoff in enumerate(max_payoff_vector):
-            if payoff > self.aggr_max_payoff_vector[i]:
-                self.aggr_max_payoff_vector[i] = payoff
-        pass"""
 
     def update_action_stats(self):
         # count at each node the number of children visited for the respective action and update that action's stats
@@ -123,6 +119,7 @@ class MCTSNode:
 
         # UCT: returns the child with the highest UCB1 score
         # Note: we need to choose the most promising action, but ensuring that they are also collisionfree
+        # TODO: Multi Agent adjustment
         weights_0 = [self.calc_UCT(action_stat, payoff_range, MCTS_params['c_param']) for action_stat in self.action_stats_0]
         weights_1 = [self.calc_UCT(action_stat, payoff_range, MCTS_params['c_param']) for action_stat in self.action_stats_1]
         print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
@@ -158,31 +155,32 @@ class MCTSNode:
 
     def X(self, agent=None):
         # get sum of payoffs for agent index
-        payoff_agent = 0
+        """payoff_agent = 0
         for payoffs in Model_params["payoff_vector"].values():
             for payoff in payoffs.values():
                 if payoff["agent"] == agent:
-                    payoff_agent += float(self.aggr_payoff_vector[payoff["pos"]])
-        return payoff_agent
+                    payoff_agent += float(self._payoff_vector[payoff["pos"]])"""
+        return self._aggr_payoffs[agent]
 
     def is_fully_expanded(self):
         return len(self._untried_actions) == 0
 
-    def rollout(self, payoff_weights= None):
+    def rollout(self, interm_weights_vec = None, final_weights_vec = None):
         # rollout policy: random action selection
         current_rollout_node = self
 
         rollout_trajectory = [current_rollout_node.state]
         
-        payoff_vector = np.zeros((Model_params["len_payoff_vector"],1))
+        interm_payoff_vec = np.zeros((Model_params["len_interm_payoffs"],1))
+        final_payoff_vec = np.zeros((Model_params["len_final_payoffs"],1))
 
         # intermediate timesteps
         while not is_terminal(current_rollout_node.state):
             #print("Rollout State: {}".format(current_rollout_node.state.get_state_together()))
             moves_0, moves_1, possible_moves = sample_legal_actions(current_rollout_node.state)
 
-            #print("Moves 0: {}, Moves 1: {}".format(moves_0, moves_1))
-            #print("Possible moves: {}".format(possible_moves))
+            print("Moves 0: {}, Moves 1: {}".format(moves_0, moves_1))
+            print("Possible moves: {}".format(possible_moves))
 
             #TODO: change parameter punishment when stuck (or pruning..?)
             if len(possible_moves) == 0:
@@ -210,27 +208,18 @@ class MCTSNode:
             next_rollout_node = MCTSNode(next_rollout_state, parent=current_rollout_node, parent_action=action)
 
             # updating intermediate payoffs
-            collision_penalty_0, collision_penalty_1 = get_intermediate_penalty(next_rollout_node.state)
-            #TODO: Multi agent adjustment
-            payoff_vector[0] += collision_penalty_0
-            payoff_vector[1] += collision_penalty_1
-
-            progress_reward_0, progress_reward_1 = get_intermediate_reward(current_rollout_node.state, next_rollout_node.state)
-            payoff_vector[2] += progress_reward_0
-            payoff_vector[3] += progress_reward_1
+            interm_payoff_vec = update_intermediate_payoffs(current_rollout_node.state, next_rollout_node.state, interm_payoff_vec, interm_weights_vec)
 
             current_rollout_node = next_rollout_node
             rollout_trajectory.append(current_rollout_node.state)
 
         # updating final payoffs
         if is_terminal(current_rollout_node.state):
-            payoff_final_0, payoff_final_1 = get_final_payoffs(current_rollout_node.state)
-            #TODO: Multi agent adjustment
-            payoff_vector[4] += payoff_final_0
-            payoff_vector[5] += payoff_final_1
+            final_payoff_vec = update_final_payoffs(current_rollout_node.state, final_payoff_vec, final_weights_vec)
 
-        return rollout_trajectory, payoff_vector
+        return rollout_trajectory, interm_payoff_vec, final_payoff_vec
     
+
     def rollout_policy(self, possible_moves):
             #TODO: Check informed rollout sampling
             # choose a random action to simulate rollout
@@ -240,13 +229,14 @@ class MCTSNode:
             except:
                 return None
             
-    def backpropagate(self, payoff_vector):
+    def backpropagate(self, payoff_list):
         # backpropagate statistics of the node
         self._number_of_visits += 1
-        self.aggr_payoff_vector += payoff_vector
+        for agent in Model_params["agents"]:
+            self._aggr_payoffs[agent] += float(payoff_list[agent])
 
         if self.parent:
-            self.parent.backpropagate(payoff_vector)
+            self.parent.backpropagate(payoff_list)
 
     def _tree_policy(self, payoff_range):
         current_node = self

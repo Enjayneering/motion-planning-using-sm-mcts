@@ -1,8 +1,6 @@
 import numpy as np
 import itertools
 from shapely import LineString
-from sympy import symbols, solve
-from sympy.matrices import Matrix
 
 from common import *
 from environment import *
@@ -15,17 +13,17 @@ def mm_unicycle(state, action, delta_t=1):
     theta_new = (state[2] + action[1]*delta_t)%(2*np.pi) # modulo to keep angle between 0 and 2pi
     return x_new, y_new, theta_new
 
-def is_collision(prev_state, joint_action, num_linesearch = 1):
+def is_collision(prev_state, joint_action):
     # check for collision between the agents
 
     # Create lines for both agents
     state_0 = prev_state.get_state_0()
     action_0 = joint_action[:2]
-    x_next_0, y_next_0, theta_next_0 = mm_unicycle(state_0, action_0)
+    x_next_0, y_next_0, theta_next_0 = mm_unicycle(state_0, action_0, Model_params["delta_t"])
 
     state_1 = prev_state.get_state_1()
     action_1 = joint_action[2:]
-    x_next_1, y_next_1, theta_next_1 = mm_unicycle(state_1, action_1)
+    x_next_1, y_next_1, theta_next_1 = mm_unicycle(state_1, action_1, Model_params["delta_t"])
 
     line_0 = LineString([state_0[:2], [x_next_0, y_next_0]])
     line_1 = LineString([state_1[:2], [x_next_1, y_next_1]])

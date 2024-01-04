@@ -14,13 +14,13 @@ def csv_init_global_state():
 
     # writing global state data to csv file
     with open(path_to_global_state, mode='w') as csv_file:
-        fieldnames = state_space
+        fieldnames = Model_params["state_space"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
 def csv_write_global_state(state):
     with open(path_to_global_state, mode='a') as csv_file:
-        fieldnames = state_space
+        fieldnames = Model_params["state_space"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         state_dict = {field: getattr(state, field) for field in fieldnames}
         writer.writerow(state_dict)
@@ -28,27 +28,27 @@ def csv_write_global_state(state):
 
 """def csv_init_rollout_curr():
     with open(path_to_rollout_curr, mode='w') as csv_file:
-        fieldnames = state_space+['timehorizon']
+        fieldnames = Model_params["state_space"]+['timehorizon']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()"""
 
 def csv_init_rollout_last():
     with open(path_to_rollout_last, mode='w') as csv_file:
-        fieldnames = state_space+['timehorizon']
+        fieldnames = Model_params["state_space"]+['timehorizon']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
     with open(path_to_rollout_tmp, mode='w') as csv_file:
-        fieldnames = state_space+['timehorizon']
+        fieldnames = Model_params["state_space"]+['timehorizon']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
 def csv_write_rollout_last(rollout_trajectory, timehorizon = None):
     # plot statistical exploration data
     with open(path_to_rollout_tmp, mode='a+') as csv_file:
-        fieldnames = state_space+['timehorizon']
+        fieldnames = Model_params["state_space"]+['timehorizon']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         for state in rollout_trajectory:
-            state_dict = {field: getattr(state, field) for field in state_space}
+            state_dict = {field: getattr(state, field) for field in Model_params["state_space"]}
             state_dict['timehorizon'] = timehorizon
             writer.writerow(state_dict)
         csv_file.seek(0)  # Move the file pointer to the beginning of the file
@@ -58,7 +58,7 @@ def csv_write_rollout_last(rollout_trajectory, timehorizon = None):
     lines = lines[-keep_num_data:]
 
     with open(path_to_rollout_tmp, 'w') as csv_file:
-        fieldnames = state_space+['timehorizon']
+        fieldnames = Model_params["state_space"]+['timehorizon']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
         csv_file.writelines(lines)

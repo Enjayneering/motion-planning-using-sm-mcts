@@ -37,47 +37,38 @@ payoff_range = max_payoff - min_payoff
 aver_intermediate_penalties = 1
 aver_final_payoff = 0
 
-# motion parameters
-delta_t = 1
-
-freq_stat_data = 4
-# Tuning parameters (weights for payoffs)
-
-# state and action space
-state_space = ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
-action_space = ['x0', 'y0', 'x1', 'y1']
+freq_stat_data = 2
 
 Model_params = {
+    "delta_t": 1,
     "agents": [0, 1],
-    "state_space": state_space,
-    "action_space": action_space,
-    "payoff_vector": {
-        "intermediate_penalties": {
-            "penalty_collision_0": {"pos": 0, "weight": 4, "agent": 0},
-            "penalty_collision_1": {"pos": 1, "weight": 0.5, "agent": 1},
-        },
-        "intermediate_rewards": {
-            "reward_progress_0": {"pos": 2, "weight": 0.1, "agent": 0},
-            "reward_progress_1": {"pos": 3, "weight": 0.1, "agent": 1},
-        },
-        "final_rewards": {
-            "reward_lead_0": {"pos": 4, "weight": 1, "agent": 0},
-            "reward_lead_1": {"pos": 5, "weight": 1, "agent": 1},
-        },
+    "state_space": ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep'],
+    "action_space": ['x0', 'y0', 'x1', 'y1'],
+    "interm_payoffs": {
+        "penalty_collision_0": {"pos": 0, "weight": -0.5, "agent": 0},
+        "penalty_collision_1": {"pos": 1, "weight": -0.5, "agent": 1},
+        "reward_progress_0": {"pos": 2, "weight": 0.5, "agent": 0},
+        "reward_progress_1": {"pos": 3, "weight": 0.5, "agent": 1},
+    },
+    "final_payoffs": {
+        "penalty_timestep_0": {"pos": 0, "weight": -0.1, "agent": 0},
+        "penalty_timestep_1": {"pos": 1, "weight": -0.1, "agent": 1},
+        "reward_lead_0": {"pos": 2, "weight": 1, "agent": 0},
+        "reward_lead_1": {"pos": 3, "weight": 1, "agent": 1},
     },
     }
-Model_params["len_payoff_vector"] = sum(len(component) for component in Model_params["payoff_vector"].values())
+Model_params["len_interm_payoffs"] = len(Model_params["interm_payoffs"])
+Model_params["len_final_payoffs"] = len(Model_params["final_payoffs"])
 
 Competitive_params = {
     "action_set_0": {"velocity_0": np.linspace(0, 2, 3).tolist(),
                     "ang_velocity_0": np.linspace(-np.pi/2, np.pi/2, 3).tolist()},
-    "action_set_1": {"velocity_1": np.linspace(0, 2, 3).tolist(),
+    "action_set_1": {"velocity_1": np.linspace(0, 1, 2).tolist(),
                     "ang_velocity_1": np.linspace(-np.pi/2, np.pi/2, 3).tolist()},
-    #"risk_factor_0": 0.1, #risk appetite agent1 = 1 - risk appetite agent0
     }
 
 MCTS_params = {
-    "num_iter": 800, #max number of simulations, proportional to complexity of the game
+    "num_iter": 1000, #max number of simulations, proportional to complexity of the game
     "c_param": np.sqrt(2), # c_param: exploration parameter | 3.52 - Tuned from Paper by Perick, 2012
 
     'penalty_collision_init': 0.1, # penalty at initial state

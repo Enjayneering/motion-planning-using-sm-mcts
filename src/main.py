@@ -8,19 +8,20 @@ from payoff_utilities import *
 from csv_utilities import *
 from networkx_utilities import *
 
-def MCTS_play_subgame(simhorizon, node_current_timestep, max_payoff, min_payoff, payoff_range):
+def MCTS_play_subgame(simhorizon, node_current_timestep, max_payoff, min_payoff, payoff_range, interm_weights_vec, final_weights_vec):
     #num_iter = int(1-node_current_timestep.state.timestep/timehorizon)*num_iter
+    interm_payoff_vec = np.zeros((Model_params["len_interm_payoffs"],1))
+    final_payoff_vec = np.zeros((Model_params["len_final_payoffs"],1))
     
-    payoff_weights = init_payoff_weights(node_current_timestep)
-
     for iter in range(MCTS_params['num_iter']):
         print("Horizon {} | Iteration {}".format(simhorizon, iter))
         #print("Starting tree policy")
         v = node_current_timestep._tree_policy(payoff_range)
 
         #print("Starting rollout")
-        rollout_trajectory, payoff_vector = v.rollout(payoff_weights)
-        max_payoff, min_payoff, payoff_range = update_payoff_range(max_payoff, min_payoff, payoff_vector)
+        rollout_trajectory, interm_payoff_rollout, final_payoff_rollout = v.rollout(interm_weights_vec, final_weights_vec)
+        payoff_list = get_total_payoffs_all_agents(interm_payoff_rollout, final_payoff_rollout)
+        max_payoff, min_payoff, payoff_range = update_payoff_range(max_payoff, min_payoff, payoff_list)
         
 
         # write every x rollout trajectories
@@ -28,7 +29,7 @@ def MCTS_play_subgame(simhorizon, node_current_timestep, max_payoff, min_payoff,
             csv_write_rollout_last(rollout_trajectory, timehorizon = node_current_timestep.state.timestep)
         
         #print("Backpropagating")
-        v.backpropagate(payoff_vector)
+        v.backpropagate(payoff_list)
         #payoff_weights = update_weigths_payoff(node_current_timestep, payoff_weights)
         #print("Payoff weights: {}".format(payoff_weights))
     
@@ -42,8 +43,8 @@ def MCTS_play_subgame(simhorizon, node_current_timestep, max_payoff, min_payoff,
 
 if __name__ == "__main__":
     # create a text trap and redirect stdout
-    #text_trap = io.StringIO()
-    #sys.stdout = text_trap
+    text_trap = io.StringIO()
+    sys.stdout = text_trap
 
     # initialize csv files
     csv_init_global_state()
@@ -60,27 +61,30 @@ if __name__ == "__main__":
     trajectory = [root_node.state.get_state_together()]
     csv_write_global_state(root_node.state)
 
-    # initialize payoff vector
-    payoff_0 = 0
-    payoff_1 = 0
-    payoff_list_0 = [(0,0)]
-    payoff_list_1 = [(0,0)]
+    # initialize payoff list
+    interm_payoff_vec_global = np.zeros((Model_params["len_interm_payoffs"],1))
+    final_payoff_vec_global = np.zeros((Model_params["len_final_payoffs"],1))
+    payoff_dict_global = {}
+    for agent in Model_params["agents"]:
+        payoff_dict_global[agent] = [(0,0)]
 
     while not is_terminal(node_current_horizon.state):
-        simhorizon = node_current_horizon.state.timestep
         csv_init_rollout_last()
+        
+        simhorizon = node_current_horizon.state.timestep
 
-        next_state, chosen_action = MCTS_play_subgame(simhorizon, node_current_horizon, max_payoff, min_payoff, payoff_range)
+        interm_weights_vec = init_interm_weights(node_current_horizon)
+        final_weights_vec = init_final_weights(node_current_horizon)
+        
+        
+
+        next_state, chosen_action = MCTS_play_subgame(simhorizon, node_current_horizon, max_payoff, min_payoff, payoff_range, interm_weights_vec, final_weights_vec)
 
         # update payoffs global solution
-        payoff_0_new, payoff_1_new = get_intermediate_penalty(next_state)
-        payoff_0 += payoff_0_new 
-        payoff_1 += payoff_1_new
-        payoff_0_new, payoff_1_new = get_intermediate_reward(node_current_horizon.state, next_state)
-        payoff_0 += payoff_0_new
-        payoff_1 += payoff_1_new
-        payoff_list_0.append((simhorizon+1, payoff_0))
-        payoff_list_1.append((simhorizon+1, payoff_1))
+        interm_payoff_vec_global = update_intermediate_payoffs(node_current_horizon.state, next_state, interm_payoff_vec_global, interm_weights_vec)
+        payoff_list = get_total_payoffs_all_agents(interm_payoff_vec_global, final_payoff_vec_global)
+        for agent in Model_params["agents"]:
+            payoff_dict_global[agent].append((simhorizon+1, payoff_list[agent]))
 
         trajectory.append(next_state.get_state_together())
 
@@ -88,14 +92,13 @@ if __name__ == "__main__":
         node_current_horizon = MCTSNode(next_state)
 
     # update final payoffs global solution
-    payoff_0_new, payoff_1_new = get_final_payoffs(node_current_horizon.state)
-    payoff_0 += payoff_0_new
-    payoff_list_0[-1] = (simhorizon+1, payoff_0)
-    payoff_1 += payoff_1_new
-    payoff_list_1[-1] = (simhorizon+1, payoff_1)
+    final_payoff_vec_global = update_final_payoffs(node_current_horizon.state, final_payoff_vec_global, final_weights_vec)
+    payoff_list = get_total_payoffs_all_agents(interm_payoff_vec_global, final_payoff_vec_global)
+    for agent in Model_params["agents"]:
+        payoff_dict_global[agent].append((simhorizon+1, payoff_list[agent]))
 
 # save final payoffs to textfile
     with open(os.path.join(path_to_results, next_video_name + ".txt"), 'a') as f:
         f.write(f"Environment trigger: {env.env_name_trigger}\n")
-        f.write(f"Payoff Agent 0: {payoff_list_0}\n")
-        f.write(f"Payoff Agent 1: {payoff_list_1}\n")
+        for agent in Model_params["agents"]:
+            f.write(f"Payoff Agent {agent}: {payoff_dict_global[agent]}\n")

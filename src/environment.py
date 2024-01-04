@@ -44,7 +44,7 @@ class Environment:
             #....##....#
             #0.........#
             #....##....#
-            #1.........#
+            #.1........#
             #....##....#
             ############""",
             'benchmark_dynamic_small2_1': """
@@ -325,9 +325,6 @@ class Environment:
                 return max_y
             else:
                 max_y -= 1
-
-
-
 
 # create environment
 env = Environment()
