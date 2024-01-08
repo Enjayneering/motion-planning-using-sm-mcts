@@ -1,8 +1,9 @@
 occupancy_grid_maze_20.txt | Collision avoidance, faster agent slows down because blue agent blocks
 occupancy_grid_maze_31.txt | Tree grows degenerated, since cannot handle infinity payoffs
-occupancy_grid_maze_33.txt | Cpompetitive and reasonable, Nash
+occupancy_grid_maze_33.txt | Competitive and reasonable, Nash
 occupancy_grid_maze_33.txt | Agent 1 gets punished more for collision, thats why it might stop more
 door_1_open_18 | Game Theoretic Blocking Behaviour
 door_1_open_24 | Very nice Game Theoretic Behaviour!
 door_2_open_02 | Red blocks
 occupancy_grid_21_open_10 | why is high number of simulations leading to a weird noisy behaviour?
+benchmark_dynamic_small2_59 & 66 | Blocking & overtaking

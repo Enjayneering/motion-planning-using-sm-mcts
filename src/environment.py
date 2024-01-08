@@ -1,26 +1,24 @@
 import numpy as np
 
-from superparameter import *
-
 class Environment:
     # define 2D environment with continuous free space and discretized obstacle space
     def __init__(self):
-        self.env_name_trigger = [(0,'occupancy_grid_21_open'), (3, 'occupancy_grid_21_closed')]
-        self.init_state = {
-            'x0': 1,
-            'y0': 1,
-            'theta0': 0,
-            'x1': 1,
-            'y1': 5,
-            'theta1': 0,
-            'timestep': 0,
-        }
+        self.env_name_trigger = [(0,'benchmark_dynamic_small2'), (1, 'benchmark_dynamic_small2_1'), (5, 'benchmark_dynamic_small2_2')] #[(0,'racetrack_1')] 
+        self.max_timehorizon = 10
         self.occupancy_grid_dict = {
             'box': """
             ####
             #..#
             #..#
             ####""",
+            'racetrack_1': """
+            ################
+            #..............#
+            #..............#
+            #01............#
+            #..............#
+            #..............#
+            ################""",
             'door_1_open': """
             #############
             #....########
@@ -33,6 +31,46 @@ class Environment:
             #....#......#
             #....########
             #############""",
+            'benchmark_dynamic_small1': """
+            #########
+            #...#...#
+            #01.....#
+            #...#...#
+            #.......#
+            #...#...#
+            #########""",
+            'benchmark_dynamic_small1_1': """
+            #########
+            #...#...#
+            #...#...#
+            #...#...#
+            #.......#
+            #...#...#
+            #########""",
+            'benchmark_dynamic_small2': """
+            ############
+            #....##....#
+            #.0........#
+            #....##....#
+            #1.........#
+            #....##....#
+            ############""",
+            'benchmark_dynamic_small2_1': """
+            ############
+            #....##....#
+            #....#.....#
+            #....##....#
+            #..........#
+            #....##....#
+            ############""",
+            'benchmark_dynamic_small2_2': """
+            ############
+            #....##....#
+            #....#.....#
+            #....##....#
+            #.....#....#
+            #....##....#
+            ############""",
             'door_2_open': """
             ###############
             #......########
@@ -108,18 +146,64 @@ class Environment:
             .......#............
             ....................
             .......#............
-            ....................
+            .01.................
             .......#............
             ....................
             .......#............""",
             'occupancy_grid_21_closed': """
             .......#............
-            ....................
+            .......#............
             .......#............
             ....................
             .......#............
             .......#............
             .......#............""",
+            'occupancy_grid_big_open': """
+            ##################################################
+            #................##..............................#
+            #.................##.............................#
+            #..................##............................#
+            #...................##...........................#
+            #....................#...........................#
+            #................................................#
+            #................................................#
+            #....................#...........................#
+            #....................#...........................#
+            #....................##..........................#
+            #.....................##.........................#
+            #......................##........................#
+            #.......................#........................#
+            #.......................#........................#
+            #................................................#
+            #................................................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            ##################################################""",
+            'occupancy_grid_big_closed': """
+            ##################################################
+            #................##..............................#
+            #.................##.............................#
+            #..................##............................#
+            #...................##...........................#
+            #....................#...........................#
+            #................................................#
+            #................................................#
+            #....................#...........................#
+            #....................#...........................#
+            #....................##..........................#
+            #.....................##.........................#
+            #......................##........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            #.......................#........................#
+            ##################################################""",
             'occupancy_grid_30': """
             ####################
             ..################..
@@ -152,34 +236,59 @@ class Environment:
 
         }
         self.dynamic_grid = self.get_dynamic_grid()
+        self.init_state = self.get_init_state()
 
+    def get_init_state(self):
+        grid = self.occupancy_grid_dict[self.dynamic_grid[0]['gridname']]
+        occupancy_grid_define = grid.replace('.', '9').replace('#', '9')
+        lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
+        transformed_grid = [list(map(int, line)) for line in lines]
+        occupancy_grid = np.array(transformed_grid)     
+
+        agent_0_y, agent_0_x = np.where(occupancy_grid == 0)
+        agent_1_y, agent_1_x = np.where(occupancy_grid == 1)
+        
+        init_state = {
+            'x0': agent_0_x[0],
+            'y0': agent_0_y[0],
+            'theta0': 0,
+            'x1': agent_1_x[0],
+            'y1': agent_1_y[0],
+            'theta1': 0,
+            'timestep': 0,
+        }
+        return init_state
 
     def get_static_grid(self, choice):
         grid = self.occupancy_grid_dict[choice]
 
-        occupancy_grid_define = grid.replace('.', '0').replace('#', '1')
+        occupancy_grid_define = grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1')
         lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
         transformed_grid = [list(map(int, line)) for line in lines]
-
         occupancy_grid = np.array(transformed_grid)
         return occupancy_grid
-
+    
     def get_dynamic_grid(self):
         env_list = []
-        i = 0
 
-        for timestep in range(game_horizon+3): #TODO: check index error
-            if i < len(self.env_name_trigger) and timestep == self.env_name_trigger[i][0]:
-                env_list.append({'grid': self.get_static_grid(self.env_name_trigger[i][1]),
-                                 'x_min': self.get_x_min(self.env_name_trigger[i][1]),
-                                 'y_min': self.get_y_min(self.env_name_trigger[i][1]),
-                                 'x_max': self.get_x_max(self.env_name_trigger[i][1]),
-                                 'y_max': self.get_y_max(self.env_name_trigger[i][1]),})
-                i += 1
-            else:
-                env_list.append((env_list[-1]))  # fill with previous environment
-
+        for element in self.env_name_trigger: #TODO: check index error
+            env_list.append({'timestep': element[0],
+                            'grid': self.get_static_grid(element[1]),
+                            'gridname': element[1],
+                            'x_min': self.get_x_min(element[1]),
+                            'y_min': self.get_y_min(element[1]),
+                            'x_max': self.get_x_max(element[1]),
+                            'y_max': self.get_y_max(element[1]),})
         return env_list
+    
+    def get_current_grid_dict(self, timestep):
+        for grid_element in reversed(self.dynamic_grid):
+            if grid_element['timestep'] <= timestep:
+                current_grid_dict = grid_element
+                break
+        return current_grid_dict
+
+    
 
     def get_x_min(self, env_name):
             static_grid = self.get_static_grid(env_name)
@@ -224,9 +333,6 @@ class Environment:
                 return max_y
             else:
                 max_y -= 1
-
-
-
 
 # create environment
 env = Environment()

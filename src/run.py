@@ -6,6 +6,8 @@ import os
 
 from common import *
 
+
+
 def run_script(script, done_event=None, stop_event=None):
     if script == path_to_src+"plot.py":
         # Run plot.py in a separate process and pass the stop_event
@@ -21,10 +23,13 @@ if __name__ == "__main__":
 
     # Create textfile for data
     with open(os.path.join(path_to_results, next_video_name + ".txt"), 'w') as f:
+        for key, value in Model_params.items():
+            f.write(f"{key}: {value}\n")
         for key, value in MCTS_params.items():
             f.write(f"{key}: {value}\n")
         for key, value in Competitive_params.items():
             f.write(f"{key}: {value}\n")
+        
 
     print("Starting Race Game at time: {}".format(start_time))
 
@@ -42,7 +47,8 @@ if __name__ == "__main__":
 
     done_event.wait()  # Wait for main.py to finish
     print("Main.py has finished")
-
+    
+    time.sleep(1)
     stop_event.set()  # Event to signal when plot.py should stop
 
     for process in processes:
@@ -58,5 +64,8 @@ if __name__ == "__main__":
     # Save duration to text file
     with open(os.path.join(path_to_results, next_video_name + ".txt"), 'a') as f:
         f.write(f"Duration: {duration}\n")
+        f.write("\nContent of global_state.csv:\n")
+        with open(os.path.join(path_to_data, "global_state.csv"), 'r') as csv_file:
+            f.write(csv_file.read())
 
     print("Finished with duration: {} s".format(duration))

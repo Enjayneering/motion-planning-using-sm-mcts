@@ -1,4 +1,5 @@
 import os
+import time
 import glob
 import networkx as nx
 import numpy as np
@@ -7,12 +8,10 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import pandas as pd
 import sys
-import glob
 import multiprocessing
 import matplotlib.gridspec as gridspec
 
 from common import *
-from superparameter import *
 from environment import *
 from networkx_utilities import open_tree_from_file
 
@@ -30,10 +29,10 @@ class FigureV0:
         self.ax1.clear()
 
     def visualize_tree(self):
-        tree = get_last_tree(path_to_data)
+        tree = get_last_tree()
 
         pos = graphviz_layout(tree, prog="twopi")
-        labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X_0(),0), round(node.X_1(),0)) for node in tree.nodes}
+        labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X(agent=0),0), round(node.X(agent=1),0)) for node in tree.nodes}
 
         # Create a list of node colors
         node_colors = []
@@ -71,7 +70,7 @@ class FigureV0:
             visited_configurations = {}
             for i in range(len(x0_longterm)):
                 configuration0 = (0, round(x0_longterm[i], 1), round(y0_longterm[i], 1), round(theta0_longterm[i], 1), timehorizon[i])
-                configuration1 = (1, round(x1_longterm[i], 1), round(y1_longterm[i], 1), round(theta0_longterm[i], 1), timehorizon[i])
+                configuration1 = (1, round(x1_longterm[i], 1), round(y1_longterm[i], 1), round(theta1_longterm[i], 1), timehorizon[i])
 
                 # count number of similar configurations
                 if configuration0 in visited_configurations:
@@ -124,7 +123,7 @@ class FigureV0:
             self.ax1.annotate(timestep_trajectory[i], (x0_trajectory[i], y0_trajectory[i]), color='b', textcoords="offset points", xytext=(0,10))
             self.ax1.annotate(timestep_trajectory[i], (x1_trajectory[i], y1_trajectory[i]), color='r', textcoords="offset points", xytext=(-10,0))
         # plot pixel environment
-        self.ax1.imshow(env.dynamic_grid[timestep_trajectory.iloc[-1]]['grid'], cmap='binary')
+        self.ax1.imshow(env.get_current_grid_dict(timestep_trajectory.iloc[-1])['grid'], cmap='binary')
 
         # plot orientations as arrows
         arrow_length = 0.5
@@ -137,15 +136,14 @@ class FigureV0:
             self.ax1.arrow(x0_trajectory[i], y0_trajectory[i], arrow_dx0, arrow_dy0, color='b', width=0.05, zorder=10)
             self.ax1.arrow(x1_trajectory[i], y1_trajectory[i], arrow_dx1, arrow_dy1, color='r', width=0.05, zorder=10)
 
-def get_last_tree(path_to_data):
-        list_of_files = glob.glob(path_to_data+"tree_*") # * means all if need specific format then *.csv
-
-        latest_file = max(list_of_files, key=os.path.getctime)
-        print("Latest file: {}".format(latest_file))
-
+def get_last_tree():
+        list_of_files = glob.glob(path_to_tree.format("*")) # * means all if need specific format then *.csv
         try:
+            latest_file = max(list_of_files, key=os.path.getctime)
+            print("Latest file: {}".format(latest_file))
             tree = open_tree_from_file(latest_file)
         except:
+            print("No tree file found")
             tree = nx.DiGraph()
             pass
         return tree
@@ -156,10 +154,10 @@ def plot_together(i, figplot, stop_event=None, animation_container=None):
     figplot.update_trajectory()
 
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(MCTS_params['num_iter']))
-    #figplot.ax1.set_title("Trajectory")
+    figplot.ax1.set_title("Trajectory")
     figplot.ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
-    figplot.ax1.set_xlim([0, env.dynamic_grid[0]['x_max']])
-    figplot.ax1.set_ylim([0, env.dynamic_grid[0]['y_max']][::-1]) # invert y-axis to fit to the environment defined in the numpy array
+    figplot.ax1.set_xlim([0, env.get_current_grid_dict(0)['x_max']+1])
+    figplot.ax1.set_ylim([0, env.get_current_grid_dict(0)['y_max']+1][::-1]) # invert y-axis to fit to the environment defined in the numpy array
 
     if stop_event and stop_event.is_set():
         animation_container[0].event_source.stop() # Stop the animation
@@ -170,7 +168,7 @@ def main(stop_event=None):
     figplot = FigureV0()
     interval = 1000
 
-    frames_max = game_horizon*MCTS_params['num_iter']*interval
+    frames_max = env.max_timehorizon*MCTS_params['num_iter']*interval
 
     animation_container = [None] # Container to store the animation object
 
@@ -178,7 +176,6 @@ def main(stop_event=None):
     animation_container[0] = animation  # Store the animation in the container
     animation_container[0].save(os.path.join(path_to_results, next_video_name + ".mp4"), writer='ffmpeg', fps=5)
     #plt.show()
-    #animation.save(os.path.join(path_to_results, next_video_name + ".mp4"), writer='ffmpeg', fps=5)
 
 
 if __name__ == "__main__":
