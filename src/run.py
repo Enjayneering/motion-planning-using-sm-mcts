@@ -6,6 +6,8 @@ import os
 
 from common import *
 
+
+
 def run_script(script, done_event=None, stop_event=None):
     if script == path_to_src+"plot.py":
         # Run plot.py in a separate process and pass the stop_event
