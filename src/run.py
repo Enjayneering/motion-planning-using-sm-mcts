@@ -1,71 +1,78 @@
-import subprocess
 import time
 import multiprocessing
-import plot
 import os
 
+from competitive_game import CompetitiveGame
+from plot_independent import plot_independent
+from plot_utilities import *
 from common import *
+from csv_utilities import *
+from config import *
+from environment_utilities import *
 
+def run_test(Game):
+    for _ in range(Game.config.num_sim):
+        start_time = time.time()
 
+        print("Starting Race Game at time: {}".format(start_time))
+        # Start the scripts independently
 
-def run_script(script, done_event=None, stop_event=None):
-    if script == path_to_src+"plot.py":
-        # Run plot.py in a separate process and pass the stop_event
-        process = multiprocessing.Process(target=plot.main, args=(stop_event,))
-        process.start()
-    else:
-        subprocess.run(["python3", script])
-        if done_event:
-            done_event.set()  # Signal that this script has finished
+        stop_event = multiprocessing.Event()  # Event to signal when plot.py should stop
 
-if __name__ == "__main__":
-    start_time = time.time()
+        processes = []
+        processes.append(multiprocessing.Process(target=plot_independent, args=(Game, stop_event)))
+        processes.append(multiprocessing.Process(target=Game.find_nash_strategies, args=()))
 
-    # Create textfile for data
-    with open(os.path.join(path_to_results, next_video_name + ".txt"), 'w') as f:
-        for key, value in Model_params.items():
-            f.write(f"{key}: {value}\n")
-        for key, value in MCTS_params.items():
-            f.write(f"{key}: {value}\n")
-        for key, value in Competitive_params.items():
-            f.write(f"{key}: {value}\n")
+        # Start all processes
+        for process in processes:
+            process.start()
+        processes[1].join()  # Wait for the trajectory process to finish
+        print("Trajectories found")
         
+        time.sleep(1)
+        stop_event.set()  # Event to signal when plot.py should stop
 
-    print("Starting Race Game at time: {}".format(start_time))
+        for process in processes:
+            process.join()
 
-    # Start the scripts independently
-    processes = []
+        # If main.py has finished, terminate all remaining processes
+        for process in processes:
+            if process.is_alive():
+                process.terminate()
 
-    done_event = multiprocessing.Event()  # Event to signal when main.py has finished
-    stop_event = multiprocessing.Event()  # Event to signal when plot.py should stop
-    processes.append(multiprocessing.Process(target=run_script, args=(path_to_src+"plot.py", done_event, stop_event)))
-    processes.append(multiprocessing.Process(target=run_script, args=(path_to_src+"main.py", done_event, stop_event)))
+        duration = time.time() - start_time
 
-    # Start all processes
-    for process in processes:
-        process.start()
+        # Save duration to text file
+        with open(os.path.join(path_to_results, Game.name + ".txt"), 'a') as f:
+            f.write(f"Duration: {duration}\n")
+            f.write("\nContent of global_state.csv:\n")
+            with open(os.path.join(path_to_data, "global_state.csv"), 'r') as csv_file:
+                f.write(csv_file.read())
 
-    done_event.wait()  # Wait for main.py to finish
-    print("Main.py has finished")
+        print("Finished with duration: {} s".format(duration))
+
+
+def run_experiment(Game):
+    # Init global csv configuration
+
+    for run_ix in range(Game.config.num_sim):
+        # Print Local csv 
+
+        start_time = time.time()
+        Game.find_nash_strategies()
+        # save local data to csv (incl detailed payoff data)
+        # plot found trajectories
+
+    # save global statistical data to csv
     
-    time.sleep(1)
-    stop_event.set()  # Event to signal when plot.py should stop
+if __name__ == "__main__": 
+    if is_feature_active(feature_flags["mode"]["experimental"]):
+        Game = CompetitiveGame(exp_config)
+        run_experiment(Game)
 
-    for process in processes:
-        process.join()
-
-    # If main.py has finished, terminate all remaining processes
-    for process in processes:
-        if process.is_alive():
-            process.terminate()
-
-    duration = time.time() - start_time
-
-    # Save duration to text file
-    with open(os.path.join(path_to_results, next_video_name + ".txt"), 'a') as f:
-        f.write(f"Duration: {duration}\n")
-        f.write("\nContent of global_state.csv:\n")
-        with open(os.path.join(path_to_data, "global_state.csv"), 'r') as csv_file:
-            f.write(csv_file.read())
-
-    print("Finished with duration: {} s".format(duration))
+    elif is_feature_active(feature_flags["mode"]["test"]):
+        Game = CompetitiveGame(test_config)
+        run_test(Game)
+    
+    
+   

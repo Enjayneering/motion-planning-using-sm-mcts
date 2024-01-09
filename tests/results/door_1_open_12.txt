@@ -1,0 +1,15 @@
+num_iter: 400
+penalty_collision_0: 0.0
+penalty_collision_1: 0.0
+reward_lead: 20
+reward_progress: 0
+penalty_centerline: 0
+penalty_stuck_in_env: -1
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0, 2.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+risk_appetite_0: 0.5
+Environment trigger: [(0, 'door_1_open'), (15, 'door_1_closed')]
+Payoff Agent 0: [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0), (8, -80.0)]
+Payoff Agent 1: [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0), (8, 80.0)]
+Duration: 159.89012837409973

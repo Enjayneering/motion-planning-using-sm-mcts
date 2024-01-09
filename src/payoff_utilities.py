@@ -1,36 +1,38 @@
-from environment import *
 from common import *
-from kinodynamic import *
+from kinodynamic_utilities import *
 
-
-def update_intermediate_payoffs(prev_state_obj, next_state_obj, interm_payoff_vec, interm_weights_vec):
+def update_intermediate_payoffs(Game, interm_payoff_vec, prev_state_obj, next_state_obj):
+    print("prev_state_obj: {}".format(prev_state_obj.get_state_together()))
+    print("next_state_obj: {}".format(next_state_obj.get_state_together()))
     dist_agents = distance(next_state_obj.get_state_0()[:2], next_state_obj.get_state_1()[:2])
-    advancement_0 = (next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0])/(next_state_obj.timestep/env.max_timehorizon)
-    advancement_1 = (next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0])/(next_state_obj.timestep/env.max_timehorizon)
+    advancement_0 = (next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0])/(next_state_obj.timestep/Game.env.max_timehorizon)
+    advancement_1 = (next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0])/(next_state_obj.timestep/Game.env.max_timehorizon)
 
     update_vec = np.array([[np.exp(-dist_agents)], [np.exp(-dist_agents)], [advancement_0], [advancement_1]])
-    interm_payoff_vec += interm_weights_vec*update_vec
+    interm_payoff_vec += Game.interm_weights_vec*update_vec
     return interm_payoff_vec
 
-def update_final_payoffs(final_state, final_payoff_vec, final_weights_vec):
+def update_final_payoffs(Game, final_payoff_vec, final_state):
     lead_0 = final_state.x0 - final_state.x1
     lead_1 = final_state.x1 - final_state.x0
     time_0 = final_state.timestep
     time_1 = final_state.timestep
 
     update_vec = np.array([[time_0], [time_1], [lead_0], [lead_1]])
-    final_payoff_vec += final_weights_vec*update_vec
+    final_payoff_vec += Game.final_weights_vec*update_vec
     return final_payoff_vec
 
-def get_total_payoffs_all_agents(interm_payoff_vec, final_payoff_vec):
-    payoff_list = [0] * len(Model_params["agents"])
-    for agent in Model_params["agents"]:
+def get_total_payoffs_all_agents(Game, interm_payoff_vec, final_payoff_vec):
+    payoff_list = [0] * len(Game.Model_params["agents"])
+    for agent in Game.Model_params["agents"]:
         interm_payoffs = 0
         final_payoffs = 0
-        for interm_payoff in Model_params["interm_payoffs"].values():
+
+        for interm_payoff in Game.Model_params["interm_payoffs"].values():
             if interm_payoff["agent"] == agent:
                 interm_payoffs += interm_payoff_vec[interm_payoff["pos"]]
-        for final_payoff in Model_params["final_payoffs"].values():
+
+        for final_payoff in Game.Model_params["final_payoffs"].values():
             if final_payoff["agent"] == agent:
                 final_payoffs += final_payoff_vec[final_payoff["pos"]]
         total_payoff = interm_payoffs+final_payoffs
@@ -57,23 +59,23 @@ def update_payoff_range(max_payoff, min_payoff, payoff_list):
     return max_payoff, min_payoff, payoff_range
 
 
-def init_interm_weights(MCTS_node):
-    weigths_payoff_vector = np.zeros((Model_params["len_interm_payoffs"],1))
-    for interm_payoff in Model_params["interm_payoffs"].values():
+def init_interm_weights(Game):
+    weigths_payoff_vector = np.zeros((Game.Model_params["len_interm_payoffs"],1))
+    for interm_payoff in Game.Model_params["interm_payoffs"].values():
         weigths_payoff_vector[interm_payoff["pos"]] = interm_payoff["weight"]
     return weigths_payoff_vector
 
-def init_final_weights(MCTS_node):
-    weigths_payoff_vector = np.zeros((Model_params["len_final_payoffs"],1))
-    for final_payoff in Model_params["final_payoffs"].values():
+def init_final_weights(Game):
+    weigths_payoff_vector = np.zeros((Game.Model_params["len_final_payoffs"],1))
+    for final_payoff in Game.Model_params["final_payoffs"].values():
         weigths_payoff_vector[final_payoff["pos"]] = final_payoff["weight"]
     return weigths_payoff_vector
 
 
-def update_weigths_payoff(MCTS_node, payoff_weights):
+"""def update_weigths_payoff(MCTS_node, payoff_weights):
     aver_payoff_vector = MCTS_node.aggr_payoff_vector / MCTS_node._number_of_visits
 
-    """# calculate update_vector
+    # calculate update_vector
     A = np.eye(len(payoff_weights))
 
     # fill A with respective final reward values
@@ -89,8 +91,8 @@ def update_weigths_payoff(MCTS_node, payoff_weights):
 
     b = np.abs(np.reciprocal(aver_payoff_vector))
     update_vector = A@b
-    updated_payoff_weights = update_vector*payoff_weights"""
+    updated_payoff_weights = update_vector*payoff_weights
     risk_factor_0 = 0.5
     risk_factor_1 = 0.5
     new_weights = np.array([risk_factor_0*(np.abs(aver_payoff_vector[2])/np.abs(aver_payoff_vector[0])), risk_factor_1*(np.abs(aver_payoff_vector[3])/np.abs(aver_payoff_vector[1])), 1, 1]).T
-    return new_weights
+    return new_weights"""
