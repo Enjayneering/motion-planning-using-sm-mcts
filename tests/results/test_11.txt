@@ -1,0 +1,37 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+agents: [0, 1]
+interm_payoffs: {'penalty_distance_0': {'pos': 0, 'weight': -10, 'agent': 0}, 'penalty_distance_1': {'pos': 1, 'weight': -1, 'agent': 1}, 'reward_progress_0': {'pos': 2, 'weight': 0, 'agent': 0}, 'reward_progress_1': {'pos': 3, 'weight': 0, 'agent': 1}, 'penalty_agressor_0': {'pos': 4, 'weight': 0, 'agent': 0}, 'penalty_agressor_1': {'pos': 5, 'weight': 0, 'agent': 1}}
+final_payoffs: {'penalty_timestep_0': {'pos': 0, 'weight': -1, 'agent': 0}, 'penalty_timestep_1': {'pos': 1, 'weight': -1, 'agent': 1}, 'reward_lead_0': {'pos': 2, 'weight': 5, 'agent': 0}, 'reward_lead_1': {'pos': 3, 'weight': 5, 'agent': 1}}
+len_interm_payoffs: 6
+len_final_payoffs: 4
+num_iter: 800
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: test
+penalty_distance_0: [-3.6787944117144233, -3.6787944117144233, -1.353352832366127, -0.49787068367863946, -0.49787068367863946, -0.1831563888873418, -0.06737946999085467]
+penalty_distance_1: [-0.36787944117144233, -0.36787944117144233, -0.1353352832366127, -0.049787068367863944, -0.049787068367863944, -0.01831563888873418, -0.006737946999085467]
+reward_progress_0: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+reward_progress_1: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+penalty_agressor_0: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+penalty_agressor_1: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+penalty_timestep_0: [-7.0]
+penalty_timestep_1: [-7.0]
+reward_lead_0: [25.0]
+reward_lead_1: [-25.0]
+payoff_total0: [-3.6787944117144233, -7.357588823428847, -8.710941655794974, -9.208812339473614, -9.706683023152253, -9.889839412039596, -9.95721888203045, 8.04278111796955]
+payoff_total1: [-0.36787944117144233, -0.7357588823428847, -0.8710941655794974, -0.9208812339473613, -0.9706683023152253, -0.9889839412039595, -0.995721888203045, -32.99572188820304]
+Duration: 43.71406078338623
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,3,0,3,3,0,0
+1,3,0,3,3,0,0
+3.0,3.0,0.0,4.0,3.0,0.0,1
+5.0,3.0,0.0,4.0,3.0,0.0,2
+7.0,3.0,0.0,5.0,3.0,0.0,3
+9.0,3.0,0.0,6.0,3.0,0.0,4
+10.0,3.0,0.0,7.0,3.0,0.0,5
+12.0,3.0,0.0,8.0,3.0,0.0,6
+14.0,3.0,4.71238898038469,9.0,3.0,4.71238898038469,7

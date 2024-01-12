@@ -22,7 +22,7 @@ class State:
         self.theta1 = roundme(theta1)
         self.timestep = timestep
 
-    def move(self, action, dt):
+    def move(self, action, delta_t):
         # transition-function: get new state from previous state and chosen action
         state_0 = self.get_state_0()
         action_0 = action[:2]
@@ -30,10 +30,10 @@ class State:
         state_1 = self.get_state_1()
         action_1 = action[2:]
 
-        x0_new, y0_new, theta0_new = mm_unicycle(state_0, action_0)
-        x1_new, y1_new, theta1_new = mm_unicycle(state_1, action_1)
+        x0_new, y0_new, theta0_new = mm_unicycle(state_0, action_0, delta_t=delta_t)
+        x1_new, y1_new, theta1_new = mm_unicycle(state_1, action_1, delta_t=delta_t)
 
-        timestep_new = self.timestep + dt
+        timestep_new = self.timestep + delta_t
         return State(x0_new, y0_new, theta0_new, x1_new, y1_new, theta1_new, timestep_new)
 
     def get_state_0(self):
@@ -99,7 +99,7 @@ class MCTSNode:
     def expand(self, Game):
         action = self._untried_actions.pop(np.random.randint(len(self._untried_actions))) #pop random action out of the list
 
-        next_state = self.state.move(action, dt=Game.Model_params["delta_t"])
+        next_state = self.state.move(action, delta_t=Game.Model_params["delta_t"])
 
         child_node = MCTSNode(Game, next_state, parent=self, parent_action=action)
         self.children.append(child_node)
@@ -126,7 +126,7 @@ class MCTSNode:
         # TODO: Multi Agent adjustment
         weights_0 = [self.calc_UCT(action_stat, Game.payoff_range, Game.MCTS_params['c_param']) for action_stat in self.action_stats_0]
         weights_1 = [self.calc_UCT(action_stat, Game.payoff_range, Game.MCTS_params['c_param']) for action_stat in self.action_stats_1]
-        print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
+        #print("Weights 0: {}\nWeights 1: {}".format(weights_0, weights_1))
 
         action_select_0 = self.action_stats_0[np.argmax(weights_0)]["action"]
         action_select_1 = self.action_stats_1[np.argmax(weights_1)]["action"]
@@ -148,8 +148,7 @@ class MCTSNode:
 
     def robust_child(self):
         choices_weights = [c.n() for c in self.children]
-        robust_child = self.children[np.argmax(choices_weights)]
-        return robust_child
+        return self.children[np.argmax(choices_weights)]
 
     #TODO: def optimal_child(self, payoff_range):
 
@@ -194,36 +193,36 @@ class MCTSNode:
                 Game.forbidden_states.append(current_rollout_node.state.get_state_1()+[current_rollout_node.state.timestep])
                 #payoff_0 += MCTS_params['penalty_stuck_in_env']
                 #payoff_1 += MCTS_params['penalty_stuck_in_env']
-                print("Both agents stuck in environment, break")
+                print("Both agents stuck in environment, append current state on forbidden list, break")
                 break
             elif len(moves_0) == 0:
                 Game.forbidden_states.append(current_rollout_node.state.get_state_0()+[current_rollout_node.state.timestep])
                 #payoff_0 += MCTS_params['penalty_stuck_in_env']
-                print("Agent 0 stuck in environment, break")
+                print("Agent 0 stuck in environment, append current state on forbidden list, break")
                 break
             elif len(moves_1) == 0:
                 Game.forbidden_states.append(current_rollout_node.state.get_state_1()+[current_rollout_node.state.timestep])
                 #payoff_1 += MCTS_params['penalty_stuck_in_env']
-                print("Agent 1 stuck in environment, break")
+                print("Agent 1 stuck in environment, append current state on forbidden list, break")
                 break
-            print("Forbidden states: {}".format(Game.forbidden_states))
+            #print("Forbidden states: {}".format(Game.forbidden_states))
 
             # choose action due to rollout policy
             action = self.rollout_policy(possible_moves)
 
             #print("Rollout Action: {}".format(action))
-            next_rollout_state = current_rollout_node.state.move(action, dt=Game.Model_params["delta_t"])
+            next_rollout_state = current_rollout_node.state.move(action, delta_t=Game.Model_params["delta_t"])
             next_rollout_node = MCTSNode(Game, next_rollout_state, parent=current_rollout_node, parent_action=action)
 
             # updating intermediate payoffs
-            interm_payoff_vec = update_intermediate_payoffs(Game, interm_payoff_vec, current_rollout_node.state, next_rollout_node.state)
+            interm_payoff_vec += get_intermediate_payoffs(Game, current_rollout_node.state, next_rollout_node.state)
 
             current_rollout_node = next_rollout_node
             rollout_trajectory.append(current_rollout_node.state)
 
         # updating final payoffs
         if is_terminal(Game.env, current_rollout_node.state):
-            final_payoff_vec = update_final_payoffs(Game, final_payoff_vec, current_rollout_node.state)
+            final_payoff_vec += get_final_payoffs(Game, current_rollout_node.state)
 
         return rollout_trajectory, interm_payoff_vec, final_payoff_vec
     

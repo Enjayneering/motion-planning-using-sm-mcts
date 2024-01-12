@@ -3,14 +3,10 @@ import numpy as np
 class Environment:
     # define 2D environment with continuous free space and discretized obstacle space
     def __init__(self, config=None):
-        self.env_name_trigger = config.env_name_trigger #[(0,'racetrack_1')] 
         self.max_timehorizon = config.max_timehorizon
+        self.dynamic_grid = self.init_dynamic_grid(config.env_def)
+        self.init_state = self.get_init_state(config.env_def, config.theta_0_init, config.theta_1_init)
         self.occupancy_grid_dict = {
-            'box': """
-            ####
-            #..#
-            #..#
-            ####""",
             'racetrack_1': """
             ################
             #..............#
@@ -19,6 +15,23 @@ class Environment:
             #..............#
             #..............#
             ################""",
+            'racetrack_moving_barrier_1':"""
+            ################
+            #..............#
+            #.1............#
+            #0.............#
+            #..............#
+            #..............#
+            ################""",
+            'racetrack_moving_barrier_2':"""
+            ################
+            #..............#
+            #.1............#
+            #0.............#
+            #..............#
+            #..............#
+            ################""",
+
             'door_1_open': """
             #############
             #....########
@@ -31,6 +44,14 @@ class Environment:
             #....#......#
             #....########
             #############""",
+            'benchmark_static_dragrace': """
+            #######
+            #.....#
+            #.....#
+            #.....#
+            #.....#
+            #.....#
+            #######""",
             'benchmark_dynamic_small1': """
             #########
             #...#...#
@@ -235,11 +256,21 @@ class Environment:
             ......#..""",
 
         }
-        self.dynamic_grid = self.get_dynamic_grid()
-        self.init_state = self.get_init_state()
 
-    def get_init_state(self):
-        grid = self.occupancy_grid_dict[self.dynamic_grid[0]['gridname']]
+    def init_dynamic_grid(self, env_def):    
+        env_list = []
+
+        for time_trigger, grid in env_def.items():
+            env_list.append({'timestep': time_trigger,
+                            'grid': self.get_occupancy_grid(grid),
+                            'x_min': self.get_x_min(grid),
+                            'y_min': self.get_y_min(grid),
+                            'x_max': self.get_x_max(grid),
+                            'y_max': self.get_y_max(grid),})
+        return env_list
+    
+    def get_init_state(self, env_def, theta_0_init, theta_1_init):
+        grid = env_def[0]
         occupancy_grid_define = grid.replace('.', '9').replace('#', '9')
         lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
         transformed_grid = [list(map(int, line)) for line in lines]
@@ -251,47 +282,30 @@ class Environment:
         init_state = {
             'x0': agent_0_x[0],
             'y0': agent_0_y[0],
-            'theta0': np.pi/2,
+            'theta0':theta_0_init,
             'x1': agent_1_x[0],
             'y1': agent_1_y[0],
-            'theta1': 0,
+            'theta1': theta_0_init,
             'timestep': 0,
         }
         return init_state
 
-    def get_static_grid(self, choice):
-        grid = self.occupancy_grid_dict[choice]
-
+    def get_occupancy_grid(self, grid):
         occupancy_grid_define = grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1')
         lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
         transformed_grid = [list(map(int, line)) for line in lines]
         occupancy_grid = np.array(transformed_grid)
         return occupancy_grid
     
-    def get_dynamic_grid(self):
-        env_list = []
-
-        for element in self.env_name_trigger:
-            env_list.append({'timestep': element[0],
-                            'grid': self.get_static_grid(element[1]),
-                            'gridname': element[1],
-                            'x_min': self.get_x_min(element[1]),
-                            'y_min': self.get_y_min(element[1]),
-                            'x_max': self.get_x_max(element[1]),
-                            'y_max': self.get_y_max(element[1]),})
-        return env_list
-    
-    def get_current_grid_dict(self, timestep):
+    def get_current_grid(self, timestep):
         for grid_element in reversed(self.dynamic_grid):
             if grid_element['timestep'] <= timestep:
-                current_grid_dict = grid_element
+                current_grid = grid_element
                 break
-        return current_grid_dict
+        return current_grid
 
-    
-
-    def get_x_min(self, env_name):
-            static_grid = self.get_static_grid(env_name)
+    def get_x_min(self, grid):
+            static_grid = self.get_occupancy_grid(grid)
             min_x = 0
 
             for column in range(static_grid.shape[1]):
@@ -301,8 +315,8 @@ class Environment:
                 else:
                     min_x += 1
 
-    def get_y_min(self, env_name):
-        static_grid = self.get_static_grid(env_name)
+    def get_y_min(self, grid):
+        static_grid = self.get_occupancy_grid(grid)
         min_y = 0
 
         for row in range(static_grid.shape[0]):
@@ -312,8 +326,8 @@ class Environment:
             else:
                 min_y += 1
 
-    def get_x_max(self, env_name):
-        static_grid = self.get_static_grid(env_name)
+    def get_x_max(self, grid):
+        static_grid = self.get_occupancy_grid(grid)
         max_x = static_grid.shape[1]-1
 
         for column in range(max_x):
@@ -323,8 +337,8 @@ class Environment:
             else:
                 max_x -= 1
 
-    def get_y_max(self, env_name):
-        static_grid = self.get_static_grid(env_name)
+    def get_y_max(self, grid):
+        static_grid = self.get_occupancy_grid(grid)
         max_y = static_grid.shape[0]-1
 
         for row in range(max_y):

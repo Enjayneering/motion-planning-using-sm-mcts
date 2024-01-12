@@ -107,7 +107,7 @@ class FigureV0:
             self.ax1.annotate(timestep_trajectory[i], (x0_trajectory[i], y0_trajectory[i]), color='b', textcoords="offset points", xytext=(0,10))
             self.ax1.annotate(timestep_trajectory[i], (x1_trajectory[i], y1_trajectory[i]), color='r', textcoords="offset points", xytext=(-10,0))
         # plot pixel environment
-        self.ax1.imshow(Game.env.get_current_grid_dict(timestep_trajectory.iloc[-1])['grid'], cmap='binary')
+        self.ax1.imshow(Game.env.get_current_grid(timestep_trajectory.iloc[-1])['grid'], cmap='binary')
 
         # plot orientations as arrows
         arrow_length = 0.5
@@ -141,8 +141,8 @@ def plot_together(i, figplot, Game, stop_event, animation_container):
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(Game.MCTS_params['num_iter']))
     figplot.ax1.set_title("Trajectory")
     figplot.ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
-    figplot.ax1.set_xlim([0, Game.env.get_current_grid_dict(0)['x_max']+1])
-    figplot.ax1.set_ylim([0, Game.env.get_current_grid_dict(0)['y_max']+1][::-1]) # invert y-axis to fit to the environment defined in the numpy array
+    figplot.ax1.set_xlim([0, Game.env.get_current_grid(0)['x_max']+1])
+    figplot.ax1.set_ylim([0, Game.env.get_current_grid(0)['y_max']+1][::-1]) # invert y-axis to fit to the environment defined in the numpy array
 
     if stop_event and stop_event.is_set():
         animation_container[0].event_source.stop() # Stop the animation

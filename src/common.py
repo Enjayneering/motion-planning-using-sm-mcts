@@ -34,7 +34,7 @@ freq_stat_data = 2
 
 def is_terminal(env, state):
         # terminal condition
-        if state.x0 >= env.get_current_grid_dict(state.timestep)['x_max']-1 or state.x1 >= env.get_current_grid_dict(state.timestep)['x_max']-1 or state.timestep >= env.max_timehorizon:
+        if state.x0 >= env.get_current_grid(state.timestep)['x_max'] or state.x1 >= env.get_current_grid(state.timestep)['x_max'] or state.timestep >= env.max_timehorizon:
             return True
         else:
             return False
@@ -45,9 +45,10 @@ def generate_bernoulli(p):
     result = random.choices(choices, probabilities)[0]
     return result
 
-def distance(state_0_xy, state_1_xy):
-    x1 = state_0_xy[0]
-    y1 = state_0_xy[1]
-    x2 = state_1_xy[0]
-    y2 = state_1_xy[1]
-    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+def get_winner(state):
+    if state.x0 > state.x1: #agent 0 is ahead
+        return [1,0]
+    elif state.x0 < state.x1: #agent 1 is ahead
+        return [0,1]
+    else: #draw
+        return [0,0]

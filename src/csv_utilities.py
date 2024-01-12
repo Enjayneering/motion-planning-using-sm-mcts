@@ -60,7 +60,7 @@ def csv_write_rollout_last(Game, rollout_trajectory, timehorizon = None, config=
 
 # Video parameters
 def get_next_game_name(path_to_results, Game):
-    environment_name = Game.config.env_name_trigger[0][1]
+    environment_name = Game.config.env_name
     list_of_files = glob.glob(path_to_results + environment_name + "*.mp4")
     num_videos = len(list_of_files)
     next_video_name = "{}_{:02d}".format(environment_name, num_videos + 1)
@@ -73,5 +73,5 @@ def test_write_params(Game):
             f.write(f"{key}: {value}\n")
         for key, value in Game.MCTS_params.items():
             f.write(f"{key}: {value}\n")
-        for key, value in Game.Competitive_params.items():
+        for key, value in Game.Kinodynamic_params.items():
             f.write(f"{key}: {value}\n") 

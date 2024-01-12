@@ -12,7 +12,21 @@ def mm_unicycle(state, action, delta_t=1):
     theta_new = (state[2] + action[1]*delta_t)%(2*np.pi) # modulo to keep angle between 0 and 2pi
     return x_new, y_new, theta_new
 
-def is_collision(Game, prev_state, joint_action):
+def distance(state_0, state_1):
+    x1 = state_0[0]
+    y1 = state_0[1]
+    x2 = state_1[0]
+    y2 = state_1[1]
+    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+
+def is_collision(state_object):
+    # state = [x, y, theta]
+    state_0 = state_object.get_state_0()
+    state_1 = state_object.get_state_1()
+    if distance(state_0, state_1) <= 0.5:
+        return True
+
+def lines_intersect(Game, prev_state, joint_action):
     # check for collision between the agents
 
     # Create lines for both agents
@@ -35,9 +49,9 @@ def is_collision(Game, prev_state, joint_action):
         return False
 
 def is_in_free_space(Game, state, action, init_timestep, num_linesearch = 4):
-    x_next, y_next, theta_next = mm_unicycle(state, action)
+    x_next, y_next, theta_next = mm_unicycle(state, action, delta_t=Game.Model_params["delta_t"])
     dt = Game.Model_params["delta_t"]
-    if Game.env.get_current_grid_dict(init_timestep+dt)['x_min'] < x_next < Game.env.get_current_grid_dict(init_timestep+dt)['x_max'] and Game.env.get_current_grid_dict(init_timestep+dt)['y_min'] < y_next < Game.env.get_current_grid_dict(init_timestep+dt)['y_max']:
+    if Game.env.get_current_grid(init_timestep+dt)['x_min'] <= x_next <= Game.env.get_current_grid(init_timestep+dt)['x_max'] and Game.env.get_current_grid(init_timestep+dt)['y_min'] <= y_next <= Game.env.get_current_grid(init_timestep+dt)['y_max']:
         # create line inclusing discretized timestep
         line_points = np.linspace(state[:2]+[init_timestep], [x_next, y_next]+[init_timestep+dt], num=num_linesearch).tolist()
 
@@ -58,7 +72,7 @@ def is_in_free_space(Game, state, action, init_timestep, num_linesearch = 4):
             time_int = int(time_point) # round down to nearest integer since environment changes at next increment
 
             # Check if points on obstacles now and in next step
-            if Game.env.get_current_grid_dict(time_int)['grid'][y_round, x_round] == 1:
+            if Game.env.get_current_grid(time_int)['grid'][y_round, x_round] == 1:
                 return False  # Collision detected
     else:
         #print("collision outside grid")
@@ -67,7 +81,7 @@ def is_in_free_space(Game, state, action, init_timestep, num_linesearch = 4):
     return True
 
 def is_in_forbidden_state(Game, state, action, init_timestep, forbidden_states):
-    x_next, y_next, theta_next = mm_unicycle(state, action)
+    x_next, y_next, theta_next = mm_unicycle(state, action, delta_t=Game.Model_params["delta_t"])
     time_next = init_timestep+Game.Model_params["delta_t"]
     if [x_next, y_next, theta_next, time_next] in forbidden_states:
         return True
@@ -84,10 +98,10 @@ def sample_legal_actions(Game, state_object):
     # state = [x, y, theta]
     # action = [vel, angular_vel]
 
-    values_speed_0 = Game.Competitive_params['action_set_0']['velocity_0']
-    values_speed_1 = Game.Competitive_params['action_set_1']['velocity_1']
-    values_angular_speed_0 = Game.Competitive_params['action_set_0']['ang_velocity_0']
-    values_angular_speed_1 = Game.Competitive_params['action_set_1']['ang_velocity_1']
+    values_speed_0 = Game.Kinodynamic_params['action_set_0']['velocity_0']
+    values_speed_1 = Game.Kinodynamic_params['action_set_1']['velocity_1']
+    values_angular_speed_0 = Game.Kinodynamic_params['action_set_0']['ang_velocity_0']
+    values_angular_speed_1 = Game.Kinodynamic_params['action_set_1']['ang_velocity_1']
 
     action_tuples_0   = itertools.product(values_speed_0, values_angular_speed_0)
     action_tuples_1   = itertools.product(values_speed_1, values_angular_speed_1)

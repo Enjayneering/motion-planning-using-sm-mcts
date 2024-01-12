@@ -1,0 +1,42 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+agents: [0, 1]
+interm_payoffs: {'penalty_distance_0': {'pos': 0, 'weight': -1, 'agent': 0}, 'penalty_distance_1': {'pos': 1, 'weight': -1, 'agent': 1}, 'reward_progress_0': {'pos': 2, 'weight': 0, 'agent': 0}, 'reward_progress_1': {'pos': 3, 'weight': 0, 'agent': 1}, 'penalty_agressor_0': {'pos': 4, 'weight': -inf, 'agent': 0}, 'penalty_agressor_1': {'pos': 5, 'weight': -inf, 'agent': 1}}
+final_payoffs: {'penalty_timestep_0': {'pos': 0, 'weight': -1, 'agent': 0}, 'penalty_timestep_1': {'pos': 1, 'weight': -1, 'agent': 1}, 'reward_lead_0': {'pos': 2, 'weight': 5, 'agent': 0}, 'reward_lead_1': {'pos': 3, 'weight': 5, 'agent': 1}}
+len_interm_payoffs: 6
+len_final_payoffs: 4
+num_iter: 800
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: test
+penalty_distance_0: [-0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127]
+penalty_distance_1: [-0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127, -0.1353352832366127]
+reward_progress_0: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+reward_progress_1: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+penalty_agressor_0: [nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]
+penalty_agressor_1: [nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]
+penalty_timestep_0: [-12.0]
+penalty_timestep_1: [-12.0]
+reward_lead_0: [-10.0]
+reward_lead_1: [10.0]
+payoff_total0: [nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]
+payoff_total1: [nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]
+Duration: 41.81576180458069
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,3,0,3,3,0,0
+1,3,0,3,3,0,0
+1.0,3.0,4.71238898038469,3.0,3.0,4.71238898038469,1
+1.0,3.0,3.141592653589793,3.0,3.0,3.141592653589793,2
+1.0,3.0,1.5707963267948966,3.0,3.0,1.5707963267948966,3
+1.0,3.0,0.0,3.0,3.0,0.0,4
+1.0,3.0,4.71238898038469,3.0,3.0,4.71238898038469,5
+1.0,3.0,3.141592653589793,3.0,3.0,3.141592653589793,6
+1.0,3.0,1.5707963267948966,3.0,3.0,1.5707963267948966,7
+1.0,3.0,0.0,3.0,3.0,0.0,8
+1.0,3.0,4.71238898038469,3.0,3.0,4.71238898038469,9
+1.0,3.0,3.141592653589793,3.0,3.0,3.141592653589793,10
+1.0,3.0,1.5707963267948966,3.0,3.0,1.5707963267948966,11
+1.0,3.0,0.0,3.0,3.0,0.0,12

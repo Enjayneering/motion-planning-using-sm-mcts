@@ -1,6 +1,7 @@
 import time
 import multiprocessing
 import os
+import json
 
 from competitive_game import CompetitiveGame
 from plot_independent import plot_independent
@@ -29,7 +30,7 @@ def run_test(Game):
         processes[1].join()  # Wait for the trajectory process to finish
         print("Trajectories found")
         
-        time.sleep(1)
+        time.sleep(2)
         stop_event.set()  # Event to signal when plot.py should stop
 
         for process in processes:
@@ -53,24 +54,51 @@ def run_test(Game):
 
 
 def run_experiment(Game):
-    # Init global csv configuration
+    print("Running MCTS in Experimental mode!")
+    # INITIALIZE FOLDER
+    param_of_investigation = "w" # w: "weights", t: "T_max/T_goal", n: "num_iter"
+    start_config = "s" # s: "symmetric", a: "advantageous", d: "disadvantageous" (perspective of Agent 0)
+    selection = [flag for flag in Game.config.feature_flags["selection_policy"] if Game.config.feature_flags["selection_policy"][flag] == True][0]
+    final_move_selection = [flag for flag in Game.config.feature_flags["final_move"] if Game.config.feature_flags["final_move"][flag] == True][0]
+    rollout_policy = [flag for flag in Game.config.feature_flags["rollout_policy"] if Game.config.feature_flags["rollout_policy"][flag] == True][0]
+    environment = Game.config.env_name_trigger[0][1]
+    exp_name = f"{param_of_investigation}_{start_config}_{selection}_{final_move_selection}_{rollout_policy}_{environment}"
+
+    # Check if folder with the same exp_name already exists
+    index = 0
+    while os.path.exists(os.path.join(path_to_experiments, f"{exp_name}_{index:02d}")):
+        index += 1
+    exp_name = f"{exp_name}_{index:02d}"
+
+    exp_filepath = os.path.join(path_to_experiments, exp_name)
+    os.mkdir(exp_filepath)
+
+    # WRITE CONFIGURATION FILE
+    with open(os.path.join(exp_filepath, "config.json"), 'w') as f:
+        json.dump(Game.config.__dict__, f)
 
     for run_ix in range(Game.config.num_sim):
-        # Print Local csv 
+        exp_ix = run_ix % 10000
 
-        start_time = time.time()
-        Game.find_nash_strategies()
-        # save local data to csv (incl detailed payoff data)
-        # plot found trajectories
+        os.mkdir(os.path.join(exp_filepath, str(exp_ix)))
 
-    # save global statistical data to csv
-    
+        # RUN EXPERIMENT
+        result_dict = Game.find_nash_strategies()
+
+        # Write the result dictionary to the JSON file
+        with open(os.path.join(exp_filepath, str(exp_ix), "results.json"), "w") as f:
+            json.dump(result_dict, f)
+
+    # COLLECT AND SAVE GLOBAL STATISTICAL DATA
+
+
+
 if __name__ == "__main__": 
-    if is_feature_active(feature_flags["mode"]["experimental"]):
-        Game = CompetitiveGame(exp_config)
+    if experimental_mode:
+        Game = CompetitiveGame(exp001_config)
         run_experiment(Game)
 
-    elif is_feature_active(feature_flags["mode"]["test"]):
+    else:
         Game = CompetitiveGame(test_config)
         run_test(Game)
     
