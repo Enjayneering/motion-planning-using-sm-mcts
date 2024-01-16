@@ -1,9 +1,10 @@
 import numpy as np
+from common import get_max_timehorizon
 
 class Environment:
     # define 2D environment with continuous free space and discretized obstacle space
     def __init__(self, config=None):
-        self.max_timehorizon = config.max_timehorizon
+        self.max_timehorizon = get_max_timehorizon(config)
         self.dynamic_grid = self.init_dynamic_grid(config.env_def)
         self.init_state = self.get_init_state(config.env_def, config.theta_0_init, config.theta_1_init)
         self.occupancy_grid_dict = {
@@ -31,7 +32,31 @@ class Environment:
             #..............#
             #..............#
             ################""",
-
+            'intersection_1': """
+            ################
+            #####......#####
+            #####......#####
+            #####......#####
+            #####......#####
+            #..............#
+            #..............#
+            #..............#
+            #..............#
+            #..............#
+            #..............#
+            #####......#####
+            #####......#####
+            #####......#####
+            #####......#####
+            ################""",
+            'trichter_1': """
+            ################
+            #........#######
+            #..........#####
+            #0.1...........#
+            #..........#####
+            #........#######
+            ################""",
             'door_1_open': """
             #############
             #....########

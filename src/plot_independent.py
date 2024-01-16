@@ -153,7 +153,7 @@ def plot_independent(Game, stop_event):
     figplot = FigureV0()
     interval = 1000
 
-    frames_max = Game.config.max_timehorizon*Game.config.num_iter*interval
+    frames_max = get_max_timehorizon(Game.config)*Game.config.num_iter*interval
 
     animation_container = [None] # Container to store the animation object
 

@@ -32,18 +32,21 @@ aver_final_payoff = 0
 
 freq_stat_data = 2
 
-def is_terminal(env, state):
+def get_max_timehorizon(config):
+    return config.alpha_t * config.terminal_progress
+
+def is_terminal(Game, state):
         # terminal condition
-        if state.x0 >= env.get_current_grid(state.timestep)['x_max'] or state.x1 >= env.get_current_grid(state.timestep)['x_max'] or state.timestep >= env.max_timehorizon:
+        if state.x0 >= Game.config.terminal_progress or state.x1 >= Game.config.terminal_progress or state.timestep >= get_max_timehorizon(Game.config):
             return True
         else:
             return False
 
-def generate_bernoulli(p):
+"""def generate_bernoulli(p):
     choices = [0, 1]
     probabilities = [1 - p, p]
     result = random.choices(choices, probabilities)[0]
-    return result
+    return result"""
 
 def get_winner(state):
     if state.x0 > state.x1: #agent 0 is ahead

@@ -47,7 +47,7 @@ def csv_write_rollout_last(Game, rollout_trajectory, timehorizon = None, config=
         csv_file.seek(0)  # Move the file pointer to the beginning of the file
         lines = csv_file.readlines()[1:]
 
-    keep_num_data = int(config.num_iter*config.max_timehorizon/freq_stat_data)+1
+    keep_num_data = int(config.num_iter*get_max_timehorizon(Game.config)/freq_stat_data)+1
     lines = lines[-keep_num_data:]
 
     with open(path_to_rollout_tmp, 'w') as csv_file:

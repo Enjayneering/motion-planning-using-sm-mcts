@@ -22,7 +22,7 @@ def run_test(Game):
 
         processes = []
         processes.append(multiprocessing.Process(target=plot_independent, args=(Game, stop_event)))
-        processes.append(multiprocessing.Process(target=Game.find_nash_strategies, args=()))
+        processes.append(multiprocessing.Process(target=Game.compute_trajectories, args=()))
 
         # Start all processes
         for process in processes:
@@ -45,6 +45,7 @@ def run_test(Game):
 
         # Save duration to text file
         with open(os.path.join(path_to_results, Game.name + ".txt"), 'a') as f:
+            f.write("Config: {}\n".format(Game.config))
             f.write(f"Duration: {duration}\n")
             f.write("\nContent of global_state.csv:\n")
             with open(os.path.join(path_to_data, "global_state.csv"), 'r') as csv_file:
@@ -55,14 +56,15 @@ def run_test(Game):
 
 def run_experiment(Game):
     print("Running MCTS in Experimental mode!")
+
     # INITIALIZE FOLDER
     param_of_investigation = "w" # w: "weights", t: "T_max/T_goal", n: "num_iter"
     start_config = "s" # s: "symmetric", a: "advantageous", d: "disadvantageous" (perspective of Agent 0)
     selection = [flag for flag in Game.config.feature_flags["selection_policy"] if Game.config.feature_flags["selection_policy"][flag] == True][0]
     final_move_selection = [flag for flag in Game.config.feature_flags["final_move"] if Game.config.feature_flags["final_move"][flag] == True][0]
     rollout_policy = [flag for flag in Game.config.feature_flags["rollout_policy"] if Game.config.feature_flags["rollout_policy"][flag] == True][0]
-    environment = Game.config.env_name_trigger[0][1]
-    exp_name = f"{param_of_investigation}_{start_config}_{selection}_{final_move_selection}_{rollout_policy}_{environment}"
+    env_name = Game.config.env_name
+    exp_name = f"{param_of_investigation}_{start_config}_{selection}_{final_move_selection}_{rollout_policy}_{env_name}"
 
     # Check if folder with the same exp_name already exists
     index = 0
@@ -75,15 +77,21 @@ def run_experiment(Game):
 
     # WRITE CONFIGURATION FILE
     with open(os.path.join(exp_filepath, "config.json"), 'w') as f:
-        json.dump(Game.config.__dict__, f)
+        json.dump(Game.config, f)
 
     for run_ix in range(Game.config.num_sim):
         exp_ix = run_ix % 10000
+        exp_path= os.path.join(exp_filepath, str(exp_ix))
 
-        os.mkdir(os.path.join(exp_filepath, str(exp_ix)))
+        os.mkdir(exp_path)
 
         # RUN EXPERIMENT
-        result_dict = Game.find_nash_strategies()
+        result_dict = Game.compute_trajectories()
+
+        # PLOT TRAJECTORIES
+        for t in range(result_dict['T_terminal']+1):
+            plot_single_run(Game.config, result_dict, exp_path, timestep=t, main_agent=0)
+            plot_single_run(Game.config, result_dict, exp_path, timestep=t, main_agent=1)
 
         # Write the result dictionary to the JSON file
         with open(os.path.join(exp_filepath, str(exp_ix), "results.json"), "w") as f:

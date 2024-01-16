@@ -139,9 +139,9 @@ class MCTSNode:
         selected_action = self.select_action(Game)
 
         if selected_action:
-            best_child = [child for child in self.children if child.parent_action == selected_action]
+            best_child = [child for child in self.children if child.parent_action == selected_action][0]
             #print("Selected Child: {}".format(best_child[0].state.get_state_together()))
-            return best_child[0]
+            return best_child
         else:
             print("Return self")
             return self  # Return node to choose another joint action
@@ -177,7 +177,7 @@ class MCTSNode:
         final_payoff_vec = np.zeros((Game.Model_params["len_final_payoffs"],1))
 
         # intermediate timesteps
-        while not is_terminal(Game.env, current_rollout_node.state):
+        while not is_terminal(Game, current_rollout_node.state):
             #print("Rollout State: {}".format(current_rollout_node.state.get_state_together()))
             moves_0, moves_1, possible_moves = sample_legal_actions(Game, current_rollout_node.state)
 
@@ -221,7 +221,7 @@ class MCTSNode:
             rollout_trajectory.append(current_rollout_node.state)
 
         # updating final payoffs
-        if is_terminal(Game.env, current_rollout_node.state):
+        if is_terminal(Game, current_rollout_node.state):
             final_payoff_vec += get_final_payoffs(Game, current_rollout_node.state)
 
         return rollout_trajectory, interm_payoff_vec, final_payoff_vec
@@ -247,15 +247,26 @@ class MCTSNode:
 
     def _tree_policy(self, Game):
         current_node = self
-        while not is_terminal(Game.env, current_node.state):
+        while not is_terminal(Game, current_node.state):
             #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
             #print("Current node not terminal")
-            if not current_node.is_fully_expanded():
-                #print("Current node not fully expanded")
-                return current_node.expand(Game)
-            else:
-                #print("Current node fully expanded, next child")
-                current_node = current_node.select_child(Game)
-                # prevent parent from choosing the same action again
+
+            #randomm expansion
+            if Game.config.feature_flags['expansion_policy']['random']:
+                random_selector = random.choice([True, False])
+                print(len(current_node.children))
+                if random_selector or len(current_node.children) <= 50:
+                    return current_node.expand(Game)
+                else:
+                    current_node = current_node.select_child(Game)
+
+            if Game.config.feature_flags['expansion_policy']['full_child']:
+                if not current_node.is_fully_expanded():
+                    #print("Current node not fully expanded")
+                    return current_node.expand(Game)
+                else:
+                    #print("Current node fully expanded, next child")
+                    current_node = current_node.select_child(Game)
+                    # prevent parent from choosing the same action again
         #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
         return current_node

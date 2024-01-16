@@ -134,15 +134,15 @@ class CompetitiveGame:
             #print("Backpropagating")
             v.backpropagate(self, payoff_total_list)
 
-            if is_feature_active(feature_flags["payoff_weights"]["adaptive"]):
+            if is_feature_active(self.config.feature_flags["payoff_weights"]["adaptive"]):
                 #self.interm_weights_vec = update_interm_weights(self, self.interm_weights_vec, interm_payoff_rollout_vec)
                 #self.final_weights_vec = update_final_weights(self, self.final_weights_vec, final_payoff_rollout_vec)
                 #payoff_weights = update_weigths_payoff(current_node_mcts, payoff_weights)
                 pass
         
-        if is_feature_active(feature_flags["final_move"]["robust"]):
+        if is_feature_active(self.config.feature_flags["final_move"]["robust"]):
             next_node = current_node_mcts.robust_child()
-        elif is_feature_active(feature_flags["final_move"]["max"]):
+        elif is_feature_active(self.config.feature_flags["final_move"]["max"]):
             pass
 
         if not experimental_mode:
@@ -150,7 +150,7 @@ class CompetitiveGame:
             #print("Next State: {}".format(next_node.state.get_state_together()))
         return next_node
     
-    def find_nash_strategies(self):
+    def compute_trajectories(self):
         # create a text trap and redirect stdout
         #text_trap = io.StringIO()
         #sys.stdout = text_trap
@@ -168,16 +168,17 @@ class CompetitiveGame:
         # RUN TRAJECTORY PLANNER
         start_time = time.time()
 
-        while not is_terminal(self.env, current_node.state):
+        while not is_terminal(self, current_node.state):
+            print("Searching game tree in timestep {}...".format(current_node.state.timestep))
             if not experimental_mode:
                 csv_init_rollout_last(self)
             elif experimental_mode:
                 pass
                 
-            if is_feature_active(feature_flags["payoff_weights"]["adaptive"]):
+            if is_feature_active(self.config.feature_flags["payoff_weights"]["adaptive"]):
                 self.interm_weights_vec = init_interm_weights(self)
                 self.final_weights_vec = init_final_weights(self)
-            elif is_feature_active(feature_flags["payoff_weights"]["fixed"]):
+            elif is_feature_active(self.config.feature_flags["payoff_weights"]["fixed"]):
                 self.interm_weights_vec = init_interm_weights(self)
                 self.final_weights_vec = init_final_weights(self)
             
@@ -209,6 +210,7 @@ class CompetitiveGame:
         self.final_payoff_vec_global += final_payoff_increment_vec
 
         end_time = time.time()
+        print("Runtime: {} s".format(end_time - start_time))
 
         # update global payoff dict
         for payoff in self.Model_params["final_payoffs"].keys():

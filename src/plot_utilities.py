@@ -1,5 +1,4 @@
 import os
-import time
 import glob
 import networkx as nx
 import numpy as np
@@ -8,158 +7,157 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import pandas as pd
 import sys
-import multiprocessing
-import matplotlib.gridspec as gridspec
+from matplotlib.ticker import AutoMinorLocator
 
 from common import *
 from environment_utilities import *
-from networkx_utilities import open_tree_from_file
+from matplotlib.patches import Rectangle
+
+def plot_single_run(config, result_dict, path_to_experiment, timestep=10, main_agent=0):
+    colormap = {'red': (192/255, 67/255, 11/255), 
+                'darkred': (83/255, 29/255, 0/255),
+                'blue': (78/255, 127/255, 141/255), 
+                'darkblue': (38/255, 57/255, 63/255),
+                'yellow': (218/255, 181/255, 100/255), 
+                'grey': (71/255, 63/255, 61/255)}
+    
+    if timestep is None:
+        timestep = result_dict['T_terminal']
+
+    # plotting the trajectory of two agents on a 2D-plane and connecting states with a line and labeling states with timestep | trajectory: list of states [x1, y1, x2, y2, timestep]
+    trajectories = result_dict['trajectories']
+    finish_line = config.terminal_progress
+    
+    # define plotting environment
+    fig, ax = plt.subplots()
+    xmax = max((line.count("#")+line.count(".")) for line in config.env_def[0].split('\n')) - 1
+    ymax = config.env_def[0].count('\n') - 1
+    print("xmax: {}, ymax: {}".format(xmax, ymax))
+    ax.set_xlim([-0.5, xmax+1.5])
+    ax.set_ylim([-0.5, ymax+1.5][::-1]) # invert y-axis to fit to the environment defined in the numpy array
 
 
-class FigureV0:
-    def __init__(self):
-        gs_kw = dict(width_ratios=[1, 2], height_ratios=[1])
-        self.fig, self.axd = plt.subplot_mosaic([['tree', 'trajectory']], gridspec_kw=gs_kw, figsize=(12, 6), layout='constrained')
-        self.fig.suptitle("MCTS Tree and Trajectory")
-        self.ax0 = self.axd['tree']
-        self.ax1 = self.axd['trajectory']
+    # turn of the outter axes
+    #plt.tick_params(top='off', bottom='off', left='off', right='off', labelleft='off', labelbottom='off')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    # create a frame around the figure
+    #frame = plt.gca()
+    #frame.set_frame_on(True)
+    #frame.patch.set_edgecolor(grey_color)
+    #frame.patch.set_linewidth(5)  # Increase the linewidth to make the frame thicker
+    #ax.set_title("Trajectory")
 
-    def clear_ax(self):
-        self.ax0.clear()
-        self.ax1.clear()
 
-    def visualize_tree(self):
-        tree = get_last_tree()
+    # Plot the grid map 
+    last_map = get_current_grid(config.env_def, timestep)
+    #color_range = np.linspace(218/255, 100/255, len(grid_maps))
+    #gridcolor = [(218/255, 181/255, color_range[i]) for i in range(len(grid_maps))]
+    #for i, grid_map in enumerate(grid_maps):
+    
+    plot_map(ax, array=last_map, facecolor=colormap['yellow'], edgecolor=colormap['grey'])
 
-        pos = graphviz_layout(tree, prog="twopi")
-        labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X(agent=0),0), round(node.X(agent=1),0)) for node in tree.nodes}
+    # Plot coordinate system
+    plotCOS(ax, x_orig=0, y_orig=0, scale=1, colormap=colormap)
+                 
+    # plot finish line
+    plot_finish_line(ax, finish_line=finish_line, ymax=ymax)
+    
+    # plot trajectories
+    trajectory_0 = [[sublist[0], sublist[1], sublist[2], int(sublist[6])] for sublist in trajectories[:timestep+1]]
+    trajectory_1 = [[sublist[3], sublist[4], sublist[5], int(sublist[6])] for sublist in trajectories[:timestep+1]]
+    if main_agent == 0:
+        plot_trajectory(ax, trajectory_0, facecolor=colormap['red'], edgecolor=colormap['darkred'] ,label='Agent 0 (Us)', zorder=100, alpha=1)
+        plot_trajectory(ax, trajectory_1, facecolor=colormap['blue'], edgecolor=colormap['darkblue'] , label='Agent 1 (Opponent)', zorder=50, alpha=1)
+    elif main_agent == 1:
+        plot_trajectory(ax, trajectory_0, facecolor=colormap['red'], edgecolor=colormap['darkred'] ,label='Agent 0 (Us)', zorder=50, alpha=1)
+        plot_trajectory(ax, trajectory_1, facecolor=colormap['blue'], edgecolor=colormap['darkblue'] , label='Agent 1 (Opponent)', zorder=100, alpha=1) 
+    
+    
+    # plot legend
+    ax.legend(loc='lower center', bbox_to_anchor=(0.5, 0.1), ncol=2, fancybox=True, framealpha=0.5, bbox_transform=fig.transFigure) #title='Trajectory of'
+    ax.set_aspect('equal', 'box')
+    # remove x and y labels
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    plt.axis('off')
+    fig.tight_layout()
 
-        # Create a list of node colors
-        node_colors = []
-        cmap = plt.get_cmap('Oranges')
-        for node in tree.nodes:
-            """if any(node == parent._next_child for parent in tree.predecessors(node)):
-                node_colors.append("orange")
-            else:"""
-            node_colors.append('lightgrey')
+    # save figure
+    fig.savefig(os.path.join(path_to_experiment, "trajectory{}_{}.png".format(main_agent, timestep)), dpi=300, bbox_inches='tight')
 
-        #logging.debug('Node colors: %s', node_colors)
-        node_colors = np.array(node_colors, dtype=object)
-        nx.draw(tree, pos=pos, labels=labels, ax=self.ax0, with_labels=False, node_size=10, font_size=8, node_color=node_colors)
+def plot_finish_line(ax, finish_line=None, ymax=None):
+    # plot finish line
+    finishline_dist = 0.25
+    scale_dotted_line = 50 
+    dist_dotted_line= 50
+    dot_param = dist_dotted_line/scale_dotted_line
+    ax.plot([finish_line-finishline_dist, finish_line-finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(0, (dot_param,dot_param)), zorder=2)
+    ax.plot([finish_line+finishline_dist, finish_line+finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(dot_param, (dot_param,dot_param)), zorder=2)
 
-    def update_trajectory(self, env=None):
-        # plot dynamic rollout data
-        """try:
-            data_rollout = pd.read_csv(path_to_rollout_curr)
-            x0_rollout, y0_rollout, x1_rollout, y1_rollout = data_rollout['x0'], data_rollout['y0'], data_rollout['x1'], data_rollout['y1']
-            self.ax1.plot(x0_rollout, y0_rollout, "darkturquoise", label='Rollout Agent 0')
-            self.ax1.plot(x1_rollout, y1_rollout, "salmon", label='Rollout Agent 1')
-        except:
-            data_rollout = pd.read_csv(path_to_rollout_last)
-            x0_rollout, y0_rollout, x1_rollout, y1_rollout = data_rollout['x0'], data_rollout['y0'], data_rollout['x1'], data_rollout['y1']
-            self.ax1.plot(x0_rollout, y0_rollout, "darkturquoise", label='Rollout Agent 0')
-            self.ax1.plot(x1_rollout, y1_rollout, "salmon", label='Rollout Agent 1')
-            pass"""
+def plot_trajectory(ax, trajectory, linewidth=4, facecolor=None, edgecolor=None, label=None, fontsize=4, zorder=None, alpha=None):
+    xy_visited = []
+    x_values = [sublist[0] for sublist in trajectory]
+    y_values = [sublist[1] for sublist in trajectory]
+    theta_values = [sublist[2] for sublist in trajectory]
+    timesteps = [sublist[3] for sublist in trajectory]
+    # plot connecting lines
+    ax.plot(x_values, y_values, color=facecolor, linestyle='-', linewidth=linewidth, label=label, zorder=zorder, alpha=alpha*0.75)
 
-        # plot longterm rollout data as points being explored with color dependend on timehorizon
-        try:
-            data_longterm = pd.read_csv(path_to_rollout_last)
-            x0_longterm, y0_longterm, theta0_longterm, x1_longterm, y1_longterm, theta1_longterm, timehorizon = data_longterm['x0'], data_longterm['y0'], data_longterm['theta0'] , data_longterm['x1'], data_longterm['y1'], data_longterm['theta1'], data_longterm['timehorizon']
+    # annotate timesteps
+    for i in range(len(trajectory)):
+        annotate_state(ax, x_values[i], y_values[i], theta_values[i], timesteps[i], visit_count=xy_visited.count([x_values[i], y_values[i]]), facecolor=facecolor, edgecolor=edgecolor, fontsize=fontsize, zorder=zorder+1, alpha=alpha)
+        xy_visited.append([x_values[i], y_values[i]])
 
-            # Store visited configurations and number of visits
-            visited_configurations = {}
-            for i in range(len(x0_longterm)):
-                configuration0 = (0, round(x0_longterm[i], 1), round(y0_longterm[i], 1), round(theta0_longterm[i], 1), timehorizon[i])
-                configuration1 = (1, round(x1_longterm[i], 1), round(y1_longterm[i], 1), round(theta1_longterm[i], 1), timehorizon[i])
+def annotate_state(ax, x, y, theta, timestep, visit_count=0, facecolor=None, edgecolor=None, fontsize=None, zorder=None, alpha=None):
+    # plot orientations as arrows
+    arrow_length = 0.1+0.2*(visit_count)
+    arrow_width = 0.2
+    head_width = 0.4
+    head_length = 0.4
+    linewidth = 0.4
+    annot_alignment = 0.25
 
-                # count number of similar configurations
-                if configuration0 in visited_configurations:
-                    visited_configurations[configuration0] += 1
-                else:
-                    visited_configurations[configuration0] = 1
-                if configuration1 in visited_configurations:
-                    visited_configurations[configuration1] += 1
-                else:
-                    visited_configurations[configuration1] = 1
+    arrow_dx = arrow_length * np.cos(theta)
+    arrow_dy = arrow_length * np.sin(theta)
+    ax.arrow(x, y, arrow_dx, arrow_dy, facecolor=facecolor, edgecolor=edgecolor, linewidth=linewidth, width=arrow_width, head_width=head_width , head_length=head_length, zorder=zorder+visit_count, alpha=alpha)
+    
+    # annotate timestep on arrow
+    ax.annotate(timestep, (x+arrow_dx+annot_alignment*head_length*np.cos(theta), y+arrow_dy+annot_alignment*head_length*np.sin(theta)), color=edgecolor, fontsize=fontsize, textcoords="offset points", xytext=(0, 0), ha='center', va='center', zorder=zorder+visit_count, alpha=alpha)
 
-            max_visits = max(visited_configurations.values(), key=lambda x: x)
+    # add cicrle in the middle of the state
+    loc_circle = plt.Circle((x, y), radius=0.1, facecolor=facecolor, edgecolor=edgecolor, linewidth=0.4, zorder=zorder+visit_count, alpha=alpha)
+    ax.add_patch(loc_circle)
 
-            # Plot visited configurations as triangles with scaled sizes
-            for configuration, visits in visited_configurations.items():
+def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8):
+    thickness = 0.2
+    ax.arrow(x_orig, y_orig, scale, 0, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], zorder=4)
+    ax.arrow(x_orig, y_orig, 0, scale, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], zorder=4)
+    ax.plot(x_orig, y_orig, 'o', color=colormap['grey'], markersize=5, zorder=5)
 
-                size = np.log(1+visits/max_visits) * 0.5  # Scale the size based on the number of visits
+    ax.text(x_orig, y_orig-0.3, "(0,0)", fontsize=fontsize, ha='center', va='center', zorder=4)
+    ax.text(x_orig+scale, y_orig-0.3, "x", fontsize=fontsize, ha='center', va='center', zorder=4)
+    ax.text(x_orig-0.3, y_orig+scale, "y", fontsize=fontsize, ha='center', va='center', zorder=4)
 
-                if configuration[0] == 0 and configuration[-1] == timehorizon.max():
-                    _, x0, y0, theta0, timehorizon = configuration
-                    arrow_dx0 = 0.5 * np.cos(theta0)
-                    arrow_dy0 = 0.5 * np.sin(theta0)
-                    #self.ax1.plot(x0, y0, marker='^', markersize=size, c='darkturquoise', alpha=0.5, label='Longterm Agent 0')
-                    self.ax1.arrow(x0, y0, arrow_dx0, arrow_dy0, color='darkturquoise', alpha=0.5, width=size)
-                elif configuration[0] == 1 and configuration[-1] == timehorizon.max():
-                    _, x1, y1, theta1, timehorizon = configuration
-                    arrow_dx1 = 0.5 * np.cos(theta1)
-                    arrow_dy1 = 0.5 * np.sin(theta1)
-                    #self.ax1.plot(x1, y1, marker='v', markersize=size, c='salmon', alpha=0.5, label='Longterm Agent 1')
-                    self.ax1.arrow(x1, y1, arrow_dx1, arrow_dy1, color='salmon', alpha=0.5, width=size)
-        except:
-            print("Longterm data print error")
-            pass
+def plot_map(ax, array, facecolor=None, edgecolor=None):
+    for row in range(len(array)):
+        for col in range(len(array[0])):
+            if array[row][col] == 1: # obstacles
+                ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, facecolor=facecolor, edgecolor=edgecolor, alpha=1, zorder=3))
+            elif array[row][col] == 0: # free space, road
+                ax.plot(col, row, 'o', color='dimgrey', markersize=1, alpha=1)
+                ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, color='grey', linewidth=0, alpha=1, zorder=1))
 
-        # plotting the trajectory of two agents on a 2D-plane and connecting states with a line and labeling states with timestep | trajectory: list of states [x1, y1, x2, y2, timestep]
-        trajectory = pd.read_csv(path_to_global_state)
 
-        x0_trajectory = trajectory['x0']
-        y0_trajectory = trajectory['y0']
-        theta0_trajectory = trajectory['theta0']
-        x1_trajectory = trajectory['x1']
-        y1_trajectory = trajectory['y1']
-        theta1_trajectory = trajectory['theta1']
-        timestep_trajectory = trajectory['timestep']
-
-        self.ax1.plot(x0_trajectory, y0_trajectory, "bo-", label='Trajectory Agent 0')
-        self.ax1.plot(x1_trajectory, y1_trajectory, "ro-", label='Trajectory Agent 1')
-        # annotate timesteps
-        for i in range(len(trajectory)):
-            self.ax1.annotate(timestep_trajectory[i], (x0_trajectory[i], y0_trajectory[i]), color='b', textcoords="offset points", xytext=(0,10))
-            self.ax1.annotate(timestep_trajectory[i], (x1_trajectory[i], y1_trajectory[i]), color='r', textcoords="offset points", xytext=(-10,0))
-        # plot pixel environment
-        self.ax1.imshow(env.get_current_grid(timestep_trajectory.iloc[-1])['grid'], cmap='binary')
-
-        # plot orientations as arrows
-        arrow_length = 0.5
-        for i in range(len(trajectory)):
-            arrow_dx0 = arrow_length * np.cos(theta0_trajectory[i])
-            arrow_dy0 = arrow_length * np.sin(theta0_trajectory[i])
-            arrow_dx1 = arrow_length * np.cos(theta1_trajectory[i])
-            arrow_dy1 = arrow_length * np.sin(theta1_trajectory[i])
-
-            self.ax1.arrow(x0_trajectory[i], y0_trajectory[i], arrow_dx0, arrow_dy0, color='b', width=0.05, zorder=10)
-            self.ax1.arrow(x1_trajectory[i], y1_trajectory[i], arrow_dx1, arrow_dy1, color='r', width=0.05, zorder=10)
-
-def get_last_tree():
-        list_of_files = glob.glob(path_to_tree.format("*")) # * means all if need specific format then *.csv
-        try:
-            latest_file = max(list_of_files, key=os.path.getctime)
-            print("Latest file: {}".format(latest_file))
-            tree = open_tree_from_file(latest_file)
-        except:
-            print("No tree file found")
-            tree = nx.DiGraph()
-            pass
-        return tree
-
-def plot_together(i, figplot, env=None, stop_event=None, animation_container=None):
-    figplot.clear_ax()
-    figplot.visualize_tree()
-    figplot.update_trajectory(env)
-
-    figplot.ax0.set_title("MCTS Tree with {} iterations".format(MCTS_params['num_iter']))
-    figplot.ax1.set_title("Trajectory")
-    figplot.ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
-    figplot.ax1.set_xlim([0, env.get_current_grid(0)['x_max']+1])
-    figplot.ax1.set_ylim([0, env.get_current_grid(0)['y_max']+1][::-1]) # invert y-axis to fit to the environment defined in the numpy array
-
-    if stop_event and stop_event.is_set():
-        animation_container[0].event_source.stop() # Stop the animation
-        plt.close(figplot.fig)
-        sys.exit()
+def get_current_grid(grid_dict, timestep):
+    for grid_timeindex in reversed(grid_dict.keys()):
+        if grid_timeindex <= timestep:
+            current_grid = grid_dict[grid_timeindex]
+            break
+    occupancy_grid_define = current_grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1')
+    lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
+    transformed_grid = [list(map(int, line)) for line in lines]
+    occupancy_grid = np.array(transformed_grid)
+    return occupancy_grid

@@ -1,0 +1,17 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+agents: [0, 1]
+interm_payoffs: {'penalty_distance_0': {'pos': 0, 'weight': -0.2, 'agent': 0}, 'penalty_distance_1': {'pos': 1, 'weight': -0.2, 'agent': 1}, 'reward_progress_0': {'pos': 2, 'weight': 0, 'agent': 0}, 'reward_progress_1': {'pos': 3, 'weight': 0, 'agent': 1}, 'penalty_agressor_0': {'pos': 4, 'weight': 0, 'agent': 0}, 'penalty_agressor_1': {'pos': 5, 'weight': 0, 'agent': 1}}
+final_payoffs: {'penalty_timestep_0': {'pos': 0, 'weight': -0.2, 'agent': 0}, 'penalty_timestep_1': {'pos': 1, 'weight': -0.2, 'agent': 1}, 'reward_lead_0': {'pos': 2, 'weight': 1, 'agent': 0}, 'reward_lead_1': {'pos': 3, 'weight': 1, 'agent': 1}}
+len_interm_payoffs: 6
+len_final_payoffs: 4
+num_iter: 400
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0, 2.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Config: {'env_name': 'test', 'env_def': {0: '\n            ########################\n            #1.....................#\n            #####.....##############\n            ###.....################\n            #..0...#################\n            ########################'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 20, 'alpha_t': 1, 'num_sim': 1, 'num_iter': 400, 'delta_t': 1, 'c_param': 1.4142135623730951, 'penalty_distance_0': -0.2, 'penalty_distance_1': -0.2, 'reward_progress_0': 0, 'reward_progress_1': 0, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.2, 'penalty_timestep_1': -0.2, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0, 2.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': False, 'random': True}}}
+Duration: 4.423638343811035
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
