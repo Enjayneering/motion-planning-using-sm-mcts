@@ -54,57 +54,97 @@ def run_test(Game):
         print("Finished with duration: {} s".format(duration))
 
 
-def run_experiment(Game):
+def run_experiment(exp_subfolder, Game, exp_comment="", input=""):
     print("Running MCTS in Experimental mode!")
 
-    # INITIALIZE FOLDER
-    param_of_investigation = "w" # w: "weights", t: "T_max/T_goal", n: "num_iter"
-    start_config = "s" # s: "symmetric", a: "advantageous", d: "disadvantageous" (perspective of Agent 0)
-    selection = [flag for flag in Game.config.feature_flags["selection_policy"] if Game.config.feature_flags["selection_policy"][flag] == True][0]
-    final_move_selection = [flag for flag in Game.config.feature_flags["final_move"] if Game.config.feature_flags["final_move"][flag] == True][0]
-    rollout_policy = [flag for flag in Game.config.feature_flags["rollout_policy"] if Game.config.feature_flags["rollout_policy"][flag] == True][0]
-    env_name = Game.config.env_name
-    exp_name = f"{param_of_investigation}_{start_config}_{selection}_{final_move_selection}_{rollout_policy}_{env_name}"
-
-    # Check if folder with the same exp_name already exists
-    index = 0
-    while os.path.exists(os.path.join(path_to_experiments, f"{exp_name}_{index:02d}")):
-        index += 1
-    exp_name = f"{exp_name}_{index:02d}"
-
-    exp_filepath = os.path.join(path_to_experiments, exp_name)
-    os.mkdir(exp_filepath)
+    exp_filepath = get_exp_filepath(exp_subfolder, exp_comment, input)
 
     # WRITE CONFIGURATION FILE
     with open(os.path.join(exp_filepath, "config.json"), 'w') as f:
         json.dump(Game.config, f)
 
     for run_ix in range(Game.config.num_sim):
+        
         exp_ix = run_ix % 10000
-        exp_path= os.path.join(exp_filepath, str(exp_ix))
+        subex_filepath= os.path.join(exp_filepath, str(exp_ix))
 
-        os.mkdir(exp_path)
+        os.mkdir(subex_filepath)
+
+        # Redirect print outputs to a text file
+        print_file = open(os.path.join(subex_filepath, "print_output.txt"), "w")
+        sys.stdout = print_file
 
         # RUN EXPERIMENT
         result_dict = Game.compute_trajectories()
 
         # PLOT TRAJECTORIES
-        for t in range(result_dict['T_terminal']+1):
-            plot_single_run(Game.config, result_dict, exp_path, timestep=t, main_agent=0)
-            plot_single_run(Game.config, result_dict, exp_path, timestep=t, main_agent=1)
+        plot_trajectory(result_dict, subex_filepath, all_timesteps=False)
 
         # Write the result dictionary to the JSON file
-        with open(os.path.join(exp_filepath, str(exp_ix), "results.json"), "w") as f:
+        with open(os.path.join(subex_filepath, "results.json"), "w") as f:
             json.dump(result_dict, f)
+
+        # Restore the standard output
+        sys.stdout = sys.__stdout__
+        print_file.close()
 
     # COLLECT AND SAVE GLOBAL STATISTICAL DATA
 
+def get_exp_filepath(exp_subfolder, exp_comment="", input=""):
+    with open(os.path.join(exp_subfolder, "index.txt"), 'r') as f:
+        global_index = int(f.read())
+    
+    # INITIALIZE FOLDER
+    start_config = "dis" # sym: "symmetric", adv: "advantageous", dis: "disadvantageous" (perspective of Agent 0)
+    num_iter = Game.config.num_iter
+    selection = [flag for flag in Game.config.feature_flags["selection_policy"] if Game.config.feature_flags["selection_policy"][flag] == True][0]
+    final_move_selection = [flag for flag in Game.config.feature_flags["final_move"] if Game.config.feature_flags["final_move"][flag] == True][0]
+    rollout_policy = [flag for flag in Game.config.feature_flags["rollout_policy"] if Game.config.feature_flags["rollout_policy"][flag] == True][0]
+    env_name = Game.config.env_name
+    exp_name = f"{global_index}_{exp_comment}_{input}_{start_config}_{num_iter}_{selection}_{final_move_selection}_{rollout_policy}_{env_name}"
 
+    exp_filepath = os.path.join(exp_subfolder, exp_name)
+    os.mkdir(exp_filepath)
+
+    with open(os.path.join(exp_subfolder, "index.txt"), 'w') as f:
+        global_index += 1
+        f.write(str(global_index))
+    return exp_filepath
+
+def plot_trajectory(result_dict, exp_path, all_timesteps=False):
+    if all_timesteps:
+        for t in range(result_dict['T_terminal']+1):
+            plot_single_run(Game.config, result_dict, exp_path, timestep=t, main_agent=0)
+            plot_single_run(Game.config, result_dict, exp_path, timestep=t, main_agent=1)
+    else:
+        plot_single_run(Game.config, result_dict, exp_path, main_agent=0)
+        plot_single_run(Game.config, result_dict, exp_path, main_agent=1)
+
+def create_global_index(exp_subfolder):
+    with open(os.path.join(exp_subfolder, "index.txt"), 'w') as f:
+        f.write("1")
 
 if __name__ == "__main__": 
     if experimental_mode:
-        Game = CompetitiveGame(exp001_config)
-        run_experiment(Game)
+        exp_subfolder = "02_test"
+        if not os.path.exists(os.path.join(path_to_experiments, exp_subfolder)):
+            os.mkdir(os.path.join(path_to_experiments, exp_subfolder), )
+        create_global_index(os.path.join(path_to_experiments, exp_subfolder))
+        
+        exp_start = time.time()
+        num_incr = 10
+        for incr_dist in range(0, num_incr+1):
+            for incr_timestep in range(0, num_incr+1):
+                increment_dict = {  'penalty_distance_0': -incr_dist/num_incr,
+                                    'penalty_distance_1': -incr_dist/num_incr,
+                                    'penalty_timestep_0': -incr_timestep/num_incr,
+                                    'penalty_timestep_1': -incr_timestep/num_incr}
+                exp_weights_increment_config = copy_new_config(exp_weights_config, increment_dict)
+                print(exp_weights_increment_config)
+                Game = CompetitiveGame(exp_weights_increment_config)
+                run_experiment(os.path.join(path_to_experiments, exp_subfolder), Game, input=f"{incr_dist/num_incr}-{incr_timestep/num_incr}")
+        exp_duration = time.time() - exp_start
+        print("Finished all experiments with duration: {} s".format(exp_duration))
 
     else:
         Game = CompetitiveGame(test_config)

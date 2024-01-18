@@ -69,7 +69,6 @@ class MCTSNode:
         self.action_stats_1 = [{"action": action, "num_count": 1, "sum_payoffs": 0} for action in legal_action_1]
         return self.action_stats_0, self.action_stats_1"""
 
-
     def update_action_stats(self, Game):
         legal_action_0, legal_action_1, _ = sample_legal_actions(Game, self.state)
         self.action_stats_0 = [{"action": action, "num_count": 1, "sum_payoffs": 0} for action in legal_action_0]
@@ -78,20 +77,20 @@ class MCTSNode:
         # count at each node the number of children visited for the respective action and update that action's stats
         # TODO: for multiple agents
         for i, action_stat in enumerate(self.action_stats_0):
-            self.action_stats_0[i]["num_count"] = 1
-            self.action_stats_0[i]["sum_payoffs"] = 0
+            #self.action_stats_0[i]["num_count"] = 1
+            #self.action_stats_0[i]["sum_payoffs"] = 0
 
             for c in self.children:
-                if c.parent_action[:2] == action_stat["action"] and action_stat["action"] != -np.inf:
+                if c.parent_action[:2] == action_stat["action"]: # and action_stat["action"] != -np.inf:
                     self.action_stats_0[i]["num_count"] += 1
                     self.action_stats_0[i]["sum_payoffs"] += c.X(agent=0)
 
         for i, action_stat in enumerate(self.action_stats_1):
-            self.action_stats_1[i]["num_count"] = 1
-            self.action_stats_1[i]["sum_payoffs"] = 0
+            #self.action_stats_1[i]["num_count"] = 1
+            #self.action_stats_1[i]["sum_payoffs"] = 0
 
             for c in self.children:
-                if c.parent_action[2:] == action_stat["action"] and action_stat["action"] != -np.inf:
+                if c.parent_action[2:] == action_stat["action"]: # and action_stat["action"] != -np.inf:
                     self.action_stats_1[i]["num_count"] += 1
                     self.action_stats_1[i]["sum_payoffs"] += c.X(agent=1)
         pass
@@ -107,9 +106,10 @@ class MCTSNode:
         return child_node
 
     def untried_actions(self, Game):
-        _, _, _untried_actions = sample_legal_actions(Game, self.state)
-        return _untried_actions
+        _, _, untried_actions = sample_legal_actions(Game, self.state)
+        return untried_actions
 
+    # TODO: vary Selection policy
     def calc_UCT(self, action_stat, payoff_range, c_param):
             X = action_stat["sum_payoffs"]
             n = action_stat["num_count"]

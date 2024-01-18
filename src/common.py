@@ -37,7 +37,11 @@ def get_max_timehorizon(config):
 
 def is_terminal(Game, state):
         # terminal condition
-        if state.x0 >= Game.config.terminal_progress or state.x1 >= Game.config.terminal_progress or state.timestep >= get_max_timehorizon(Game.config):
+        if state.x0 >= Game.config.terminal_progress or state.x1 >= Game.config.terminal_progress:
+            print("Terminal state reached")
+            return True
+        elif state.timestep >= get_max_timehorizon(Game.config):
+            print("Max timehorizon reached")
             return True
         else:
             return False

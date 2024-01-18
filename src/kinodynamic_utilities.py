@@ -21,6 +21,8 @@ def distance(state_0, state_1):
 
 def is_collision(state_object):
     # state = [x, y, theta]
+
+    # vertex collisions
     state_0 = state_object.get_state_0()
     state_1 = state_object.get_state_1()
     if distance(state_0, state_1) <= 0.5:

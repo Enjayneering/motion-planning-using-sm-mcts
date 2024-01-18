@@ -188,8 +188,8 @@ test_dict = {
     
 }
 
-exp001_dict = {
-    'env_name': 'closing-door',
+exp_weigths_dict = {
+    'env_name': 'racetrack-7x16',
     'env_def': {
         0: """
             ################
@@ -199,49 +199,24 @@ exp001_dict = {
             #..............#
             #..............#
             ################""",
-        2: """
-            ################
-            #.......#......#
-            #..............#
-            #..............#
-            #..............#
-            #..............#
-            ################""",
-        4: """
-            ################
-            #.......#......#
-            #.......#......#
-            #..............#
-            #..............#
-            #..............#
-            ################""",
-        6: """
-            ################
-            #.......#......#
-            #.......#......#
-            #.......#......#
-            #..............#
-            #..............#
-            ################""",
-
     },
     'theta_0_init': 0,
     'theta_1_init': 0,
     'terminal_progress': 12,
     'alpha_t': 1,
-    'num_sim': 1,
-    'num_iter': 100,
+    'num_sim': 5,
+    'num_iter': 10,
     'delta_t': 1,
-    'penalty_distance_0': -2,
-    'penalty_distance_1': -5,
-    'reward_progress_0': 1,
-    'reward_progress_1': 1,
-    'penalty_agressor_0': -10,
-    'penalty_agressor_1': -10,
+    'penalty_distance_0': -1,
+    'penalty_distance_1': -1,
+    'reward_progress_0': 0,
+    'reward_progress_1': 0,
+    'penalty_agressor_0': -0,
+    'penalty_agressor_1': -0,
     'penalty_timestep_0': -0.1,
     'penalty_timestep_1': -0.1,
-    'reward_lead_0': 5,
-    'reward_lead_1': 5,
+    'reward_lead_0': 1,
+    'reward_lead_1': 1,
     'velocity_0': np.linspace(0, 2, 3).tolist(),
     'ang_velocity_0': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
     'velocity_1': np.linspace(0, 1, 2).tolist(),
@@ -251,7 +226,7 @@ exp001_dict = {
         'collision_handling': {'punishing': True, 'pruning': False},
         'selection_policy': {'ucb': True, 'random': False},
         'rollout_policy': {'uniform_random': True, 'best': False},
-        'payoff_weights': {'adaptive': False, 'fixed': True},
+        'payoff_weights': {'fixed': True, 'adaptive': False},
         'expansion_policy': {'full_child': True, 'random': False},
     }
 }
@@ -260,5 +235,5 @@ experimental_mode = True
 
 default_config = Config(default_dict)
 test_config = copy_new_config(default_config, test_dict)
-exp001_config = copy_new_config(default_config, exp001_dict)
+exp_weights_config = copy_new_config(default_config, exp_weigths_dict)
 

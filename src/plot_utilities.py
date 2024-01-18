@@ -12,8 +12,18 @@ from matplotlib.ticker import AutoMinorLocator
 from common import *
 from environment_utilities import *
 from matplotlib.patches import Rectangle
+from kinodynamic_utilities import distance, mm_unicycle
 
-def plot_single_run(config, result_dict, path_to_experiment, timestep=10, main_agent=0):
+def coll_count(joint_trajectory):
+    coll_count = 0
+    for t in range(len(joint_trajectory)-1):
+        line_points_0 = np.linspace(joint_trajectory[t][0:2], joint_trajectory[t+1][0:2], num=10).tolist()
+        line_points_1 = np.linspace(joint_trajectory[t][3:5], joint_trajectory[t+1][3:5], num=10).tolist()
+        if any(distance(point_0, point_1) <= 0.5 for point_0 in line_points_0 for point_1 in line_points_1):
+            coll_count += 1
+    return coll_count
+
+def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main_agent=0):
     colormap = {'red': (192/255, 67/255, 11/255), 
                 'darkred': (83/255, 29/255, 0/255),
                 'blue': (78/255, 127/255, 141/255), 

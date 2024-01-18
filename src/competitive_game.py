@@ -229,11 +229,6 @@ class CompetitiveGame:
             # COLLECT AND SAVE DATA
             result_dict["runtime"] = end_time - start_time
             result_dict["winner"] = get_winner(self.mcts_nodes_global[-1].state)
-            coll_count = 0
-            for node in self.mcts_nodes_global:
-                if is_collision(node.state):
-                    coll_count += 1
-            result_dict["collision_count"] = coll_count
             result_dict["T_terminal"] = self.mcts_nodes_global[-1].state.timestep
             result_dict["trajectories"] = [[float(value) for value in node.state.get_state_together()] for node in self.mcts_nodes_global]
             result_dict.update(self.payoff_dict_global)
