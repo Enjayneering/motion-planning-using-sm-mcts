@@ -68,7 +68,8 @@ def run_experiment(exp_subfolder, Game, exp_comment="", input=""):
         exp_ix = run_ix % 10000
         subex_filepath= os.path.join(exp_filepath, str(exp_ix))
 
-        os.mkdir(subex_filepath)
+        if not os.path.exists(subex_filepath):
+            os.mkdir(subex_filepath)
 
         # Redirect print outputs to a text file
         print_file = open(os.path.join(subex_filepath, "print_output.txt"), "w")
@@ -104,7 +105,9 @@ def get_exp_filepath(exp_subfolder, exp_comment="", input=""):
     exp_name = f"{global_index}_{exp_comment}_{input}_{start_config}_{num_iter}_{selection}_{final_move_selection}_{rollout_policy}_{env_name}"
 
     exp_filepath = os.path.join(exp_subfolder, exp_name)
-    os.mkdir(exp_filepath)
+
+    if not os.path.exists(exp_filepath):
+        os.mkdir(exp_filepath)
 
     with open(os.path.join(exp_subfolder, "index.txt"), 'w') as f:
         global_index += 1
@@ -126,7 +129,7 @@ def create_global_index(exp_subfolder):
 
 if __name__ == "__main__": 
     if experimental_mode:
-        exp_subfolder = "02_test"
+        exp_subfolder = "04_test"
         if not os.path.exists(os.path.join(path_to_experiments, exp_subfolder)):
             os.mkdir(os.path.join(path_to_experiments, exp_subfolder), )
         create_global_index(os.path.join(path_to_experiments, exp_subfolder))

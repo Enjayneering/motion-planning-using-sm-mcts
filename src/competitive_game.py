@@ -101,16 +101,8 @@ class CompetitiveGame:
         for payoff in self.Model_params["final_payoffs"].keys():
             payoff_dict_global[payoff]= []
         for agent in self.Model_params["agents"]:
-            payoff_dict_global["payoff_total"+str(agent)] = []
+            payoff_dict_global["payoff_total_"+str(agent)] = []
         return payoff_dict_global
-    
-    """def _update_payoff_dict(self, next_payoff_dict):
-        for agent in self.Model_params["agents"]:
-            for interm_payoff in self.Model_params["interm_payoffs"].values():
-                self.payoff_dict_global[agent].append(next_payoff_dict[agent][interm_payoff])
-            for final_payoff in self.Model_params["final_payoffs"].values():
-                self.payoff_dict_global[agent].append(next_payoff_dict[agent][final_payoff])
-        return self.payoff_dict_global"""
     
     def search_game_tree(self, current_node):
         current_node_mcts = current_node
@@ -118,8 +110,9 @@ class CompetitiveGame:
         
         # TREE POLICY
         for iter in range(self.MCTS_params['num_iter']):
-            #print("Horizon {} | Iteration {}".format(simhorizon, iter))
+            print("Horizon {} | Iteration {}".format(simhorizon, iter))
             v = current_node_mcts._tree_policy(self)
+            print("Selected node: {}".format(v.state.get_state_together()))
 
             #print("Starting rollout")
             rollout_trajectory, interm_payoff_rollout_vec, final_payoff_rollout_vec = v.rollout(self)
@@ -193,7 +186,7 @@ class CompetitiveGame:
                 self.payoff_dict_global[payoff].append(float(interm_payoff_increment_vec[self.Model_params["interm_payoffs"][payoff]["pos"]]))
             for agent in self.Model_params["agents"]:
                 total_payoff = get_total_payoffs_all_agents(self, self.interm_payoff_vec_global, self.final_payoff_vec_global)[agent]
-                self.payoff_dict_global["payoff_total"+str(agent)].append(total_payoff)
+                self.payoff_dict_global["payoff_total_"+str(agent)].append(total_payoff)
 
             if not experimental_mode:
                 csv_write_global_state(self, self.mcts_nodes_global[-1].state)
@@ -206,18 +199,18 @@ class CompetitiveGame:
         print("Terminal state: {}".format(current_node.state.get_state_together()))
         
         # update final payoffs global solution
-        final_payoff_increment_vec = get_final_payoffs(self, current_node.state)    
-        self.final_payoff_vec_global += final_payoff_increment_vec
+        final_payoff_vec = get_final_payoffs(self, current_node.state)    
+        self.final_payoff_vec_global += final_payoff_vec
 
         end_time = time.time()
         print("Runtime: {} s".format(end_time - start_time))
 
         # update global payoff dict
         for payoff in self.Model_params["final_payoffs"].keys():
-            self.payoff_dict_global[payoff].append(float(final_payoff_increment_vec[self.Model_params["final_payoffs"][payoff]["pos"]]))
+            self.payoff_dict_global[payoff].append(float(final_payoff_vec[self.Model_params["final_payoffs"][payoff]["pos"]]))
         for agent in self.Model_params["agents"]:
             total_payoff = get_total_payoffs_all_agents(self, self.interm_payoff_vec_global, self.final_payoff_vec_global)[agent]
-            self.payoff_dict_global["payoff_total"+str(agent)].append(total_payoff)
+            self.payoff_dict_global["payoff_total_"+str(agent)].append(total_payoff)
         
         if not experimental_mode:
             with open(os.path.join(path_to_results, self.name + ".txt"), 'a') as f:
@@ -231,5 +224,5 @@ class CompetitiveGame:
             result_dict["winner"] = get_winner(self.mcts_nodes_global[-1].state)
             result_dict["T_terminal"] = self.mcts_nodes_global[-1].state.timestep
             result_dict["trajectories"] = [[float(value) for value in node.state.get_state_together()] for node in self.mcts_nodes_global]
-            result_dict.update(self.payoff_dict_global)
+            result_dict.update(self.payoff_dict_global) # merge dictionaries
             return result_dict
