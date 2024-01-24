@@ -1,0 +1,180 @@
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.1681079864501953
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.2134170532226562
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.081387519836426
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.151137590408325
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.865086317062378
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.7622342109680176
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.1744120121002197
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.1238808631896973
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.056443929672241
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11
+Config: {'env_name': 'racetrack-7x16', 'env_def': {0: '\n            #############\n            #.0.........#\n            #1..........#\n            #############', 4: '\n            #############\n            #...#.......#\n            #...#.......#\n            #############'}, 'theta_0_init': 0, 'theta_1_init': 0, 'terminal_progress': 8, 'alpha_t': 1, 'num_sim': 10, 'num_iter': 1000, 'delta_t': 1, 'collision_distance': 0.5, 'c_param': 1.4142135623730951, 'penalty_distance_0': 0, 'penalty_distance_1': -1, 'reward_progress_0': 0.1, 'reward_progress_1': 0.1, 'penalty_agressor_0': 0, 'penalty_agressor_1': 0, 'penalty_timestep_0': -0.1, 'penalty_timestep_1': -0.1, 'reward_lead_0': 1, 'reward_lead_1': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'feature_flags': {'final_move': {'robust': True, 'best': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'ucb': True, 'random': False}, 'rollout_policy': {'uniform_random': True, 'best': False}, 'payoff_weights': {'fixed': True, 'adaptive': False}, 'expansion_policy': {'full_child': True, 'random': False}}}
+Duration: 2.173999071121216
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+3,4,0,1,1,0,0
+3,4,0,1,1,0,0
+5.0,4.0,4.71238898038469,3.0,1.0,0.0,1
+5.0,2.0,3.141592653589793,5.0,1.0,0.0,2
+5.0,2.0,4.71238898038469,7.0,1.0,0.0,3
+5.0,2.0,3.141592653589793,9.0,1.0,0.0,4
+5.0,2.0,4.71238898038469,10.0,1.0,1.5707963267948966,5
+5.0,1.0,0.0,10.0,1.0,0.0,6
+7.0,1.0,0.0,12.0,1.0,0.0,7
+9.0,1.0,0.0,14.0,1.0,0.0,8
+11.0,1.0,0.0,16.0,1.0,0.0,9
+13.0,1.0,0.0,18.0,1.0,0.0,10
+15.0,1.0,0.0,20.0,1.0,4.71238898038469,11

@@ -60,10 +60,10 @@ def csv_write_rollout_last(Game, rollout_trajectory, timehorizon = None, config=
 
 # Video parameters
 def get_next_game_name(path_to_results, Game):
-    environment_name = Game.config.env_name
-    list_of_files = glob.glob(path_to_results + environment_name + "*.mp4")
+    instance_name = Game.config.instance_name
+    list_of_files = glob.glob(path_to_results + instance_name + "*.mp4")
     num_videos = len(list_of_files)
-    next_video_name = "{}_{:02d}".format(environment_name, num_videos + 1)
+    next_video_name = "{}_{:02d}".format(instance_name, num_videos + 1)
     return next_video_name
 
 

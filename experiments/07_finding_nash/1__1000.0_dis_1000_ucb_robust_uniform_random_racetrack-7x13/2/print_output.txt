@@ -1,0 +1,46 @@
+Searching game tree in timestep 0...
+No possible moves
+Agent 0 stuck in environment, append current state on forbidden list, break
+No possible moves
+Agent 0 stuck in environment, append current state on forbidden list, break
+No possible moves
+Agent 1 stuck in environment, append current state on forbidden list, break
+No possible moves
+Agent 1 stuck in environment, append current state on forbidden list, break
+Searching game tree in timestep 1...
+Searching game tree in timestep 2...
+Searching game tree in timestep 3...
+Searching game tree in timestep 4...
+Searching game tree in timestep 5...
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 1.5707963267948966, 4.0, 3.0, 4.71238898038469, 7]
+Collision detected from state [4.0, 2.0, 1.5707963267948966, 4.0, 4.0, 4.71238898038469, 6] to state [4.0, 3.0, 3.141592653589793, 4.0, 3.0, 0.0, 7]
+Searching game tree in timestep 6...
+Searching game tree in timestep 7...
+Searching game tree in timestep 8...
+Searching game tree in timestep 9...
+Runtime: 42.22127437591553 s

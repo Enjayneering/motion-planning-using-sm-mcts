@@ -29,13 +29,10 @@ def save_tree_to_file(node_current_timestep, path_to_tree):
             tree.add_edge(current_node, child)
             stack.append(child)
 
-    with open(path_to_tree, 'wb') as file:
-        pickle.dump(tree, file)
+    with open(path_to_tree, 'wb') as f:
+        pickle.dump(tree, f)
 
 def open_tree_from_file(latest_file):
-    # Create a new DiGraph tree
-    #tree = nx.DiGraph()
-
     # Unpickle and load the tree from the file
     with open(latest_file, 'rb') as f:
         unpickler = pickle.Unpickler(f)

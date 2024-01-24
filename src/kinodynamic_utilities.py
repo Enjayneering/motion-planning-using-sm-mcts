@@ -34,11 +34,11 @@ def lines_intersect(Game, prev_state, joint_action):
     # Create lines for both agents
     state_0 = prev_state.get_state_0()
     action_0 = joint_action[:2]
-    x_next_0, y_next_0, theta_next_0 = mm_unicycle(state_0, action_0, Game.Model_params["delta_t"])
+    x_next_0, y_next_0, theta_next_0 = mm_unicycle(state_0, action_0, delta_t=Game.Model_params["delta_t"])
 
     state_1 = prev_state.get_state_1()
     action_1 = joint_action[2:]
-    x_next_1, y_next_1, theta_next_1 = mm_unicycle(state_1, action_1, Game.Model_params["delta_t"])
+    x_next_1, y_next_1, theta_next_1 = mm_unicycle(state_1, action_1, delta_t=Game.Model_params["delta_t"])
 
     line_0 = LineString([state_0[:2], [x_next_0, y_next_0]])
     line_1 = LineString([state_1[:2], [x_next_1, y_next_1]])
@@ -74,7 +74,7 @@ def is_in_free_space(Game, state, action, init_timestep, num_linesearch = 4):
             time_int = int(time_point) # round down to nearest integer since environment changes at next increment
 
             # Check if points on obstacles now and in next step
-            if Game.env.get_current_grid(time_int)['grid'][y_round, x_round] == 1:
+            if Game.env.get_current_grid(time_int)['grid'][y_round, x_round] != 0:
                 return False  # Collision detected
     else:
         #print("collision outside grid")
@@ -82,14 +82,13 @@ def is_in_free_space(Game, state, action, init_timestep, num_linesearch = 4):
     #print("no collision")
     return True
 
-def is_in_forbidden_state(Game, state, action, init_timestep, forbidden_states):
+def is_in_forbidden_state(Game, state, action, init_timestep):
     x_next, y_next, theta_next = mm_unicycle(state, action, delta_t=Game.Model_params["delta_t"])
     time_next = init_timestep+Game.Model_params["delta_t"]
-    if [x_next, y_next, theta_next, time_next] in forbidden_states:
+    if [x_next, y_next, theta_next, time_next] in Game.forbidden_states:
         return True
     else:
         return False
-
 
 def sample_legal_actions(Game, state_object):
     # representing KINODYNAMIC CONSTRAINTS
@@ -116,8 +115,8 @@ def sample_legal_actions(Game, state_object):
 
     # prune actions that lead to forbidden states (where the agent cannot get out)
     if Game.forbidden_states:
-        sampled_actions_0_pruned = [action_0 for action_0 in sampled_actions_0_pruned if not is_in_forbidden_state(Game, state_0, action_0, state_object.timestep, Game.forbidden_states)]
-        sampled_actions_1_pruned = [action_1 for action_1 in sampled_actions_1_pruned if not is_in_forbidden_state(Game, state_1, action_1, state_object.timestep, Game.forbidden_states)]
+        sampled_actions_0_pruned = [action_0 for action_0 in sampled_actions_0_pruned if not is_in_forbidden_state(Game, state_0, action_0, state_object.timestep)]
+        sampled_actions_1_pruned = [action_1 for action_1 in sampled_actions_1_pruned if not is_in_forbidden_state(Game, state_1, action_1, state_object.timestep)]
 
     # combine both list elements in all possible combinations
     action_pair_pruned = list(itertools.product(sampled_actions_0_pruned, sampled_actions_1_pruned))

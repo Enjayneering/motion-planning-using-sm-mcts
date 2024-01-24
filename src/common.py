@@ -30,18 +30,18 @@ payoff_range = max_payoff - min_payoff
 aver_intermediate_penalties = 1
 aver_final_payoff = 0
 
-freq_stat_data = 2
+freq_stat_data = 10
 
 def get_max_timehorizon(config):
-    return config.alpha_t * config.terminal_progress
+    return int(config.alpha_t * config.terminal_progress)
 
 def is_terminal(Game, state):
         # terminal condition
-        if state.x0 >= Game.config.terminal_progress or state.x1 >= Game.config.terminal_progress:
-            print("Terminal state reached")
+        if state.x0 >= Game.config.finish_line or state.x1 >= Game.config.finish_line:
+            #print("Terminal state reached")
             return True
         elif state.timestep >= get_max_timehorizon(Game.config):
-            print("Max timehorizon reached")
+            #print("Max timehorizon reached")
             return True
         else:
             return False

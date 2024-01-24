@@ -21,7 +21,7 @@ class CompetitiveGame:
 
         self.MCTS_params = self._set_mcts_params()
         self.Model_params = self._set_model_params()
-        self.Kinodynamic_params = self._set_Kinodynamic_params()
+        self.Kinodynamic_params = self._set_kinodynamic_params()
 
         self.forbidden_states = []
         self.mcts_nodes_global = [self._init_root_node()] # stores all nodes of the tree, represents the final trajectory
@@ -41,14 +41,13 @@ class CompetitiveGame:
         Model_params = {
             "state_space": ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep'],
             "delta_t": self.config.delta_t,
+            "collision_distance": self.config.collision_distance,
             "agents": [0, 1],
             "interm_payoffs": {
-                "penalty_distance_0": {"pos": 0, "weight": self.config.penalty_distance_0, "agent": 0},
-                "penalty_distance_1": {"pos": 1, "weight": self.config.penalty_distance_1, "agent": 1},
+                "penalty_distance_0": {"pos": 0, "weight": self.config.risk_factor*self.config.penalty_distance, "agent": 0},
+                "penalty_distance_1": {"pos": 1, "weight": (1-self.config.risk_factor)*self.config.penalty_distance, "agent": 1},
                 "reward_progress_0": {"pos": 2, "weight": self.config.reward_progress_0, "agent": 0},
                 "reward_progress_1": {"pos": 3, "weight": self.config.reward_progress_1, "agent": 1},
-                "penalty_agressor_0": {"pos": 4, "weight": self.config.penalty_agressor_0, "agent": 0},
-                "penalty_agressor_1": {"pos": 5, "weight": self.config.penalty_agressor_1, "agent": 1},
             },
             "final_payoffs": {
                 "penalty_timestep_0": {"pos": 0, "weight": self.config.penalty_timestep_0, "agent": 0},
@@ -61,7 +60,7 @@ class CompetitiveGame:
         Model_params["len_final_payoffs"] = len(Model_params["final_payoffs"])
         return Model_params
     
-    def _set_Kinodynamic_params(self):
+    def _set_kinodynamic_params(self):
         Kinodynamic_params = {
         "action_set_0": {"velocity_0": self.config.velocity_0,
                         "ang_velocity_0": self.config.ang_velocity_0},
@@ -74,10 +73,6 @@ class CompetitiveGame:
         MCTS_params = {
         "num_iter": self.config.num_iter, #max number of simulations, proportional to complexity of the game
         "c_param": self.config.c_param, # c_param: exploration parameter | 3.52 - Tuned from Paper by Perick, 2012
-
-        #'penalty_collision_init': 0.1, # penalty at initial state
-        #'penalty_collision_delay': 1, # dynamic factor for ensuring reward is bigger than sum of penalties
-        #"penalty_stuck_in_env": -1,
         }
         return MCTS_params
         
@@ -105,14 +100,13 @@ class CompetitiveGame:
         return payoff_dict_global
     
     def search_game_tree(self, current_node):
+        start_time = time.time()
         current_node_mcts = current_node
-        simhorizon = current_node_mcts.state.timestep
         
         # TREE POLICY
         for iter in range(self.MCTS_params['num_iter']):
-            print("Horizon {} | Iteration {}".format(simhorizon, iter))
+            #print("Horizon {} | Iteration {}".format(simhorizon, iter))
             v = current_node_mcts._tree_policy(self)
-            print("Selected node: {}".format(v.state.get_state_together()))
 
             #print("Starting rollout")
             rollout_trajectory, interm_payoff_rollout_vec, final_payoff_rollout_vec = v.rollout(self)
@@ -121,8 +115,9 @@ class CompetitiveGame:
             self.max_payoff, self.min_payoff, self.payoff_range = update_payoff_range(self.max_payoff, self.min_payoff, payoff_total_list)
 
             # write every x rollout trajectories
-            if iter % freq_stat_data == 0:
-                csv_write_rollout_last(self, rollout_trajectory, timehorizon = current_node_mcts.state.timestep, config=self.config)
+            if not experimental_mode:
+                if iter % freq_stat_data == 0:
+                    csv_write_rollout_last(self, rollout_trajectory, timehorizon = current_node_mcts.state.timestep, config=self.config)
             
             #print("Backpropagating")
             v.backpropagate(self, payoff_total_list)
@@ -133,15 +128,14 @@ class CompetitiveGame:
                 #payoff_weights = update_weigths_payoff(current_node_mcts, payoff_weights)
                 pass
         
-        if is_feature_active(self.config.feature_flags["final_move"]["robust"]):
-            next_node = current_node_mcts.robust_child()
-        elif is_feature_active(self.config.feature_flags["final_move"]["max"]):
-            pass
+        next_node = current_node_mcts.select_final_child(self)
 
         if not experimental_mode:
             save_tree_to_file(current_node_mcts, path_to_tree.format(current_node_mcts.state.timestep))
             #print("Next State: {}".format(next_node.state.get_state_together()))
-        return next_node
+        
+        runtime = time.time() - start_time 
+        return next_node, runtime
     
     def compute_trajectories(self):
         # create a text trap and redirect stdout
@@ -165,8 +159,6 @@ class CompetitiveGame:
             print("Searching game tree in timestep {}...".format(current_node.state.timestep))
             if not experimental_mode:
                 csv_init_rollout_last(self)
-            elif experimental_mode:
-                pass
                 
             if is_feature_active(self.config.feature_flags["payoff_weights"]["adaptive"]):
                 self.interm_weights_vec = init_interm_weights(self)
@@ -176,7 +168,10 @@ class CompetitiveGame:
                 self.final_weights_vec = init_final_weights(self)
             
             # RUN SINGLE MCTS ALGORITHM IN CURRENT TIMESTEP
-            next_node = self.search_game_tree(current_node)
+            next_node, runtime = self.search_game_tree(current_node)
+
+            if experimental_mode:
+                result_dict["runtime_game_length_{}".format(get_max_timehorizon(self.config)-current_node.state.timestep)] = runtime
 
             interm_payoff_increment_vec = get_intermediate_payoffs(self, current_node.state, next_node.state)
             self.interm_payoff_vec_global += interm_payoff_increment_vec
@@ -196,7 +191,7 @@ class CompetitiveGame:
         
         if not experimental_mode:
                 csv_write_global_state(self, self.mcts_nodes_global[-1].state)
-        print("Terminal state: {}".format(current_node.state.get_state_together()))
+        #print("Terminal state: {}".format(current_node.state.get_state_together()))
         
         # update final payoffs global solution
         final_payoff_vec = get_final_payoffs(self, current_node.state)    
@@ -214,15 +209,15 @@ class CompetitiveGame:
         
         if not experimental_mode:
             with open(os.path.join(path_to_results, self.name + ".txt"), 'a') as f:
-                f.write(f"Environment trigger: {self.config.env_name}\n")
+                f.write(f"Environment trigger: {self.config.instance_name}\n")
                 for key, value in self.payoff_dict_global.items():
                     f.write(f"{key}: {value}\n")
-
         elif experimental_mode:
             # COLLECT AND SAVE DATA
             result_dict["runtime"] = end_time - start_time
             result_dict["winner"] = get_winner(self.mcts_nodes_global[-1].state)
             result_dict["T_terminal"] = self.mcts_nodes_global[-1].state.timestep
-            result_dict["trajectories"] = [[float(value) for value in node.state.get_state_together()] for node in self.mcts_nodes_global]
+            result_dict["trajectory_0"] = [[float(value) for value in node.state.get_state_0()]+[node.state.timestep] for node in self.mcts_nodes_global]
+            result_dict["trajectory_1"] = [[float(value) for value in node.state.get_state_1()]+[node.state.timestep] for node in self.mcts_nodes_global]
             result_dict.update(self.payoff_dict_global) # merge dictionaries
             return result_dict

@@ -310,13 +310,13 @@ class Environment:
             'theta0':theta_0_init,
             'x1': agent_1_x[0],
             'y1': agent_1_y[0],
-            'theta1': theta_0_init,
+            'theta1': theta_1_init,
             'timestep': 0,
         }
         return init_state
 
     def get_occupancy_grid(self, grid):
-        occupancy_grid_define = grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1')
+        occupancy_grid_define = grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1').replace('+', '2')
         lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
         transformed_grid = [list(map(int, line)) for line in lines]
         occupancy_grid = np.array(transformed_grid)

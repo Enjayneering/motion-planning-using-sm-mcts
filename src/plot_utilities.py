@@ -35,20 +35,20 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
         timestep = result_dict['T_terminal']
 
     # plotting the trajectory of two agents on a 2D-plane and connecting states with a line and labeling states with timestep | trajectory: list of states [x1, y1, x2, y2, timestep]
-    trajectories = result_dict['trajectories']
-    finish_line = config.terminal_progress
+    trajectory_0 = result_dict['trajectory_0']
+    trajectory_1 = result_dict['trajectory_1']
+    finish_line = config.finish_line
     
     # define plotting environment
     fig, ax = plt.subplots()
     xmax = max((line.count("#")+line.count(".")) for line in config.env_def[0].split('\n')) - 1
     ymax = config.env_def[0].count('\n') - 1
-    print("xmax: {}, ymax: {}".format(xmax, ymax))
+    #print("xmax: {}, ymax: {}".format(xmax, ymax))
     ax.set_xlim([-0.5, xmax+1.5])
     ax.set_ylim([-0.5, ymax+1.5][::-1]) # invert y-axis to fit to the environment defined in the numpy array
 
 
     # turn of the outter axes
-    #plt.tick_params(top='off', bottom='off', left='off', right='off', labelleft='off', labelbottom='off')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
@@ -76,8 +76,6 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
     plot_finish_line(ax, finish_line=finish_line, ymax=ymax)
     
     # plot trajectories
-    trajectory_0 = [[sublist[0], sublist[1], sublist[2], int(sublist[6])] for sublist in trajectories[:timestep+1]]
-    trajectory_1 = [[sublist[3], sublist[4], sublist[5], int(sublist[6])] for sublist in trajectories[:timestep+1]]
     if main_agent == 0:
         plot_trajectory(ax, trajectory_0, facecolor=colormap['red'], edgecolor=colormap['darkred'] ,label='Agent 0 (Us)', zorder=100, alpha=1)
         plot_trajectory(ax, trajectory_1, facecolor=colormap['blue'], edgecolor=colormap['darkblue'] , label='Agent 1 (Opponent)', zorder=50, alpha=1)
@@ -87,7 +85,7 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
     
     
     # plot legend
-    ax.legend(loc='lower center', bbox_to_anchor=(0.5, 0.1), ncol=2, fancybox=True, framealpha=0.5, bbox_transform=fig.transFigure) #title='Trajectory of'
+    ax.legend(loc='lower center', bbox_to_anchor=(0.5, 0.05), ncol=2, fancybox=True, framealpha=0.5, bbox_transform=fig.transFigure) #title='Trajectory of'
     ax.set_aspect('equal', 'box')
     # remove x and y labels
     ax.set_xticklabels([])
@@ -97,6 +95,7 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
 
     # save figure
     fig.savefig(os.path.join(path_to_experiment, "trajectory{}_{}.png".format(main_agent, timestep)), dpi=300, bbox_inches='tight')
+    plt.close(fig)
 
 def plot_finish_line(ax, finish_line=None, ymax=None):
     # plot finish line
@@ -152,10 +151,13 @@ def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8):
     ax.text(x_orig-0.3, y_orig+scale, "y", fontsize=fontsize, ha='center', va='center', zorder=4)
 
 def plot_map(ax, array, facecolor=None, edgecolor=None):
+    # plot the racing gridmap
     for row in range(len(array)):
         for col in range(len(array[0])):
-            if array[row][col] == 1: # obstacles
+            if array[row][col] == 1: # static obstacles
                 ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, facecolor=facecolor, edgecolor=edgecolor, alpha=1, zorder=3))
+            if array[row][col] == 2: # dynamic obstacles
+                ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, facecolor=facecolor, edgecolor=edgecolor, alpha=1, hatch="//", zorder=3))
             elif array[row][col] == 0: # free space, road
                 ax.plot(col, row, 'o', color='dimgrey', markersize=1, alpha=1)
                 ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, color='grey', linewidth=0, alpha=1, zorder=1))
@@ -166,7 +168,7 @@ def get_current_grid(grid_dict, timestep):
         if grid_timeindex <= timestep:
             current_grid = grid_dict[grid_timeindex]
             break
-    occupancy_grid_define = current_grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1')
+    occupancy_grid_define = current_grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1').replace('+', '2')
     lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
     transformed_grid = [list(map(int, line)) for line in lines]
     occupancy_grid = np.array(transformed_grid)

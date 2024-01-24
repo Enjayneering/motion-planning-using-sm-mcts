@@ -7,12 +7,11 @@ def get_intermediate_payoffs(Game, prev_state_obj, next_state_obj):
     #print("prev_state_obj: {}".format(prev_state_obj.get_state_together()))
     #print("next_state_obj: {}".format(next_state_obj.get_state_together()))
     dist_agents = distance(next_state_obj.get_state_0(), next_state_obj.get_state_1())
-    advancement_0 = (next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0])/(next_state_obj.timestep/Game.env.max_timehorizon)
-    advancement_1 = (next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0])/(next_state_obj.timestep/Game.env.max_timehorizon)
-    is_aggressor_0 = 1 if is_collision(next_state_obj) and advancement_0 > advancement_1 else 0
-    is_aggressor_1 = 1 if is_collision(next_state_obj) and advancement_1 > advancement_0 else 0
+    progress_0 = (next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0])
+    progress_1 = (next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0])
+    discount = Game.config.discount_factor**prev_state_obj.timestep
 
-    update_vec = np.array([[np.exp(-dist_agents)], [np.exp(-dist_agents)], [advancement_0], [advancement_1], [is_aggressor_0], [is_aggressor_1]])
+    update_vec = discount*np.array([[np.exp(-dist_agents)], [np.exp(-dist_agents)], [progress_0], [progress_1]])
     interm_payoff_vec = Game.interm_weights_vec*update_vec
     return interm_payoff_vec
 
@@ -126,6 +125,7 @@ if __name__ == "__main__":
             ang_velocity_1=np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
             )
     Game = CompetitiveGame(exp_config)
+    
     # Optimal trajectories [self.x0, self.y0, self.theta0, self.x1, self.y1, self.theta1, self.timestep]
     traj_drag_race = [[1, 1, 0, 1, 2, 0, 0],
                       [3, 1, 0, 2, 2, 0, 1],

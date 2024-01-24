@@ -29,20 +29,28 @@ class FigureV0:
         tree = get_last_tree()
 
         pos = graphviz_layout(tree, prog="twopi")
-        labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X(agent=0),0), round(node.X(agent=1),0)) for node in tree.nodes}
+        #labels = {node: "n:{}".format(node._number_of_visits)+"\n"+"X0:{}\nX1:{}".format(round(node.X(agent=0),0), round(node.X(agent=1),0)) for node in tree.nodes}
 
-        # Create a list of node colors
+        # Create a list of node colors based on the number of visits
         node_colors = []
-        cmap = plt.get_cmap('Oranges')
+        cmap = plt.get_cmap('coolwarm')
+        try:
+            visit_counts = [node.n() for node in tree.nodes if len(list(tree.predecessors(node))) != 0]
+            max_visits = np.max(visit_counts)
+        except:
+            pass
+        
         for node in tree.nodes:
-            """if any(node == parent._next_child for parent in tree.predecessors(node)):
-                node_colors.append("orange")
-            else:"""
-            node_colors.append('lightgrey')
+            if len(list(tree.predecessors(node))) != 0:  # if the node is not the root
+                visit_count = node.n()
+                color = cmap(visit_count/max_visits)
+                node_colors.append(color)
+            else:
+                node_colors.append('black')
 
         #logging.debug('Node colors: %s', node_colors)
         node_colors = np.array(node_colors, dtype=object)
-        nx.draw(tree, pos=pos, labels=labels, ax=self.ax0, with_labels=False, node_size=10, font_size=8, node_color=node_colors)
+        nx.draw(tree, pos=pos, labels=None, ax=self.ax0, with_labels=False, node_size=12, font_size=8, node_color=node_colors)
 
     def update_trajectory(self, Game):
         # plot longterm rollout data as points being explored with color dependend on timehorizon
@@ -159,6 +167,6 @@ def plot_independent(Game, stop_event):
 
     animation = FuncAnimation(figplot.fig, plot_together, fargs=(figplot, Game, stop_event, animation_container), frames=frames_max, interval=interval)
     animation_container[0] = animation  # Store the animation in the container
-    animation_container[0].save(os.path.join(path_to_results, Game.name + ".mp4"), writer='ffmpeg', fps=5)
+    #animation_container[0].save(os.path.join(path_to_results, Game.name + ".mp4"), writer='ffmpeg', fps=5)
     print("Finished plotting")
-    #plt.show()
+    plt.show()
