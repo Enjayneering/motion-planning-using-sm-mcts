@@ -167,7 +167,7 @@ def plot_together(i, figplot, Game, stop_event, animation_container):
 
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(Game.MCTS_params['num_iter']))
     figplot.ax1.set_title("Trajectory")
-    figplot.ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
+    figplot.ax1.legend(loc='lower center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
     figplot.ax1.set_xlim([0, Game.env.get_current_grid(0)['x_max']+1])
     figplot.ax1.set_ylim([0, Game.env.get_current_grid(0)['y_max']+1][::-1]) # invert y-axis to fit to the environment defined in the numpy array
 

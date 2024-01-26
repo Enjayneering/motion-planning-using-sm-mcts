@@ -224,7 +224,7 @@ exp_overtaking_punishcoll = {
     }
 }
 
-experimental_mode = True 
+experimental_mode = False 
 
 
 
