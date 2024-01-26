@@ -13,6 +13,7 @@ def mm_unicycle(state, action, delta_t=1):
     return x_new, y_new, theta_new
 
 def distance(state_0, state_1):
+    # state = [x, y, theta]
     x1 = state_0[0]
     y1 = state_0[1]
     x2 = state_1[0]
@@ -121,7 +122,7 @@ def sample_legal_actions(Game, state_object):
     # combine both list elements in all possible combinations
     action_pair_pruned = list(itertools.product(sampled_actions_0_pruned, sampled_actions_1_pruned))
     sampled_actions_seperate_pruned = [list(action_pair) for action_pair in action_pair_pruned]
-    sampled_actions_together_pruned = [action_pair[0] + action_pair[1] for action_pair in sampled_actions_seperate_pruned]
+    sampled_actions_together_pruned = [action_pair[0] + action_pair[1] for action_pair in sampled_actions_seperate_pruned] # adding both lists to one list
 
     #print("sampled_actions_together_pruned: {}".format(sampled_actions_together_pruned))
     return sampled_actions_0_pruned, sampled_actions_1_pruned, sampled_actions_together_pruned

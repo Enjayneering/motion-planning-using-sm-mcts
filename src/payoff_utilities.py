@@ -3,15 +3,17 @@ from kinodynamic_utilities import *
 
 from config import *
 
-def get_intermediate_payoffs(Game, prev_state_obj, next_state_obj):
+def get_intermediate_payoffs(Game, prev_state_obj, next_state_obj, discount_factor=1):
     #print("prev_state_obj: {}".format(prev_state_obj.get_state_together()))
     #print("next_state_obj: {}".format(next_state_obj.get_state_together()))
-    dist_agents = distance(next_state_obj.get_state_0(), next_state_obj.get_state_1())
+    discount = discount_factor**prev_state_obj.timestep
+
+    dist_agents = discount*np.exp(-distance(next_state_obj.get_state_0(), next_state_obj.get_state_1()))
     progress_0 = (next_state_obj.get_state_0()[0]-prev_state_obj.get_state_0()[0])
     progress_1 = (next_state_obj.get_state_1()[0]-prev_state_obj.get_state_1()[0])
-    discount = Game.config.discount_factor**prev_state_obj.timestep
+    
 
-    update_vec = discount*np.array([[np.exp(-dist_agents)], [np.exp(-dist_agents)], [progress_0], [progress_1]])
+    update_vec = np.array([[dist_agents], [dist_agents], [progress_0], [progress_1]])
     interm_payoff_vec = Game.interm_weights_vec*update_vec
     return interm_payoff_vec
 

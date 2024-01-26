@@ -158,15 +158,23 @@ class MCTSNode:
         
         return selected_action"""
     
-    def _select_action_greedy(self, Game, agent = 0):
-        weights = [action_stat["sum_payoffs"] for action_stat in self.select_policy_data['action_stats_{}'.format(agent)].values()]
+    def _select_action_max(self, Game, agent = 0):
+        weights = [action_stat["sum_payoffs"]/action_stat['num_count'] for action_stat in self.select_policy_data['action_stats_{}'.format(agent)].values()]
         action_select = list(self.select_policy_data['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
         return action_select
     
-    def _select_action_robust(self, Game, agent = 0):
+    def _select_action_robust(self, Game, agent = 0, num_child = 0):
         weights = [action_stat["num_count"] for action_stat in self.select_policy_data['action_stats_{}'.format(agent)].values()]
-        action_select = list(self.select_policy_data['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
-        return action_select
+        if num_child == 0:
+            action_select = list(self.select_policy_data['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
+            return action_select
+        elif num_child > 0:
+            actions_select = []
+            for n_child in range(0, num_child):
+                action_select = list(self.select_policy_data['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
+                weights[np.argmax(weights)] = -np.inf
+                actions_select.append(action_select)
+            return actions_select
 
     def select_policy_child(self, Game):
         # resolve selecting actions that lead to a collision
@@ -188,18 +196,18 @@ class MCTSNode:
                     #print("Collision detected from state {} to state {}".format(self.state.get_state_together(), [x0, y0, theta0, x1, y1, theta1, self.state.timestep+Game.Model_params["delta_t"]]))
                 else:
                     break
-
         elif Game.config.feature_flags['collision_handling']['punishing']:
             if Game.config.feature_flags['selection_policy']['ucb']:
                 selected_action_0 = self._select_action_UCT(Game, agent=0)
                 selected_action_1 = self._select_action_UCT(Game, agent=1)
-            elif Game.config.feature_flags['selection_policy']['greedy']:
-                selected_action_0 = self._select_action_greedy(Game, agent=0)
-                selected_action_1 = self._select_action_greedy(Game, agent=1)
+            elif Game.config.feature_flags['selection_policy']['max']:
+                selected_action_0 = self._select_action_max(Game, agent=0)
+                selected_action_1 = self._select_action_max(Game, agent=1)
 
         selected_action = selected_action_0 + selected_action_1
+        #print( "Selected action: {}".format(selected_action))
         child = [child for child in self.children if child.parent_action == selected_action][0]
-
+        #print("Selected child: {}".format(child.state.get_state_together()))
         return child
 
     def _robust_child_joint(self):
@@ -208,49 +216,73 @@ class MCTSNode:
         robust_child = self.children[index]
         return robust_child
     
-    def _robust_child_pop_value(self):
-        choices_weights = [c.n() for c in self.children]
+    def _pop_robust_child_from_list(self, children):
+        choices_weights = [c.n() for c in children]
         index = np.argmax(choices_weights)
-        robust_child = self.children.pop(index)
+        robust_child = children.pop(index)
         max_value = choices_weights[index]
         return robust_child, max_value
+        
+    def _sum_children_weights(self, Game, parent_node, parent_weight, depth, num_children):
+        # returning robust weight and calling function for robust child
+        all_children = [] +parent_node.children # list
+        for n_child in range(0, num_children):
+            if depth <= Game.config.final_move_depth and len(all_children) > 0:
+                robust_child, max_value = parent_node._pop_robust_child_from_list(all_children)
+                parent_weight += max_value
+                parent_weight = self._sum_children_weights(Game, robust_child, parent_weight, depth+1, num_children)
+        return parent_weight
     
     def select_final_child(self, Game):
         if Game.config.feature_flags['final_move']['robust-joint']:
             child = self._robust_child_joint()
             print("Robust child joint: {}".format(child.state.get_state_together()))
-        elif Game.config.feature_flags['final_move']['robust-seperate']:
-            selected_action_0 = self._select_action_robust(Game, agent=0) 
+        elif Game.config.feature_flags['final_move']['robust-separate']:
+            selected_action_0 = self._select_action_robust(Game, agent=0)
             selected_action_1 = self._select_action_robust(Game, agent=1)
             selected_action = selected_action_0 + selected_action_1
             child = [child for child in self.children if child.parent_action == selected_action][0]
             print("Robust child separate: {}".format(child.state.get_state_together()))
-        # TODO: adjust
-        """elif Game.config.feature_flags['final_move']['robust-depth']:
+        elif Game.config.feature_flags['final_move']['depth-robust-joint']:
+            all_children = []+self.children # new list
+            next_children = []
+            next_weights = []
+            if Game.config.num_final_move_childs == None:
+                num_children = len(all_children)
+            else:
+                num_children = Game.config.num_final_move_childs
+            for n_child in range(0, num_children):
+                # initialize next candidate
+                next_child, next_weight = self._pop_robust_child_from_list(all_children)
+                next_children.append(next_child)
+                # search through all childs until depth d
+                next_weight = self._sum_children_weights(Game, next_child, next_weight, 0, num_children)
+                next_weights.append(next_weight)
+            for next_child in next_children:
+                self.children.append(next_child)
+            print("Robust depth weights: {}".format(next_weights))
+            print("Best child index: {}".format(np.argmax(next_weights)))
+            best_child_index = np.argmax(next_weights)
+            child = next_children[best_child_index]
+            print("Robust depth child: {}".format(child.state.get_state_together()))
+        elif Game.config.feature_flags['final_move']['depth-robust-separate']:
+            selected_actions_0 = self._select_action_robust(Game, agent = 0, num_child = Game.config.num_final_move_childs)
+            selected_actions_1 = self._select_action_robust(Game, agent = 1, num_child = Game.config.num_final_move_childs)
+            action_combinations_together = [selected_action_0+selected_action_1 for selected_action_0, selected_action_1 in zip(selected_actions_0, selected_actions_1)]
+            #action_combinations_together = list(itertools.product(selected_actions_0, selected_actions_1))
+            #action_combinations_together = [list(action_pair) for action_pair in action_combinations_together]
+            #action_combinations_together = [action_pair[0] + action_pair[1] for action_pair in action_combinations_together]  
             children = []
-            weights = []
-
-            for n_child in range(0, Game.config.num_final_move_children):
-                robust_child, max_value = self._robust_child_pop_value()
-                children.append(robust_child)
-                weights.append(max_value)
-
-            for i, child in enumerate(children):
-                depth = 0
-                while depth < Game.config.final_move_depth and child.children != []:
-                    for n_child in range(0, Game.config.num_final_move_children):
-                        robust_child, max_value = child._robust_child_pop_value()
-                        weights[i] += max_value
-                    depth += 1"""
-                
-
+            weights =[]
+            for action_combination in action_combinations_together:
+                child = [child for child in self.children if child.parent_action == action_combination][0]
+                children.append(child)
+                weights.append(child.n())
             best_child_index = np.argmax(weights)
             child = children[best_child_index]
-            print("Best child: {}".format(child.state.get_state_together()))
-
-        elif Game.config.feature_flags['final_move']['best']:
-            selected_action_0 = self._select_action_greedy(Game, agent=0)
-            selected_action_1 = self._select_action_greedy(Game, agent=1)
+        elif Game.config.feature_flags['final_move']['max']:
+            selected_action_0 = self._select_action_max(Game, agent=0)
+            selected_action_1 = self._select_action_max(Game, agent=1)
             selected_action = selected_action_0 + selected_action_1
             child = [child for child in self.children if child.parent_action == selected_action][0]
             print("Best child: {}".format(child.state.get_state_together()))
@@ -260,6 +292,8 @@ class MCTSNode:
             selected_action = selected_action_0 + selected_action_1
             child = [child for child in self.children if child.parent_action == selected_action][0]
             print("UCT child: {}".format(child.state.get_state_together()))
+        print("Action Value Agent 0 at timestep {}: {}".format(self.state.timestep, child.parent.select_policy_data['action_stats_0'][str(child.parent_action[:2])]['sum_payoffs']/child.parent.select_policy_data['action_stats_0'][str(child.parent_action[:2])]['num_count']))
+        print("Action Value Agent 1 at timestep {}: {}".format(self.state.timestep, child.parent.select_policy_data['action_stats_1'][str(child.parent_action[2:])]['sum_payoffs']/child.parent.select_policy_data['action_stats_1'][str(child.parent_action[2:])]['num_count']))
         return child
 
     def n(self):
@@ -323,7 +357,7 @@ class MCTSNode:
             next_rollout_node = MCTSNode(Game, next_rollout_state, parent=current_rollout_node, parent_action=action)
 
             # updating intermediate payoffs
-            interm_payoff_vec += get_intermediate_payoffs(Game, current_rollout_node.state, next_rollout_node.state)
+            interm_payoff_vec += get_intermediate_payoffs(Game, current_rollout_node.state, next_rollout_node.state, discount_factor=Game.config.discount_factor)
 
             current_rollout_node = next_rollout_node
             rollout_trajectory.append(current_rollout_node.state)
@@ -336,24 +370,48 @@ class MCTSNode:
     
 
     def rollout_policy(self, Game, current_rollout_node, moves_0, moves_1, possible_moves):
-            #TODO: Check informed rollout sampling
-            try:
-                if current_rollout_node.state.timestep <= Game.config.rollout_length:
-                    # choose a random action to simulate rollout
-                    action = possible_moves[np.random.randint(len(possible_moves))]
+        if current_rollout_node.state.timestep <= Game.config.rollout_length:
+            if Game.config.feature_flags['rollout_policy']['random-uniform']:
+                # choose a random action to simulate rollout
+                action = possible_moves[np.random.randint(len(possible_moves))]
+            elif Game.config.feature_flags['rollout_policy']['random-informed']:
+                # best reference action (heuristic)
+                weights_angle_0 = [mm_unicycle(current_rollout_node.state.get_state_0(), action, delta_t=Game.config.delta_t)[2]%(np.pi) for action in moves_0]
+                weights_angle_1 = [mm_unicycle(current_rollout_node.state.get_state_1(), action, delta_t=Game.config.delta_t)[2]%(np.pi) for action in moves_1]
+                weights_dist_0 = [distance(mm_unicycle(current_rollout_node.state.get_state_0(), action, delta_t=Game.config.delta_t), [Game.config.finish_line, current_rollout_node.state.y0]) for action in moves_0]
+                weights_dist_1 = [distance(mm_unicycle(current_rollout_node.state.get_state_1(), action, delta_t=Game.config.delta_t), [Game.config.finish_line, current_rollout_node.state.y1]) for action in moves_1]
+                action_0 = moves_0[np.argmin(np.add(weights_angle_0, weights_dist_0))]
+                action_1 = moves_1[np.argmin(np.add(weights_angle_1, weights_dist_1))]
 
-                elif current_rollout_node.state.timestep > Game.config.rollout_length:
-                    # choose the action that turns the agents towards goal direction
-                    weights_angle_0 = [mm_unicycle(current_rollout_node.state.get_state_0(), action, delta_t=Game.config.delta_t)[2]%(np.pi) for action in moves_0]
-                    weights_angle_1 = [mm_unicycle(current_rollout_node.state.get_state_1(), action, delta_t=Game.config.delta_t)[2]%(np.pi) for action in moves_1]
-                    weights_dist_0 = [distance(mm_unicycle(current_rollout_node.state.get_state_0(), action, delta_t=Game.config.delta_t), [Game.config.finish_line, current_rollout_node.state.y0]) for action in moves_0]
-                    weights_dist_1 = [distance(mm_unicycle(current_rollout_node.state.get_state_1(), action, delta_t=Game.config.delta_t), [Game.config.finish_line, current_rollout_node.state.y1]) for action in moves_1]
-                    action_0 = moves_0[np.argmin(np.add(weights_angle_0, weights_dist_0))]
-                    action_1 = moves_1[np.argmin(np.add(weights_angle_1, weights_dist_1))]
-                    action = action_0 + action_1
-                return action
-            except:
-                return None
+                # Sample velocity and angular velocity from a Gaussian distribution with mean of optimal values
+                mean_velocity_0, mean_angular_velocity_0 = action_0[0], action_0[1]
+                mean_velocity_1, mean_angular_velocity_1 = action_1[0], action_1[1]
+                sampled_velocity_0 = np.random.normal(mean_velocity_0, 2)
+                sampled_angular_velocity_0 = np.random.normal(mean_angular_velocity_0, np.pi)
+                sampled_velocity_1 = np.random.normal(mean_velocity_1, 2)
+                sampled_angular_velocity_1 = np.random.normal(mean_angular_velocity_1, np.pi)
+                
+                # Find the action in moves_0 and moves_1 that is nearest to the sampled values
+                distances_0 = np.linalg.norm(np.array(moves_0) - [sampled_velocity_0, sampled_angular_velocity_0], axis=1)
+                distances_1 = np.linalg.norm(np.array(moves_1) - [sampled_velocity_1, sampled_angular_velocity_1], axis=1)
+                nearest_index_0 = np.argmin(distances_0)
+                nearest_index_1 = np.argmin(distances_1)
+                
+                action_0 = moves_0[nearest_index_0]
+                action_1 = moves_1[nearest_index_1]
+                
+                action = action_0 + action_1
+
+        elif current_rollout_node.state.timestep > Game.config.rollout_length:
+            # choose the action that turns the agents towards goal direction
+            weights_angle_0 = [mm_unicycle(current_rollout_node.state.get_state_0(), action, delta_t=Game.config.delta_t)[2]%(np.pi) for action in moves_0]
+            weights_angle_1 = [mm_unicycle(current_rollout_node.state.get_state_1(), action, delta_t=Game.config.delta_t)[2]%(np.pi) for action in moves_1]
+            weights_dist_0 = [distance(mm_unicycle(current_rollout_node.state.get_state_0(), action, delta_t=Game.config.delta_t), [Game.config.finish_line, current_rollout_node.state.y0]) for action in moves_0]
+            weights_dist_1 = [distance(mm_unicycle(current_rollout_node.state.get_state_1(), action, delta_t=Game.config.delta_t), [Game.config.finish_line, current_rollout_node.state.y1]) for action in moves_1]
+            action_0 = moves_0[np.argmin(np.add(weights_angle_0, weights_dist_0))]
+            action_1 = moves_1[np.argmin(np.add(weights_angle_1, weights_dist_1))]
+            action = action_0 + action_1
+        return action
             
     def backpropagate(self, Game, payoff_list):
         # backpropagate statistics of the node
@@ -364,20 +422,20 @@ class MCTSNode:
 
         if self.parent:
             if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
-                try: # update parent stats
+                if self.parent.select_policy_data['action_stats_0'].get(str(self.parent_action[:2])): # update parent stats
                     self.parent.select_policy_data['action_stats_0'][str(self.parent_action[:2])]['num_count'] += 1
                     self.parent.select_policy_data['action_stats_0'][str(self.parent_action[:2])]['sum_payoffs'] += float(payoff_list[0])
                     #print("backpropagate agent 0: {}".format(self.parent_action[:2]))
-                except: # create stats
+                else: # create stats
                     self.parent.select_policy_data['action_stats_0'][str(self.parent_action[:2])] = {'num_count': 1, 'sum_payoffs': 0}
                     self.parent.select_policy_data['action_stats_0'][str(self.parent_action[:2])]['action'] = self.parent_action[:2]
                     #print("create action stat for agent 0: {}".format(self.parent_action[:2]))
             if not [self.state.x1, self.state.y1, self.state.theta1, self.state.timestep] in Game.forbidden_states:
-                try: # update parent stats
+                if  self.parent.select_policy_data['action_stats_1'].get(str(self.parent_action[2:])): # update parent stats
                     self.parent.select_policy_data['action_stats_1'][str(self.parent_action[2:])]['num_count'] += 1
                     self.parent.select_policy_data['action_stats_1'][str(self.parent_action[2:])]['sum_payoffs'] += float(payoff_list[1])
                     #print("backpropagate agent 1: {}".format(self.parent_action[2:]))
-                except: # create stats
+                else: # create stats
                     self.parent.select_policy_data['action_stats_1'][str(self.parent_action[2:])] = {'num_count': 1, 'sum_payoffs': 0}
                     self.parent.select_policy_data['action_stats_1'][str(self.parent_action[2:])]['action'] = self.parent_action[2:]
                     #print("create action stat for agent 1: {}".format(self.parent_action[2:]))

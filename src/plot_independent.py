@@ -34,16 +34,35 @@ class FigureV0:
         # Create a list of node colors based on the number of visits
         node_colors = []
         cmap = plt.get_cmap('coolwarm')
-        try:
-            visit_counts = [node.n() for node in tree.nodes if len(list(tree.predecessors(node))) != 0]
-            max_visits = np.max(visit_counts)
-        except:
-            pass
+
+        def count_predecessors(node):
+                        count = 0
+                        while True:
+                            predecessors = list(tree.predecessors(node))
+                            if len(predecessors) == 0:
+                                break
+                            count += 1
+                            node = predecessors[0]
+                        return count
         
+        depth = 0
         for node in tree.nodes:
-            if len(list(tree.predecessors(node))) != 0:  # if the node is not the root
+            if count_predecessors(node) > depth:
+                depth = count_predecessors(node)
+
+        max_visits = []
+        for d in range(depth+1):
+            try:
+                visit_counts = [node.n() for node in tree.nodes if count_predecessors(node) == d]
+                max_visits.append(np.max(visit_counts))
+            except:
+                pass
+
+        for node in tree.nodes:
+            depth = count_predecessors(node)
+            if depth != 0:  # for nodes on that level
                 visit_count = node.n()
-                color = cmap(visit_count/max_visits)
+                color = cmap(visit_count / max_visits[depth])
                 node_colors.append(color)
             else:
                 node_colors.append('black')
