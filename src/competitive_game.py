@@ -98,7 +98,7 @@ class CompetitiveGame:
             payoff_dict_global["payoff_total_"+str(agent)] = []
         return payoff_dict_global
     
-    def search_game_tree(self, global_state):
+    def search_game_tree(self, global_state, game_max_timehorizon):
         start_time = time.time()
 
         # create Node for local tree search
@@ -117,7 +117,7 @@ class CompetitiveGame:
             v = current_node._tree_policy(self)
 
             #print("Starting rollout")
-            rollout_trajectory, interm_payoff_rollout_vec, final_payoff_rollout_vec = v.rollout(self)
+            rollout_trajectory, interm_payoff_rollout_vec, final_payoff_rollout_vec = v.rollout(self, game_max_timehorizon)
             
             payoff_total_list = get_total_payoffs_all_agents(self, interm_payoff_rollout_vec, final_payoff_rollout_vec)
             self.max_payoff, self.min_payoff, self.payoff_range = update_payoff_range(self.max_payoff, self.min_payoff, payoff_total_list)
@@ -139,7 +139,7 @@ class CompetitiveGame:
         next_node = current_node.select_final_child(Game=self)
 
         if not experimental_mode:
-            save_tree_to_file(current_node, path_to_tree.format(current_node.state.timestep))
+            save_tree_to_file(current_node, path_to_tree.format(global_state.timestep))
             #print("Next State: {}".format(next_node.state.get_state_together()))
         
         runtime = time.time() - start_time 
@@ -173,7 +173,7 @@ class CompetitiveGame:
         # RUN TRAJECTORY PLANNER
         start_time = time.time()
 
-        while not is_terminal(self, current_state):
+        while not is_terminal(self, current_state, max_timehorizon=get_max_timehorizon(self.config)):
             print("Searching game tree in timestep {}...".format(current_state.timestep))
             if not experimental_mode:
                 csv_init_rollout_last(self)
@@ -186,11 +186,8 @@ class CompetitiveGame:
                 self.final_weights_vec = init_final_weights(self)
             
             # RUN SINGLE MCTS ALGORITHM IN CURRENT TIMESTEP
-            next_state, runtime = self.search_game_tree(current_state)
-
-            # Update Game setting
-            self.config.rollout_length -= 1
-            self.config.terminal_progress -= 1
+            game_max_timehorizon = get_max_timehorizon(self.config)-current_state.timestep
+            next_state, runtime = self.search_game_tree(current_state, game_max_timehorizon)
 
             if experimental_mode:
                 result_dict["runtime_game_length_{}".format(get_max_timehorizon(self.config)-current_state.timestep)] = runtime
@@ -238,8 +235,8 @@ class CompetitiveGame:
 
         elif experimental_mode:
             # COLLECT AND SAVE DATA
-            result_dict["runtime"] = end_time - start_time
             result_dict["winner"] = get_winner(self.global_states[-1])
+            result_dict["runtime"] = end_time - start_time
             result_dict["T_terminal"] = self.global_states[-1].timestep
             result_dict["trajectory_0"] = [[float(value) for value in state.get_state_0()]+[state.timestep] for state in self.global_states]
             result_dict["trajectory_1"] = [[float(value) for value in state.get_state_1()]+[state.timestep] for state in self.global_states]

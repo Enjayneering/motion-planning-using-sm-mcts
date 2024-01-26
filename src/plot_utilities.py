@@ -102,9 +102,23 @@ def plot_finish_line(ax, finish_line=None, ymax=None):
     finishline_dist = 0.25
     scale_dotted_line = 50 
     dist_dotted_line= 50
-    dot_param = dist_dotted_line/scale_dotted_line
-    ax.plot([finish_line-finishline_dist, finish_line-finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(0, (dot_param,dot_param)), zorder=2)
-    ax.plot([finish_line+finishline_dist, finish_line+finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(dot_param, (dot_param,dot_param)), zorder=2)
+    #dot_param = dist_dotted_line/scale_dotted_line
+    #ax.plot([finish_line-finishline_dist, finish_line-finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(0, (dot_param,dot_param)), zorder=2)
+    #ax.plot([finish_line+finishline_dist, finish_line+finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(dot_param, (dot_param,dot_param)), zorder=2)
+    
+    # Replace dotted line with periodic square patches
+    patch_width = 0.5
+    patch_height = ymax
+
+    i = 0
+    while i * patch_width < ymax:
+        if i % 2 == 0:
+            rect = Rectangle((finish_line - patch_width, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
+        else:
+            rect = Rectangle((finish_line, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
+        ax.add_patch(rect)
+        i += 1
+
 
 def plot_trajectory(ax, trajectory, linewidth=4, facecolor=None, edgecolor=None, label=None, fontsize=4, zorder=None, alpha=None):
     xy_visited = []

@@ -35,12 +35,12 @@ freq_stat_data = 10
 def get_max_timehorizon(config):
     return int(config.alpha_t * config.terminal_progress)
 
-def is_terminal(Game, state):
+def is_terminal(Game, state, max_timehorizon=None):
         # terminal condition
         if state.x0 >= Game.config.finish_line or state.x1 >= Game.config.finish_line:
             #print("Terminal state reached")
             return True
-        elif state.timestep >= get_max_timehorizon(Game.config):
+        elif state.timestep >= max_timehorizon:
             #print("Max timehorizon reached")
             return True
         else:

@@ -311,7 +311,7 @@ class MCTSNode:
     def is_fully_expanded(self):
         return len(self._untried_actions) == 0
 
-    def rollout(self, Game):
+    def rollout(self, Game, game_max_timehorizon):
         # rollout policy: random action selection
         current_rollout_node = self
 
@@ -321,7 +321,7 @@ class MCTSNode:
         final_payoff_vec = np.zeros((Game.Model_params["len_final_payoffs"],1))
 
         # intermediate timesteps
-        while not is_terminal(Game, current_rollout_node.state):
+        while not is_terminal(Game, current_rollout_node.state, max_timehorizon=game_max_timehorizon):
             #print("Rollout State: {}".format(current_rollout_node.state.get_state_together()))
             moves_0, moves_1, possible_moves = sample_legal_actions(Game, current_rollout_node.state)
 
@@ -363,7 +363,7 @@ class MCTSNode:
             rollout_trajectory.append(current_rollout_node.state)
 
         # updating final payoffs
-        if is_terminal(Game, current_rollout_node.state):
+        if is_terminal(Game, current_rollout_node.state, max_timehorizon=game_max_timehorizon):
             final_payoff_vec += get_final_payoffs(Game, current_rollout_node.state)
 
         return rollout_trajectory, interm_payoff_vec, final_payoff_vec
@@ -386,10 +386,10 @@ class MCTSNode:
                 # Sample velocity and angular velocity from a Gaussian distribution with mean of optimal values
                 mean_velocity_0, mean_angular_velocity_0 = action_0[0], action_0[1]
                 mean_velocity_1, mean_angular_velocity_1 = action_1[0], action_1[1]
-                sampled_velocity_0 = np.random.normal(mean_velocity_0, 2)
-                sampled_angular_velocity_0 = np.random.normal(mean_angular_velocity_0, np.pi)
-                sampled_velocity_1 = np.random.normal(mean_velocity_1, 2)
-                sampled_angular_velocity_1 = np.random.normal(mean_angular_velocity_1, np.pi)
+                sampled_velocity_0 = np.random.normal(mean_velocity_0, Game.config.standard_dev_vel_0)
+                sampled_angular_velocity_0 = np.random.normal(mean_angular_velocity_0, Game.config.standard_dev_ang_vel_0)
+                sampled_velocity_1 = np.random.normal(mean_velocity_1, Game.config.standard_dev_vel_1)
+                sampled_angular_velocity_1 = np.random.normal(mean_angular_velocity_1, Game.config.standard_dev_ang_vel_1)
                 
                 # Find the action in moves_0 and moves_1 that is nearest to the sampled values
                 distances_0 = np.linalg.norm(np.array(moves_0) - [sampled_velocity_0, sampled_angular_velocity_0], axis=1)
@@ -443,7 +443,7 @@ class MCTSNode:
 
     def _tree_policy(self, Game):
         current_node = self
-        while not is_terminal(Game, current_node.state):
+        while not is_terminal(Game, current_node.state, max_timehorizon=get_max_timehorizon(Game.config)):
             #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
             #print("Current node not terminal")
 

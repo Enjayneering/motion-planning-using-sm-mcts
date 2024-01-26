@@ -129,7 +129,7 @@ if __name__ == "__main__":
     expdict = exp_overtaking_punishcoll
     env_name = 'racetrack-one-gap'
 
-    exp_path_level_2 = 'V2_investigate_collision_ignorance_01'
+    exp_path_level_2 = 'V2_investigate_collision_ignorance_uniform-random-rollout_02'
     config = copy_new_config(default_config, expdict, env_dict, env_name)
 
 
@@ -142,9 +142,9 @@ if __name__ == "__main__":
         
         exp_start = time.time()
 
-        #run_experiment(exp_path_level_1, game_config=config, input=str(config.num_iter))
+        run_experiment(exp_path_level_1, game_config=config, input=str(config.num_iter))
         
-        run_exp_vary_parameter(exp_path_level_1, game_config=config, parameter='collision_ignorance', linspace=(0, 1, 10), dtype="float")
+        #run_exp_vary_parameter(exp_path_level_1, game_config=config, parameter='collision_ignorance', linspace=(0, 1, 10), dtype="float")
 
         """num_incr = 10
         for incr_dist in range(0, num_incr+1):

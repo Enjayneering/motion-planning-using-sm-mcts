@@ -39,17 +39,15 @@ env_dict = {
     'racetrack-one-gap': {
         'env_def': {
             0: """
-                ##############
-                .......#......
-                .0.....#......
-                ..............
-                .1.....#......
-                .......#......
-                ##############""",
+                ########
+                .0..#...
+                ........
+                .1..#...
+                ########""",
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 12,
+        'finish_line': 6,
     },
     'racetrack-4x13': {
         'env_def': {
@@ -188,43 +186,45 @@ exp_overtaking_punishcoll = {
     'final_move_depth': None,
     'num_final_move_childs': None,
 
-    'rollout_length': 10,
-    'terminal_progress': 10,
+    'rollout_length': 8,
+    'terminal_progress': 8,
 
     'alpha_t': 1,
     'num_sim': 5,
-    'num_iter': 4000,
+    'num_iter': 1000,
     'delta_t': 1,
 
-    'collision_ignorance': 0.5, #[0,1]
-    'discount_factor': 0.5,
+    'collision_ignorance': 0.4, #[0,1]
+    'discount_factor': 0.8,
 
-    'penalty_distance': -10,
+    'penalty_distance': -0,
     'reward_progress_0': 0.5,
     'reward_progress_1': 0.5,
     'penalty_timestep_0': -0.05,
     'penalty_timestep_1': -0.05,
     'reward_lead_0': 1,
     'reward_lead_1': 1,
-    'velocity_0': np.linspace(0, 2, 3).tolist(),
+    'velocity_0': np.linspace(0, 1, 2).tolist(),
     'ang_velocity_0': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
-    'velocity_1': np.linspace(0, 2, 3).tolist(),
+    'velocity_1': np.linspace(0, 1, 2).tolist(),
     'ang_velocity_1': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
-    'standard_dev_vel_0': 2,
+
+    'standard_dev_vel_0': 1,
     'standard_dev_ang_vel_0': np.pi/4,
-    'standard_dev_vel_1': 2,
+    'standard_dev_vel_1': 1,
     'standard_dev_ang_vel_1':  np.pi/4,
+
     'feature_flags': {
-        'final_move': {'robust-joint': False, 'robust-separate': True, 'depth-robust-joint': False, 'depth-robust-separate': False, 'max': False, 'ucb': False},
-        'collision_handling': {'punishing': True, 'pruning': False},
+        'final_move': {'robust-joint': True, 'robust-separate': False, 'depth-robust-joint': False, 'depth-robust-separate': False, 'max': False, 'ucb': False},
+        'collision_handling': {'punishing': False, 'pruning': True},
         'selection_policy': {'ucb': True, 'max': False, 'regret-matching': False},
-        'rollout_policy': {'random-uniform': False, 'random-informed': True},
+        'rollout_policy': {'random-uniform': True, 'random-informed': False},
         'payoff_weights': {'fixed': True, 'adaptive': False},
         'expansion_policy': {'every-child': True, 'random': False},
     }
 }
 
-experimental_mode = False 
+experimental_mode = True 
 
 
 
