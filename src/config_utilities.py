@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 import yaml
+from common import *
 import numpy as np
 
 """
@@ -66,19 +67,19 @@ class Config(dict):
         return config_to_dict(self)
 
 
-def copy_new_config(default_config, new_dict, env_dict, env_name):
+def copy_new_config(default_config, new_dict, env_dict):
     new_config = Config(default_config)
+
     for key, value in new_dict.items():
         if key in new_config:
             new_config[key] = value
         else:
             new_config.__dict__[key] = value
-    for key, value in env_dict[env_name].items():
+    for key, value in env_dict[new_dict['env_name']].items():
         if key in new_config:
             new_config[key] = value
         else:
             new_config.__dict__[key] = value
-    new_config.__dict__['instance_name'] = env_name
     return new_config
 
 def config_to_dict(config: Config):

@@ -1,7 +1,7 @@
 import os
 import json
 import matplotlib.pyplot as plt
-from common import path_to_experiments
+from common import *
 from plot_utilities import coll_count
 
 def plot_data(path_to_experiments, xaxis0, xaxis1, yaxis0, yaxis1):

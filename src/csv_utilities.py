@@ -47,7 +47,7 @@ def csv_write_rollout_last(Game, rollout_trajectory, timehorizon = None, config=
         csv_file.seek(0)  # Move the file pointer to the beginning of the file
         lines = csv_file.readlines()[1:]
 
-    keep_num_data = int(config.num_iter*get_max_timehorizon(Game.config)/freq_stat_data)+1
+    keep_num_data = int(config.num_iter*get_max_timehorizon(Game)/freq_stat_data)+1
     lines = lines[-keep_num_data:]
 
     with open(path_to_rollout_tmp, 'w') as csv_file:
@@ -60,7 +60,7 @@ def csv_write_rollout_last(Game, rollout_trajectory, timehorizon = None, config=
 
 # Video parameters
 def get_next_game_name(path_to_results, Game):
-    instance_name = Game.config.instance_name
+    instance_name = Game.config.env_name
     list_of_files = glob.glob(path_to_results + instance_name + "*.mp4")
     num_videos = len(list_of_files)
     next_video_name = "{}_{:02d}".format(instance_name, num_videos + 1)

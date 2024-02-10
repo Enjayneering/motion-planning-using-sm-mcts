@@ -26,7 +26,7 @@ def run_test(game_config):
 
         processes = []
         processes.append(multiprocessing.Process(target=plot_independent, args=(Game, stop_event)))
-        processes.append(multiprocessing.Process(target=Game.compute_trajectories, args=()))
+        processes.append(multiprocessing.Process(target=Game.run_simulation, args=()))
 
         # Start all processes
         for process in processes:
@@ -79,10 +79,10 @@ def run_experiment(exp_path_level_1, game_config, exp_comment="", input=""):
         sys.stdout = print_file
 
         # RUN EXPERIMENT
-        result_dict = Game.compute_trajectories()
+        result_dict = Game.run_simulation()
 
         # PLOT TRAJECTORIES
-        plot_trajectory(game_config, result_dict, subex_filepath, all_timesteps=False)
+        plot_trajectory(Game, result_dict, subex_filepath, all_timesteps=False)
 
         # Write the result dictionary to the JSON file
         with open(os.path.join(subex_filepath, "results.json"), "w") as f:
@@ -97,14 +97,14 @@ def run_experiment(exp_path_level_1, game_config, exp_comment="", input=""):
     save_statistical_data(exp_path_level_0, global_data="global_results.json")
 
 
-def plot_trajectory(config, result_dict, exp_path, all_timesteps=False):
+def plot_trajectory(Game, result_dict, exp_path, all_timesteps=False):
     if all_timesteps:
         for t in range(result_dict['T_terminal']+1):
-            plot_single_run(config, result_dict, exp_path, timestep=t, main_agent=0)
-            plot_single_run(config, result_dict, exp_path, timestep=t, main_agent=1)
+            plot_single_run(Game, result_dict, exp_path, timestep=t, main_agent=0)
+            plot_single_run(Game, result_dict, exp_path, timestep=t, main_agent=1)
     else:
-        plot_single_run(config, result_dict, exp_path, main_agent=0)
-        plot_single_run(config, result_dict, exp_path, main_agent=1)
+        plot_single_run(Game, result_dict, exp_path, main_agent=0)
+        plot_single_run(Game, result_dict, exp_path, main_agent=1)
 
 def create_global_index(exp_path_level_1):
     with open(os.path.join(exp_path_level_1, "index.txt"), 'w') as f:
@@ -126,14 +126,14 @@ def run_exp_vary_parameter(exp_path_level_1, game_config, parameter, linspace, d
 
 if __name__ == "__main__":
     # SETTING EXPERIMENT UP
-    expdict = exp_overtaking_punishcoll
-    env_name = 'racetrack-one-gap'
+    expdict = curr_dict
 
-    exp_path_level_2 = 'V2_investigate_collision_ignorance_uniform-random-rollout_02'
-    config = copy_new_config(default_config, expdict, env_dict, env_name)
+    exp_path_level_2 = 'V5_Test_coll_pruning'
+
+    config = copy_new_config(default_config, expdict, env_dict)
 
 
-    if experimental_mode:
+    if config.feature_flags["run_mode"]["exp"]:
         exp_path_level_1 = os.path.join(path_to_experiments, exp_path_level_2)
 
         if not os.path.exists(os.path.join(path_to_experiments, exp_path_level_1)):
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 
         run_experiment(exp_path_level_1, game_config=config, input=str(config.num_iter))
         
-        #run_exp_vary_parameter(exp_path_level_1, game_config=config, parameter='collision_ignorance', linspace=(0, 1, 10), dtype="float")
+        #run_exp_vary_parameter(exp_path_level_1, game_config=config, parameter='c_param', linspace=(100, 1000, 10), dtype="float")
 
         """num_incr = 10
         for incr_dist in range(0, num_incr+1):
@@ -163,7 +163,7 @@ if __name__ == "__main__":
         exp_duration = time.time() - exp_start
         print("Finished all experiments with duration: {} s".format(exp_duration))
 
-    else:
+    elif config.feature_flags["run_mode"]["test"]:
         run_test(game_config=config)
     
     

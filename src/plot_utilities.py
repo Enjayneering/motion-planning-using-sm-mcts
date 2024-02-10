@@ -14,16 +14,7 @@ from environment_utilities import *
 from matplotlib.patches import Rectangle
 from kinodynamic_utilities import distance, mm_unicycle
 
-def coll_count(joint_trajectory):
-    coll_count = 0
-    for t in range(len(joint_trajectory)-1):
-        line_points_0 = np.linspace(joint_trajectory[t][0:2], joint_trajectory[t+1][0:2], num=10).tolist()
-        line_points_1 = np.linspace(joint_trajectory[t][3:5], joint_trajectory[t+1][3:5], num=10).tolist()
-        if any(distance(point_0, point_1) <= 0.5 for point_0 in line_points_0 for point_1 in line_points_1):
-            coll_count += 1
-    return coll_count
-
-def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main_agent=0):
+def plot_single_run(Game, result_dict, path_to_experiment, timestep=None, main_agent=0):
     colormap = {'red': (192/255, 67/255, 11/255), 
                 'darkred': (83/255, 29/255, 0/255),
                 'blue': (78/255, 127/255, 141/255), 
@@ -37,12 +28,12 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
     # plotting the trajectory of two agents on a 2D-plane and connecting states with a line and labeling states with timestep | trajectory: list of states [x1, y1, x2, y2, timestep]
     trajectory_0 = result_dict['trajectory_0']
     trajectory_1 = result_dict['trajectory_1']
-    finish_line = config.finish_line
+    finish_line = Game.env.finish_line
     
     # define plotting environment
     fig, ax = plt.subplots()
-    xmax = max((line.count("#")+line.count(".")) for line in config.env_def[0].split('\n')) - 1
-    ymax = config.env_def[0].count('\n') - 1
+    xmax = max((line.count("#")+line.count(".")) for line in Game.config.env_def[0].split('\n')) - 1
+    ymax = Game.config.env_def[0].count('\n') - 1
     #print("xmax: {}, ymax: {}".format(xmax, ymax))
     ax.set_xlim([-0.5, xmax+1.5])
     ax.set_ylim([-0.5, ymax+1.5][::-1]) # invert y-axis to fit to the environment defined in the numpy array
@@ -62,7 +53,7 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
 
 
     # Plot the grid map 
-    last_map = get_current_grid(config.env_def, timestep)
+    last_map = get_current_grid(Game.config.env_def, timestep)
     #color_range = np.linspace(218/255, 100/255, len(grid_maps))
     #gridcolor = [(218/255, 181/255, color_range[i]) for i in range(len(grid_maps))]
     #for i, grid_map in enumerate(grid_maps):
@@ -74,6 +65,10 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
                  
     # plot finish line
     plot_finish_line(ax, finish_line=finish_line, ymax=ymax)
+    #plot_goal_states(ax, goal_state=Game.env.goal_state, agent=0, color=colormap['red'])
+    #plot_goal_states(ax, goal_state=Game.env.goal_state, agent=1, color=colormap['blue'])
+    plot_centerline(ax, centerlines=Game.env.centerlines, agent=0, color=colormap['red'], alpha=0.5)
+    plot_centerline(ax, centerlines=Game.env.centerlines, agent=1, color=colormap['blue'], alpha=0.5)
     
     # plot trajectories
     if main_agent == 0:
@@ -98,27 +93,34 @@ def plot_single_run(config, result_dict, path_to_experiment, timestep=None, main
     plt.close(fig)
 
 def plot_finish_line(ax, finish_line=None, ymax=None):
-    # plot finish line
-    finishline_dist = 0.25
-    scale_dotted_line = 50 
-    dist_dotted_line= 50
-    #dot_param = dist_dotted_line/scale_dotted_line
-    #ax.plot([finish_line-finishline_dist, finish_line-finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(0, (dot_param,dot_param)), zorder=2)
-    #ax.plot([finish_line+finishline_dist, finish_line+finishline_dist], [0, ymax], color='white', linewidth=finishline_dist*scale_dotted_line, alpha=0.8, linestyle=(dot_param, (dot_param,dot_param)), zorder=2)
-    
-    # Replace dotted line with periodic square patches
-    patch_width = 0.5
-    patch_height = ymax
+    if finish_line is not None:
+        # Replace dotted line with periodic square patches
+        patch_width = 0.5
+        patch_height = ymax
 
-    i = 0
-    while i * patch_width < ymax:
-        if i % 2 == 0:
-            rect = Rectangle((finish_line - patch_width, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
-        else:
-            rect = Rectangle((finish_line, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
-        ax.add_patch(rect)
-        i += 1
+        i = 0
+        while i * patch_width < ymax:
+            if i % 2 == 0:
+                rect = Rectangle((finish_line - patch_width, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
+            else:
+                rect = Rectangle((finish_line, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
+            ax.add_patch(rect)
+            i += 1
+    else:
+        pass
 
+def plot_goal_states(ax, goal_state, agent=0, color='black'):
+    if goal_state is not None:
+        x_goal = goal_state[f'x{agent}']
+        y_goal = goal_state[f'y{agent}']
+        ax.plot(x_goal, y_goal, 'o', color=color, markersize=5, label=f'Goal agent {agent}')
+    else:
+        pass
+
+def plot_centerline(ax, centerlines, agent=0, color='black', alpha=1):
+    x_centerline = [c[0] for c in centerlines[agent]]
+    y_centerline = [c[1] for c in centerlines[agent]]
+    ax.plot(x_centerline, y_centerline, "x--", color=color, alpha=alpha, label=f'Centerline Agent {agent}', zorder=1)
 
 def plot_trajectory(ax, trajectory, linewidth=4, facecolor=None, edgecolor=None, label=None, fontsize=4, zorder=None, alpha=None):
     xy_visited = []
@@ -154,15 +156,15 @@ def annotate_state(ax, x, y, theta, timestep, visit_count=0, facecolor=None, edg
     loc_circle = plt.Circle((x, y), radius=0.1, facecolor=facecolor, edgecolor=edgecolor, linewidth=0.4, zorder=zorder+visit_count, alpha=alpha)
     ax.add_patch(loc_circle)
 
-def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8):
+def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8, alpha=0.5):
     thickness = 0.2
-    ax.arrow(x_orig, y_orig, scale, 0, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], zorder=4)
-    ax.arrow(x_orig, y_orig, 0, scale, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], zorder=4)
-    ax.plot(x_orig, y_orig, 'o', color=colormap['grey'], markersize=5, zorder=5)
+    ax.arrow(x_orig, y_orig, scale, 0, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], alpha=alpha, zorder=4)
+    ax.arrow(x_orig, y_orig, 0, scale, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], alpha=alpha, zorder=4)
+    ax.plot(x_orig, y_orig, 'o', color=colormap['grey'], markersize=5, alpha=alpha, zorder=5)
 
-    ax.text(x_orig, y_orig-0.3, "(0,0)", fontsize=fontsize, ha='center', va='center', zorder=4)
-    ax.text(x_orig+scale, y_orig-0.3, "x", fontsize=fontsize, ha='center', va='center', zorder=4)
-    ax.text(x_orig-0.3, y_orig+scale, "y", fontsize=fontsize, ha='center', va='center', zorder=4)
+    ax.text(x_orig, y_orig-0.3, "(0,0)", fontsize=fontsize, ha='center', va='center', alpha=alpha, zorder=4)
+    ax.text(x_orig+scale, y_orig-0.3, "x", fontsize=fontsize, ha='center', va='center', alpha=alpha, zorder=4)
+    ax.text(x_orig-0.3, y_orig+scale, "y", fontsize=fontsize, ha='center', va='center', alpha=alpha, zorder=4)
 
 def plot_map(ax, array, facecolor=None, edgecolor=None):
     # plot the racing gridmap

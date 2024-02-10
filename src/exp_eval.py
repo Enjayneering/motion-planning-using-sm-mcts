@@ -1,5 +1,5 @@
 import numpy as np
-from kinodynamic_utilities import distance, mm_unicycle
+from common import distance
 
 def coll_count(traj_0, traj_1):
     coll_count = 0

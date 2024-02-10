@@ -2,52 +2,110 @@ import numpy as np
 from config_utilities import *
 
 env_dict = {
-    'racetrack-7x16': {
+    'racetrack_7x16': {
         'env_def': {
             0: """
                 ################
                 ................
                 ................
-                .0.1............
+                ................
                 ................
                 ................
                 ################""",
         },
-        'theta_0_init': 0,
-        'theta_1_init': 0,
-        'finish_line': 12,
+        'env_raceconfig': {
+            '0': """
+                ################
+                ................
+                ................
+                .Sx..........xG.
+                ................
+                ................
+                ################""",
+            '1': """
+                ################
+                ................
+                ................
+                ...Sx........xG.
+                ................
+                ................
+                ################""",
+        },
+
+    },
+    'intersection_3x3': {
+        'env_def': {
+            0: """
+                #.#
+                ...
+                #.#""",
+        },
+        'env_raceconfig': {
+            '0':"""
+                #S#
+                .x.
+                #G#""",
+            '1':"""
+                #.#
+                SxG
+                #.#""",
+        },
+
+    },
+    'intersection_5x5': {
+        'env_def': {
+            0: """
+                ##.##
+                ##.##
+                .....
+                ##.##
+                ##.##""",
+        },
+        'env_raceconfig': {
+            '0':"""
+                ##S##
+                ##x##
+                .....
+                ##x##
+                ##G##""",
+            '1':"""
+                ##.##
+                ##.##
+                Sx.xG
+                ##.##
+                ##.##""",
+        },
+
     },
     'racetrack-three-gaps': {
         'env_def': {
             0: """
                 ##############
-                ..............
-                .......#......
-                .......#......
-                .0.....#......
-                ..............
-                .1.....#......
-                .......#......
-                .......#......
-                ..............
+                ............F.
+                .......#....F.
+                .......#....F.
+                .0.....#....F.
+                ............F.
+                .1.....#....F.
+                .......#....F.
+                .......#....F.
+                ............F.
                 ##############""",
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 12,
     },
     'racetrack-one-gap': {
         'env_def': {
             0: """
                 ########
-                .0..#...
-                ........
                 .1..#...
+                ........
+                .0..#...
                 ########""",
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 6,
     },
     'racetrack-4x13': {
         'env_def': {
@@ -64,7 +122,6 @@ env_dict = {
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 12,
     },
     'racetrack-closing-doors': {
         'env_def': {
@@ -85,7 +142,6 @@ env_dict = {
         },
         'theta_0_init': np.pi/2,
         'theta_1_init': 0,
-        'finish_line': 12,
     },
     'overtaking_no_obs': {
         'env_def': {
@@ -98,7 +154,6 @@ env_dict = {
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 12,
     },
     'lane_merging': {
         'env_def': {
@@ -112,7 +167,6 @@ env_dict = {
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 12,
     },
     'closing_door': {
         'env_def': {
@@ -131,33 +185,34 @@ env_dict = {
         },
         'theta_0_init': 0,
         'theta_1_init': 0,
-        'finish_line': 12,
     },
 }
 
 default_dict = {
-    'terminal_progress': float, # estimator of game length based on tracksize and agents maximum speed
-    'rollout_length': int, # length of rollout trajectory
-    'alpha_t': 1, # defines ratio of game timehorizon with respect to a heuristic estimator for timesteps needed to reach the end of the track
-    'final_move_depth': 1,
+    'env_name': str,
+    'alpha_rollout': int, # percentage of rollout duration that is sampled randomly
+    'alpha_terminal': 1, # defines ratio of game timehorizon with respect to a heuristic estimator for timesteps needed to reach the end of the track
 
     'num_sim': 1,
     'num_iter': 1000,
     'delta_t': 1,
     'c_param': np.sqrt(2),
+    'k_samples': 1,
 
-    'collision_distance': 0.5,
+    'collision_distance': 1,
+    'goal_distance': 1,
 
     'collision_ignorance': 0.5,
     'discount_factor': 0.9,
 
-    'penalty_distance': float,
-    'reward_progress_0': float,
-    'reward_progress_1': float,
-    'penalty_timestep_0': float,
-    'penalty_timestep_1': float,
-    'reward_lead_0': float,
-    'reward_lead_1': float,
+    'weight_distance': float,
+    'weight_progress': float,
+    'weight_timestep': float,
+    'weight_lead': float,
+    'weight_winning': float,
+
+    'weight_interm': 1,
+    'weight_final': 10,
 
     'velocity_0': list,
     'ang_velocity_0': list,
@@ -169,62 +224,114 @@ default_dict = {
     'standard_dev_vel_1': float,
     'standard_dev_ang_vel_1': float,
     'feature_flags': {
-        'final_move': {'robust-joint': False, 'robust-separate': True, 'depth-robust-joint': False, 'depth-robust-separate': False, 'max': False, 'ucb': False},
+        'run_mode': {'test': True, 'exp': False, 'live-plot': True},
+        'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
         'collision_handling': {'punishing': True, 'pruning': False},
-        'selection_policy': {'ucb': True, 'max': False, 'regret-matching': False},
+        'selection_policy': {'uct-decoupled': True, 'cfr': False},
         'rollout_policy': {'random-uniform': True, 'random-informed': False},
         'payoff_weights': {'fixed': True, 'adaptive': False},
-        'expansion_policy': {'every-child': True, 'random': False},
+        'expansion_policy': {'every-child': True, 'random-informed': False},
+        'strategy': {'pure': True, 'mixed': False},
     }
     }
 default_config = Config(default_dict)
 
 
-exp_overtaking_punishcoll = {
+feature_flags_cfr = {
+        'run_mode': {'test': True, 'exp': False, 'live-plot': True},
+        'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
+        'collision_handling': {'punishing': True, 'pruning': False},
+        'selection_policy': {'uct-decoupled': False, 'cfr': True},
+        'rollout_policy': {'random-uniform': False, 'random-informed': True},
+        'expansion_policy': {'every-child': False, 'random-informed': True},
+        'strategy': {'pure': True, 'mixed': False},
+        }
+
+feature_flags_uct = {
+        'run_mode': {'test': True, 'exp': False, 'live-plot': True},
+        'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
+        'collision_handling': {'punishing': False, 'pruning': True},
+        'selection_policy': {'uct-decoupled': True, 'cfr': False},
+        'rollout_policy': {'random-uniform': False, 'random-informed': True},
+        'expansion_policy': {'every-child': True, 'random-informed': False},
+        'strategy': {'pure': True, 'mixed': False},
+    }
+
+overtaking_dict = {
+    'env_name': 'racetrack_7x16',
     'c_param': np.sqrt(2),
+    'k_samples': 1,
 
-    'final_move_depth': None,
-    'num_final_move_childs': None,
+    'alpha_rollout': 1,
+    'alpha_terminal': 1.5,
 
-    'rollout_length': 8,
-    'terminal_progress': 8,
-
-    'alpha_t': 1,
-    'num_sim': 5,
-    'num_iter': 1000,
+    'num_sim': 1,
+    'num_iter': 400,
     'delta_t': 1,
 
-    'collision_ignorance': 0.4, #[0,1]
-    'discount_factor': 0.8,
+    'collision_ignorance': 0.5, #[0,1]
+    'discount_factor': 1,
 
-    'penalty_distance': -0,
-    'reward_progress_0': 0.5,
-    'reward_progress_1': 0.5,
-    'penalty_timestep_0': -0.05,
-    'penalty_timestep_1': -0.05,
-    'reward_lead_0': 1,
-    'reward_lead_1': 1,
-    'velocity_0': np.linspace(0, 1, 2).tolist(),
+    'weight_interm': 0,
+    'weight_final': 2,
+
+    'weight_distance': 1,
+    'weight_progress': 0,
+
+    'weight_timestep': 1,
+    'weight_lead': 1,
+    'weight_winning': 1,
+
+    'velocity_0': np.linspace(0, 2, 3).tolist(),
     'ang_velocity_0': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
     'velocity_1': np.linspace(0, 1, 2).tolist(),
     'ang_velocity_1': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
 
-    'standard_dev_vel_0': 1,
+    'standard_dev_vel_0': 2,
     'standard_dev_ang_vel_0': np.pi/4,
     'standard_dev_vel_1': 1,
     'standard_dev_ang_vel_1':  np.pi/4,
 
-    'feature_flags': {
-        'final_move': {'robust-joint': True, 'robust-separate': False, 'depth-robust-joint': False, 'depth-robust-separate': False, 'max': False, 'ucb': False},
-        'collision_handling': {'punishing': False, 'pruning': True},
-        'selection_policy': {'ucb': True, 'max': False, 'regret-matching': False},
-        'rollout_policy': {'random-uniform': True, 'random-informed': False},
-        'payoff_weights': {'fixed': True, 'adaptive': False},
-        'expansion_policy': {'every-child': True, 'random': False},
-    }
+    'feature_flags': feature_flags_cfr
 }
 
-experimental_mode = False 
+intersection_dict = {
+    'env_name': 'intersection_3x3',
+    'c_param': np.sqrt(2),
+    'k_samples': 10,
 
+    'alpha_rollout': 1,
+    'alpha_terminal': 1.5,
 
+    'num_sim': 5,
+    'num_iter': 500,
+    'delta_t': 1,
 
+    'collision_ignorance': 0.5, #[0,1]
+    'discount_factor': 1,
+
+    # Payoffs
+    'weight_interm': 5,
+    'weight_final': 1,
+
+    'weight_distance': 1,
+    'weight_progress': 0,
+
+    'weight_timestep': 0,
+    'weight_lead': 1,
+    'weight_winning': 1,
+
+    'velocity_0': np.linspace(0, 1, 2).tolist(),
+    'ang_velocity_0': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
+    'velocity_1': np.linspace(0, 1, 2).tolist(),
+    'ang_velocity_1': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
+
+    'standard_dev_vel_0': 2,
+    'standard_dev_ang_vel_0': np.pi/4,
+    'standard_dev_vel_1': 1,
+    'standard_dev_ang_vel_1':  np.pi/4,
+
+    'feature_flags': feature_flags_cfr
+}
+
+curr_dict = overtaking_dict

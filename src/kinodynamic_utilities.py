@@ -3,29 +3,23 @@ import itertools
 from shapely import LineString
 
 from common import *
+import random
 
 def mm_unicycle(state, action, delta_t=1):
     # state = [x, y, theta]
     # action = [speed, angular_speed]
     x_new = state[0] + action[0]*np.cos(state[2])*delta_t
     y_new = state[1] + action[0]*np.sin(state[2])*delta_t
-    theta_new = (state[2] + action[1]*delta_t)%(2*np.pi) # modulo to keep angle between 0 and 2pi
+    theta_new = np.fmod((state[2] + action[1]*delta_t), 2*np.pi) # modulo to keep angle between 0 and 2pi
     return x_new, y_new, theta_new
 
-def distance(state_0, state_1):
-    # state = [x, y, theta]
-    x1 = state_0[0]
-    y1 = state_0[1]
-    x2 = state_1[0]
-    y2 = state_1[1]
-    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 def is_collision(state_object):
     # state = [x, y, theta]
 
     # vertex collisions
-    state_0 = state_object.get_state_0()
-    state_1 = state_object.get_state_1()
+    state_0 = state_object.get_state(agent=0)
+    state_1 = state_object.get_state(agent=1)
     if distance(state_0, state_1) <= 0.5:
         return True
 
@@ -33,11 +27,11 @@ def lines_intersect(Game, prev_state, joint_action):
     # check for collision between the agents
 
     # Create lines for both agents
-    state_0 = prev_state.get_state_0()
+    state_0 = prev_state.get_state(agent=0)
     action_0 = joint_action[:2]
     x_next_0, y_next_0, theta_next_0 = mm_unicycle(state_0, action_0, delta_t=Game.Model_params["delta_t"])
 
-    state_1 = prev_state.get_state_1()
+    state_1 = prev_state.get_state(agent=1)
     action_1 = joint_action[2:]
     x_next_1, y_next_1, theta_next_1 = mm_unicycle(state_1, action_1, delta_t=Game.Model_params["delta_t"])
 
@@ -94,8 +88,8 @@ def is_in_forbidden_state(Game, state, action, init_timestep):
 def sample_legal_actions(Game, state_object):
     # representing KINODYNAMIC CONSTRAINTS
     #print("STate object: {}".format(state_object.get_state_together()))
-    state_0 = state_object.get_state_0()
-    state_1 = state_object.get_state_1()
+    state_0 = state_object.get_state(agent=0)
+    state_1 = state_object.get_state(agent=1)
 
     # state = [x, y, theta]
     # action = [vel, angular_vel]
@@ -125,4 +119,8 @@ def sample_legal_actions(Game, state_object):
     sampled_actions_together_pruned = [action_pair[0] + action_pair[1] for action_pair in sampled_actions_seperate_pruned] # adding both lists to one list
 
     #print("sampled_actions_together_pruned: {}".format(sampled_actions_together_pruned))
+    random.shuffle(sampled_actions_0_pruned)
+    random.shuffle(sampled_actions_1_pruned)
+    random.shuffle(sampled_actions_together_pruned)
+
     return sampled_actions_0_pruned, sampled_actions_1_pruned, sampled_actions_together_pruned
