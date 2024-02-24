@@ -3,6 +3,7 @@ import json
 import yaml
 from common import *
 import numpy as np
+import copy
 
 """
 Provides generic Config class useful for passing around parameters
@@ -67,20 +68,37 @@ class Config(dict):
         return config_to_dict(self)
 
 
-def copy_new_config(default_config, new_dict, env_dict):
-    new_config = Config(default_config)
+def copy_new_config(old_config, new_dict, env_dict):
+    new_config = old_config
 
     for key, value in new_dict.items():
         if key in new_config:
             new_config[key] = value
         else:
             new_config.__dict__[key] = value
-    for key, value in env_dict[new_dict['env_name']].items():
-        if key in new_config:
-            new_config[key] = value
-        else:
-            new_config.__dict__[key] = value
+    try:
+        for key, value in env_dict[new_dict['env_name']].items():
+            if key in new_config:
+                new_config[key] = value
+            else:
+                new_config.__dict__[key] = value
+    except:
+        pass
     return new_config
+
+def copy_new_dict(old_dict, add_dict, env_dict):
+    new_dict = copy.deepcopy(old_dict)
+
+    for key, value in add_dict.items():
+        new_dict[key] = value
+    # add environment definitions
+    try:
+        for key, value in env_dict[new_dict['env_name']].items():
+            new_dict[key] = value
+    except:
+        pass
+    return new_dict
+
 
 def config_to_dict(config: Config):
     """

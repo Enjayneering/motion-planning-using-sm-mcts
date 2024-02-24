@@ -32,27 +32,52 @@ aver_final_payoff = 0
 
 freq_stat_data = 10
 
-def get_max_timehorizon(Game):
-    min_time_0 = get_min_time_to_complete(Game, curr_state=[Game.env.init_state[f'x{0}'], Game.env.init_state[f'y{0}']] , final_state=[Game.env.goal_state[f'x{0}'], Game.env.goal_state[f'y{0}']], agent=0)
-    min_time_1 = get_min_time_to_complete(Game, curr_state=[Game.env.init_state[f'x{1}'], Game.env.init_state[f'y{1}']] , final_state=[Game.env.goal_state[f'x{1}'], Game.env.goal_state[f'y{1}']], agent=1)
 
-    min_time = min(min_time_0, min_time_1)
+
+def is_terminal(Game, state_obj, max_timestep=None):
+        # terminal condition
+        #print(state_obj.timestep, Game.config.max_timehorizon)
+        #print("state_obj {}: {}".format(state_obj.timestep, state_obj.get_state_obj()))
+        if Game.env.finish_line is not None:
+            finish_line = Game.env.finish_line
+            if state_obj.x0 >= finish_line or state_obj.x1 >= finish_line:
+                #print("Terminal state_obj reached")
+                return True
+        elif Game.env.goal_state_obj is not None:
+            if agent_has_finished(Game, state_obj, agent=0) or agent_has_finished(Game, state_obj, agent=1):
+                #print("Terminal state_obj reached")
+                #print("state_obj {}: {}".format(state_obj.timestep, state_obj.get_state_obj()))
+                return True
+        if state_obj.timestep >= max_timestep:
+            #print("Max timehorizon reached: {}".format(state_obj.timestep))
+            return True
+        else:
+            return False
+
+def get_max_timehorizon(Game):
+    min_time = get_min_time_to_complete(Game)
 
     max_game_timehorizon = int(Game.config.alpha_terminal * min_time)+1
     #print("Max game timehorizon: {}".format(max_game_timehorizon))
     return max_game_timehorizon
 
-def get_min_time_to_complete(Game, curr_state, final_state, agent=0):
-    dist = distance(curr_state, final_state)
+def get_min_time_to_complete(Game, curr_state=None):
+    min_times = []
+    
+    if curr_state is None:
+            curr_state = [Game.env.init_state['x0'], Game.env.init_state['y0'], Game.env.init_state['theta0'],
+                          Game.env.init_state['x1'], Game.env.init_state['y1'], Game.env.init_state['theta1']]
 
-    #dist = abs(Game.env.init_state[f'x{agent}']-Game.env.goal_state[f'x{agent}'])+abs(Game.env.init_state[f'y{agent}']-Game.env.goal_state[f'y{agent}'])
-
-    if agent == 0:
-        max_velocity = np.max(Game.config.velocity_0)
-    elif agent == 1:
-        max_velocity = np.max(Game.config.velocity_1)
-    min_time = dist/max_velocity
-    return min_time
+    final_state = [Game.env.goal_state['x0'], Game.env.goal_state['y0'], Game.env.goal_state['theta0'],
+                   Game.env.goal_state['x1'], Game.env.goal_state['y1'], Game.env.goal_state['theta1']]
+    dist_0 = distance(curr_state[0:2], final_state[0:2])
+    dist_1 = distance(curr_state[4:6], final_state[4:6])
+    #dist_1 = distance(curr_state[3:5], final_state[3:5])
+    max_velocity_0 = np.max(Game.config["velocity_0"])
+    max_velocity_1 = np.max(Game.config["velocity_1"])
+    min_times.append(dist_0/max_velocity_0)
+    min_times.append(dist_1/max_velocity_1)    
+    return max(min_times)
 
 def coll_count(joint_trajectory):
     coll_count = 0
@@ -63,28 +88,9 @@ def coll_count(joint_trajectory):
             coll_count += 1
     return coll_count
 
-def is_terminal(Game, state, max_timestep=None):
-        # terminal condition
-        #print(state.timestep, Game.config.max_timehorizon)
-        if Game.env.finish_line is not None:
-            finish_line = Game.env.finish_line
-            if state.x0 >= finish_line or state.x1 >= finish_line:
-                #print("Terminal state reached")
-                return True
-        elif Game.env.goal_state is not None:
-            if agent_has_finished(Game, state, agent=0) or agent_has_finished(Game, state, agent=1):
-                #print("Terminal state reached")
-                #print("state {}: {}".format(state.timestep, state.get_state()))
-                return True
-        if state.timestep >= max_timestep:
-            #print("Max timehorizon reached: {}".format(state.timestep))
-            return True
-        else:
-            return False
-
 def agent_has_finished(Game, state_obj, agent=0):
-    max_progress = Game.env.centerlines[agent][-1][-1]
-    if find_closest_waypoint(state_obj, Game.env.centerlines, agent=agent)[-1] >= max_progress:
+    max_progress = Game.env.env_centerline[-5][-1] # TODO: specify goal
+    if find_closest_waypoint(Game, state_obj.get_state(agent=agent))[-1] >= max_progress:
         return True
     else:
         return False
@@ -117,21 +123,39 @@ def distance(state_0, state_1):
     y2 = state_1[1]
     return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
-def get_cl_progress(Game, prev_state_obj, next_state_obj, agent=0):
+def get_agent_progress(Game, prev_state, next_state):
     # state = [x, y, theta]
     # action = [speed, angular_speed]
-    prev_closest_coordinate = find_closest_waypoint(prev_state_obj, Game.env.centerlines, agent=agent)
-    next_closest_coordinate = find_closest_waypoint(next_state_obj, Game.env.centerlines, agent=agent)
+    prev_closest_coordinate = find_closest_waypoint(Game, prev_state)
+    next_closest_coordinate = find_closest_waypoint(Game, next_state)
     progress = next_closest_coordinate[-1] - prev_closest_coordinate[-1]
     return progress
 
-def find_closest_waypoint(state_obj, centerlines, agent=0):
+def find_closest_waypoint(Game, state):
     closest_waypoint = None
     min_distance = float('inf')
 
-    for waypoint in centerlines[agent]:
-        dist = distance(state_obj.get_state(agent=agent), waypoint[:2])
+    for waypoint in Game.env.env_centerline:
+        dist = distance(state, waypoint[:2])
         if dist < min_distance:
             min_distance = dist
             closest_waypoint = waypoint
     return closest_waypoint
+
+def get_env_progress(Game, state):
+    closest_waypoint = None
+    min_distance = float('inf')
+
+    for waypoint in Game.env.env_centerline:
+        dist = distance(state, waypoint[:2])
+        if dist < min_distance:
+            min_distance = dist
+            closest_waypoint = waypoint
+    return closest_waypoint[-1]
+
+# Gaussian function
+def denormalized_gaussian(x, mu, sigma):
+    return np.exp(-(x - mu)**2 / (2 * sigma**2))
+
+def manhattan_distance(x1, y1, x2, y2):
+        return abs(x1 - x2) + abs(y1 - y2)

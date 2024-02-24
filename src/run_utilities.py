@@ -28,8 +28,6 @@ def save_global_data(exp_path_level_0):
     # read all data from result files in subfolders
     result_data = _read_result_files(exp_path_level_0) # list
     
-    # Add index column
-    
     # Save the result data to a JSON file
     with open(os.path.join(exp_path_level_0, "global_results.json"), 'w') as json_file:
         json.dump(result_data, json_file)
@@ -104,3 +102,6 @@ def _variance_list_of_lists_of_lists(data_list):
     sub_sub_mean = _mean_list_of_lists_of_lists(data_list)
     sub_sub_variance = [[sum([(d-sub_sub_mean[i][j])**2 for d in sub_sub_list])/len(sub_sub_list) for j, sub_sub_list in enumerate(zip(*sub_list))] for i, sub_list in enumerate(zip(*data_list))]
     return sub_sub_variance
+
+
+

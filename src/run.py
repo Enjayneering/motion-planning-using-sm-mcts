@@ -2,7 +2,7 @@ import time
 import multiprocessing
 import os
 import json
-import csv
+import itertools
 
 from competitive_game import CompetitiveGame
 from plot_independent import plot_independent
@@ -14,8 +14,8 @@ from run_utilities import *
 from environment_utilities import *
 
 
-def run_test(game_config):
-    Game = CompetitiveGame(game_config)
+def run_test(game_dict):
+    Game = CompetitiveGame(Config(game_dict))
     for _ in range(Game.config.num_sim):
         start_time = time.time()
 
@@ -26,7 +26,7 @@ def run_test(game_config):
 
         processes = []
         processes.append(multiprocessing.Process(target=plot_independent, args=(Game, stop_event)))
-        processes.append(multiprocessing.Process(target=Game.run_simulation, args=()))
+        processes.append(multiprocessing.Process(target=Game.run_game, args=()))
 
         # Start all processes
         for process in processes:
@@ -57,7 +57,7 @@ def run_test(game_config):
 
         print("Finished with duration: {} s".format(duration))
 
-def run_experiment(exp_path_level_1, game_config, exp_comment="", input=""):
+def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment="", input=""):
     print("Running MCTS in Experimental mode!")
 
     exp_path_level_0 = get_exp_path_level_0(exp_path_level_1, config=game_config, exp_comment=exp_comment, input=input)
@@ -79,7 +79,7 @@ def run_experiment(exp_path_level_1, game_config, exp_comment="", input=""):
         sys.stdout = print_file
 
         # RUN EXPERIMENT
-        result_dict = Game.run_simulation()
+        result_dict, policy_dict = Game.run_game(timesteps_sim=timestep_sim)
 
         # PLOT TRAJECTORIES
         plot_trajectory(Game, result_dict, subex_filepath, all_timesteps=False)
@@ -87,6 +87,8 @@ def run_experiment(exp_path_level_1, game_config, exp_comment="", input=""):
         # Write the result dictionary to the JSON file
         with open(os.path.join(subex_filepath, "results.json"), "w") as f:
             json.dump(result_dict, f)
+        with open(os.path.join(subex_filepath, "policies.json"), "w") as f:
+            json.dump(policy_dict, f)
         
         # Restore the standard output
         sys.stdout = sys.__stdout__
@@ -100,71 +102,65 @@ def run_experiment(exp_path_level_1, game_config, exp_comment="", input=""):
 def plot_trajectory(Game, result_dict, exp_path, all_timesteps=False):
     if all_timesteps:
         for t in range(result_dict['T_terminal']+1):
-            plot_single_run(Game, result_dict, exp_path, timestep=t, main_agent=0)
-            plot_single_run(Game, result_dict, exp_path, timestep=t, main_agent=1)
+            plot_single_run(Game, exp_path, result_dict=result_dict, timestep=t, main_agent=0)
+            plot_single_run(Game, exp_path, result_dict=result_dict, timestep=t, main_agent=1)
     else:
-        plot_single_run(Game, result_dict, exp_path, main_agent=0)
-        plot_single_run(Game, result_dict, exp_path, main_agent=1)
+        plot_single_run(Game, exp_path, result_dict=result_dict, main_agent=0)
+        plot_single_run(Game, exp_path, result_dict=result_dict, main_agent=1)
 
 def create_global_index(exp_path_level_1):
-    with open(os.path.join(exp_path_level_1, "index.txt"), 'w') as f:
-        f.write("1")
+    index_file_path = os.path.join(exp_path_level_1, "index.txt")
+    if not os.path.exists(index_file_path):
+        with open(index_file_path, 'w') as f:
+            f.write("1")
 
-def run_exp_vary_parameter(exp_path_level_1, game_config, parameter, linspace, dtype="float"):
-    num_incr = linspace[2]
-    if dtype == "float":
-        for param_value in np.linspace(linspace[0], linspace[1], num_incr):
-            update_dict = {parameter: param_value}
-            exp_config = copy_new_config(game_config, update_dict, env_dict, env_name)
-            run_experiment(exp_path_level_1, game_config=exp_config, input=f"{parameter}_{param_value}")
-    elif dtype == "int":
-        for param_value in np.linspace(linspace[0], linspace[1], num_incr):
-            update_dict = {parameter: int(param_value)}
-            exp_config = copy_new_config(game_config, update_dict, env_dict, env_name)
-            run_experiment(exp_path_level_1, game_config=exp_config, input=f"{param_value}")
+
+def run_exp_vary_parameter(exp_path_level_1, game_dict, exp_params, timestep_sim=None):
+    linspace = {}
+    for parameter, param_range in exp_params.items():
+        linspace[parameter] = np.linspace(param_range[0], param_range[0] + param_range[1] * (param_range[2]-1), param_range[2])
+
+    for param_values in itertools.product(*linspace.values()):
+        update_dict = {parameter: value for parameter, value in zip(linspace.keys(), param_values)}
+        exp_name = "_".join([f"{parameter}_{value}" for parameter, value in zip(linspace.keys(), param_values)])
+        exp_config = Config(copy_new_dict(game_dict, update_dict, env_dict))
+        run_experiment(exp_path_level_1, game_config=exp_config, timestep_sim=timestep_sim, input=exp_name)
 
 
 if __name__ == "__main__":
     # SETTING EXPERIMENT UP
-    expdict = curr_dict
-
-    exp_path_level_2 = 'V5_Test_coll_pruning'
-
-    config = copy_new_config(default_config, expdict, env_dict)
-
-
-    if config.feature_flags["run_mode"]["exp"]:
-        exp_path_level_1 = os.path.join(path_to_experiments, exp_path_level_2)
-
-        if not os.path.exists(os.path.join(path_to_experiments, exp_path_level_1)):
-            os.mkdir(os.path.join(path_to_experiments, exp_path_level_1))
-        create_global_index(os.path.join(path_to_experiments, exp_path_level_1))
-        
-        exp_start = time.time()
-
-        run_experiment(exp_path_level_1, game_config=config, input=str(config.num_iter))
-        
-        #run_exp_vary_parameter(exp_path_level_1, game_config=config, parameter='c_param', linspace=(100, 1000, 10), dtype="float")
-
-        """num_incr = 10
-        for incr_dist in range(0, num_incr+1):
-            for incr_timestep in range(0, num_incr+1):
-                increment_dict = {  'penalty_distance_0': -incr_dist/num_incr,
-                                    'penalty_distance_1': -incr_dist/num_incr,
-                                    'penalty_timestep_0': -incr_timestep/num_incr,
-                                    'penalty_timestep_1': -incr_timestep/num_incr}
-                exp_weights_increment_config = copy_new_config(game_config, increment_dict)
-                #print(exp_weights_increment_config)
-
-                # RUN EXPERIMENT
-                run_experiment(exp_path_level_1, game_config=config, input=f"{incr_dist/num_incr}-{incr_timestep/num_incr}")"""
-
-        
-        exp_duration = time.time() - exp_start
-        print("Finished all experiments with duration: {} s".format(exp_duration))
-
-    elif config.feature_flags["run_mode"]["test"]:
-        run_test(game_config=config)
+    experiments = []
     
+    # basic experiment
+    dict_0 = copy_new_dict(default_dict, overtaking_dict, env_dict)
+    #experiments.append({'name': 'V8_Convergence_Following_alphat', 'dict': dict_0})
+
+    # change action space agent 1
+    update_dict = {'velocity_1': np.linspace(0, 1, 2).tolist()}
+    dict_1 = copy_new_dict(dict_0, update_dict, env_dict)
+    experiments.append({'name': 'V8_Convergence_Overtaking_alphat', 'dict': dict_1})
+
+    for experiment in experiments:
+        if experiment['dict']['feature_flags']["run_mode"]["exp"]:
+            exp_path_level_1 = os.path.join(path_to_experiments, experiment['name'])
+
+            if not os.path.exists(os.path.join(path_to_experiments, exp_path_level_1)):
+                os.mkdir(os.path.join(path_to_experiments, exp_path_level_1))
+            create_global_index(os.path.join(path_to_experiments, exp_path_level_1))
+            
+            exp_start = time.time()
+
+            #run_experiment(exp_path_level_1, game_config=Config(experiment['dict']), timestep_sim=None, input=str(config.num_iter))
+            exp_params = {'alpha_terminal': (2.0, 0.1, 3),
+                          'num_iter': (100, 500, 10)}
+            run_exp_vary_parameter(exp_path_level_1, game_dict=experiment['dict'], exp_params=exp_params, timestep_sim=1)
+            
+            exp_duration = time.time() - exp_start
+
+            print("Finished all experiments with duration: {} s".format(exp_duration))
+
+        elif experiment['dict']['feature_flags']["run_mode"]["test"]:
+            run_test(game_dict=experiment['dict'])
     
+    print("All experiments finished")
    

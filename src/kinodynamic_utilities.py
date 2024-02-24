@@ -14,13 +14,9 @@ def mm_unicycle(state, action, delta_t=1):
     return x_new, y_new, theta_new
 
 
-def is_collision(state_object):
+def is_collision(Game, state_0, state_1):
     # state = [x, y, theta]
-
-    # vertex collisions
-    state_0 = state_object.get_state(agent=0)
-    state_1 = state_object.get_state(agent=1)
-    if distance(state_0, state_1) <= 0.5:
+    if distance(state_0, state_1) <= Game.config.collision_distance:
         return True
 
 def lines_intersect(Game, prev_state, joint_action):

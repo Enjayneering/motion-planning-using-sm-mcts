@@ -14,7 +14,7 @@ from environment_utilities import *
 from matplotlib.patches import Rectangle
 from kinodynamic_utilities import distance, mm_unicycle
 
-def plot_single_run(Game, result_dict, path_to_experiment, timestep=None, main_agent=0):
+def plot_single_run(Game, path_savefig, result_dict= None, timestep=None, main_agent=0):
     colormap = {'red': (192/255, 67/255, 11/255), 
                 'darkred': (83/255, 29/255, 0/255),
                 'blue': (78/255, 127/255, 141/255), 
@@ -61,7 +61,7 @@ def plot_single_run(Game, result_dict, path_to_experiment, timestep=None, main_a
     plot_map(ax, array=last_map, facecolor=colormap['yellow'], edgecolor=colormap['grey'])
 
     # Plot coordinate system
-    plotCOS(ax, x_orig=0, y_orig=0, scale=1, colormap=colormap)
+    plotCOS(ax, x_orig=0, y_orig=0, scale=0.8, colormap=colormap)
                  
     # plot finish line
     plot_finish_line(ax, finish_line=finish_line, ymax=ymax)
@@ -89,7 +89,7 @@ def plot_single_run(Game, result_dict, path_to_experiment, timestep=None, main_a
     fig.tight_layout()
 
     # save figure
-    fig.savefig(os.path.join(path_to_experiment, "trajectory{}_{}.png".format(main_agent, timestep)), dpi=300, bbox_inches='tight')
+    fig.savefig(os.path.join(path_savefig, "trajectory{}_{}.png".format(main_agent, timestep)), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
 def plot_finish_line(ax, finish_line=None, ymax=None):
@@ -101,9 +101,9 @@ def plot_finish_line(ax, finish_line=None, ymax=None):
         i = 0
         while i * patch_width < ymax:
             if i % 2 == 0:
-                rect = Rectangle((finish_line - patch_width, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
+                rect = Rectangle((finish_line - patch_width, i * patch_width), patch_width, patch_width, facecolor='lightgrey', edgecolor='lightgrey')
             else:
-                rect = Rectangle((finish_line, i * patch_width), patch_width, patch_width, facecolor='white', edgecolor='white')
+                rect = Rectangle((finish_line, i * patch_width), patch_width, patch_width, facecolor='lightgrey', edgecolor='lightgrey')
             ax.add_patch(rect)
             i += 1
     else:
@@ -156,7 +156,7 @@ def annotate_state(ax, x, y, theta, timestep, visit_count=0, facecolor=None, edg
     loc_circle = plt.Circle((x, y), radius=0.1, facecolor=facecolor, edgecolor=edgecolor, linewidth=0.4, zorder=zorder+visit_count, alpha=alpha)
     ax.add_patch(loc_circle)
 
-def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8, alpha=0.5):
+def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8, alpha=1):
     thickness = 0.2
     ax.arrow(x_orig, y_orig, scale, 0, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], alpha=alpha, zorder=4)
     ax.arrow(x_orig, y_orig, 0, scale, head_width=thickness, head_length=thickness, fc=colormap['grey'], ec=colormap['grey'], alpha=alpha, zorder=4)
@@ -166,7 +166,7 @@ def plotCOS(ax, x_orig, y_orig, scale, colormap, fontsize = 8, alpha=0.5):
     ax.text(x_orig+scale, y_orig-0.3, "x", fontsize=fontsize, ha='center', va='center', alpha=alpha, zorder=4)
     ax.text(x_orig-0.3, y_orig+scale, "y", fontsize=fontsize, ha='center', va='center', alpha=alpha, zorder=4)
 
-def plot_map(ax, array, facecolor=None, edgecolor=None):
+def plot_map(ax, array, facecolor=None, edgecolor=None, timestep_max=None, roadcolor="grey"):
     # plot the racing gridmap
     for row in range(len(array)):
         for col in range(len(array[0])):
@@ -176,15 +176,14 @@ def plot_map(ax, array, facecolor=None, edgecolor=None):
                 ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, facecolor=facecolor, edgecolor=edgecolor, alpha=1, hatch="//", zorder=3))
             elif array[row][col] == 0: # free space, road
                 ax.plot(col, row, 'o', color='dimgrey', markersize=1, alpha=1)
-                ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, color='grey', linewidth=0, alpha=1, zorder=1))
-
+                ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, color=roadcolor, linewidth=0, alpha=1, zorder=1))
 
 def get_current_grid(grid_dict, timestep):
     for grid_timeindex in reversed(grid_dict.keys()):
-        if grid_timeindex <= timestep:
+        if int(grid_timeindex) <= timestep:
             current_grid = grid_dict[grid_timeindex]
             break
-    occupancy_grid_define = current_grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1').replace('+', '2')
+    occupancy_grid_define = current_grid.replace('.', '0').replace('0', '0').replace('x', '0').replace('1', '0').replace('#', '1').replace('+', '2').replace('F', '0')
     lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
     transformed_grid = [list(map(int, line)) for line in lines]
     occupancy_grid = np.array(transformed_grid)

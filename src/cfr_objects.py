@@ -206,9 +206,7 @@ class CFRNode:
         strategy_0 = self.get_strategy(agent=0)
         strategy_1 = self.get_strategy(agent=1)
         action_0_ix =  np.random.choice(range(len(strategy_0)), p=np.array(strategy_0)/ np.sum(strategy_0))
-        #np.argmax(strategy_0)
         action_1_ix = np.random.choice(range(len(strategy_1)), p=np.array(strategy_1)/ np.sum(strategy_1))
-        #np.argmax(strategy_1)
         select_action_0 = self.actions[0][action_0_ix]
         select_action_1 = self.actions[1][action_1_ix]
         selected_action = select_action_0 + select_action_1

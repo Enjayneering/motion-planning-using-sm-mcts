@@ -56,19 +56,39 @@ class State:
 class MCTSNode:
     def __init__(self, Game, state, parent=None, parent_action=None):
         self.state = state
+        self.actions = {0: sample_legal_actions(Game, self.state)[0], 1: sample_legal_actions(Game, self.state)[1]}
         self.parent = parent
         self.parent_action = parent_action
         self.children = []
-
+        
         ########## MCTS parameters ##########
-        self._aggr_payoffs = [0]*len(Game.Model_params["agents"])
-        self._number_of_visits = 1
+        if Game.config.feature_flags['selection_policy']['uct-decoupled']:
+            self._number_of_visits = 1
 
-        self._untried_actions = self._get_untried_actions(Game)
+        elif Game.config.feature_flags['selection_policy']['regret-matching']:
+            self._number_of_visits = 0
+            self._num_actions = {0: len(self.actions[0]), 1: len(self.actions[1])}
+            self._action_utilities = {0: [0] * self._num_actions[0], 1: [0] * self._num_actions[1]}
+            self._regret_sum = {0: [0] * self._num_actions[0], 1: [0] * self._num_actions[1]}
+            self._strategy_sum = {0: [0] * self._num_actions[0], 1: [0] * self._num_actions[1]}
+
+
+        self._untried_actions = sample_legal_actions(Game, self.state)[-1]
         self._tried_actions = []
-        self._select_policy_stats = {"action_stats_0": {}, "action_stats_1": {}}
+        self._select_policy_stats = {0: {}, 1: {}}
+        self._aggr_payoffs = [0]*len(Game.Model_params["agents"])
         
 
+    #############################
+    ####   MCTS Functions    ####
+    #############################
+        
+    def n(self):
+        return self._number_of_visits
+
+    def is_fully_expanded(self):
+        return len(self._untried_actions) == 0
+    
     def expand(self, Game, action=None):
         if action is None:
             # Pop random action out of the list
@@ -77,19 +97,17 @@ class MCTSNode:
             # Delete the specified action from the list
             self._untried_actions.remove(action)
         self._tried_actions.append(action)
-
         next_state = self.state.move(action, delta_t=Game.Model_params["delta_t"])
-
         child_node = MCTSNode(Game, next_state, parent=self, parent_action=action)
         self.children.append(child_node)
         #print("Child node: {}".format(child_node.state.get_state_together()))
         return child_node
 
-    def _get_untried_actions(self, Game):
+    """def _get_untried_actions(self, Game):
         untried_action_0, untried_action_1, untried_actions = sample_legal_actions(Game, self.state)
-        return untried_actions
+        return untried_actions"""
     
-    def _separate_actions(self, actions_together):
+    """def _separate_actions(self, actions_together):
         # Remove duplicate actions
         actions_0 = list(set(tuple(action[:2]) for action in actions_together))
         actions_1 = list(set(tuple(action[2:]) for action in actions_together))
@@ -97,54 +115,19 @@ class MCTSNode:
         actions_1 = [list(action) for action in actions_1]
         random.shuffle(actions_0)
         random.shuffle(actions_1)
-        return actions_0, actions_1
-
-    # TODO: vary Selection policy
-    def calc_UCT(self, action_stat, c_param):
-            X = action_stat["sum_payoffs"]
-            n = action_stat["num_count"]
-            UCT = (X/n) + c_param * np.sqrt((np.log(self.n()) / n)) # payoff range normalizes the payoffs so that we get better exploration
-            return UCT
+        return actions_0, actions_1"""
     
-
-    
-    def _select_action_UCT(self, Game, agent = 0):
-        weights = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats['action_stats_{}'.format(agent)].values()]
-        action_select = list(self._select_policy_stats['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
-        return action_select
-    
-    def _select_action_max(self, Game, agent = 0):
-        weights = [action_stat["sum_payoffs"]/action_stat['num_count'] for action_stat in self._select_policy_stats['action_stats_{}'.format(agent)].values()]
-        action_select = list(self._select_policy_stats['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
-        return action_select
-    
-    def _select_action_robust(self, Game, agent = 0):
-
-        weights = [action_stat["num_count"]/self._number_of_visits for action_stat in self._select_policy_stats['action_stats_{}'.format(agent)].values()]
-        print("Actions to choose Agent {}: {}".format(agent, self._select_policy_stats['action_stats_{}'.format(agent)].values()))
-        print("Weights num count: {}".format(weights))
-        
-        if Game.config.feature_flags['strategy']['pure']:
-            action_select = list(self._select_policy_stats['action_stats_{}'.format(agent)].values())[np.argmax(weights)]['action']
-            return action_select
-        elif Game.config.feature_flags['strategy']['mixed']:
-            probabilitic_sample_index = np.random.choice(range(len(weights)), p=np.array(weights)/ np.sum(weights))
-            action_select = list(self._select_policy_stats['action_stats_{}'.format(agent)].values())[probabilitic_sample_index]['action']
-            return action_select
-        
-
     def select_policy_child(self, Game):
         # resolve selecting actions that lead to a collision
         if Game.config.feature_flags['collision_handling']['pruning']:
             if Game.config.feature_flags['selection_policy']['uct-decoupled']:
-                weights_0 = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats['action_stats_0'].values()]
-                weights_1 = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats['action_stats_1'].values()]
-            elif Game.config.feature_flags['selection_policy']['greedy']:
-                weights_0 = [action_stat["sum_payoffs"] for action_stat in self._select_policy_stats['action_stats_0'].values()]
-                weights_1 = [action_stat["sum_payoffs"] for action_stat in self._select_policy_stats['action_stats_1'].values()]
+                weights_0 = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[0].values()]
+                weights_1 = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[1].values()]
+            elif Game.config.feature_flags['selection_policy']['regret-matching']:
+               pass
             while True:
-                selected_action_0 = list(self._select_policy_stats['action_stats_0'].values())[np.argmax(weights_0)]['action']
-                selected_action_1 = list(self._select_policy_stats['action_stats_1'].values())[np.argmax(weights_1)]['action']
+                selected_action_0 = list(self._select_policy_stats[0].values())[np.argmax(weights_0)]['action']
+                selected_action_1 = list(self._select_policy_stats[1].values())[np.argmax(weights_1)]['action']
                 x0, y0, theta0 = mm_unicycle(self.state.get_state(agent=0), selected_action_0, delta_t=Game.Model_params["delta_t"])
                 x1, y1, theta1 = mm_unicycle(self.state.get_state(agent=1), selected_action_1, delta_t=Game.Model_params["delta_t"])
                 if distance([x0, y0], [x1, y1]) < Game.Model_params["collision_distance"]:
@@ -155,13 +138,9 @@ class MCTSNode:
                 else:
                     break
         elif Game.config.feature_flags['collision_handling']['punishing']:
-            if Game.config.feature_flags['selection_policy']['uct-decoupled']:
-                selected_action_0 = self._select_action_UCT(Game, agent=0)
-                selected_action_1 = self._select_action_UCT(Game, agent=1)
-            elif Game.config.feature_flags['selection_policy']['max']:
-                selected_action_0 = self._select_action_max(Game, agent=0)
-                selected_action_1 = self._select_action_max(Game, agent=1)
-
+            selected_action_0 = self._select_action(Game, agent=0)
+            selected_action_1 = self._select_action(Game, agent=1)
+        
         selected_action = selected_action_0 + selected_action_1
         #print( "Selected action: {}".format(selected_action))
         if any(selected_action == sublist for sublist in self._tried_actions):
@@ -171,47 +150,112 @@ class MCTSNode:
             child = self.expand(Game, selected_action)
         #print("Selected child: {}".format(child.state.get_state_together()))
         return child
-
-    def _robust_child_joint(self):
-        choices_weights = [c.n() for c in self.children]
-        index = np.argmax(choices_weights)
-        robust_child = self.children[index]
-        return robust_child
     
-    
-    def select_final_child(self, Game):
+    def _select_final_child(self, Game):
         if Game.config.feature_flags['final_move']['robust-joint']:
-            child = self._robust_child_joint()
-            print("Robust child joint: {}".format(child.state.get_state_together()))
+            weights = [c.n() for c in self.children]
+            index = np.argmax(weights)
+            child = self.children[index]
         elif Game.config.feature_flags['final_move']['robust-separate']:
             selected_action_0 = self._select_action_robust(Game, agent=0)
             selected_action_1 = self._select_action_robust(Game, agent=1)
             selected_action = selected_action_0 + selected_action_1
+            print('Selected final action: {}'.format(selected_action))
             child = [child for child in self.children if child.parent_action == selected_action][0]
-            print("Robust child separate: {}".format(child.state.get_state_together()))
         elif Game.config.feature_flags['final_move']['max']:
             selected_action_0 = self._select_action_max(Game, agent=0)
             selected_action_1 = self._select_action_max(Game, agent=1)
             selected_action = selected_action_0 + selected_action_1
             child = [child for child in self.children if child.parent_action == selected_action][0]
-            print("Best child: {}".format(child.state.get_state_together()))
-        print("Expected Payoff Value Agent 0 at timestep {}: {}".format(self.state.timestep, child.parent._select_policy_stats['action_stats_0'][str(child.parent_action[:2])]['sum_payoffs']/child.parent._select_policy_stats['action_stats_0'][str(child.parent_action[:2])]['num_count']))
-        print("Expected Payoff Value Agent 1 at timestep {}: {}".format(self.state.timestep, child.parent._select_policy_stats['action_stats_1'][str(child.parent_action[2:])]['sum_payoffs']/child.parent._select_policy_stats['action_stats_1'][str(child.parent_action[2:])]['num_count']))
-        print("Selection Probability Agent 0: {}".format(child.parent._select_policy_stats['action_stats_0'][str(child.parent_action[:2])]['num_count']/child.parent._number_of_visits))
-        print("Selection Probability Agent 1: {}".format(child.parent._select_policy_stats['action_stats_1'][str(child.parent_action[2:])]['num_count']/child.parent._number_of_visits))
+        #print("Expected Payoff Value Agent 0 at timestep {}: {}".format(self.state.timestep, child.parent._select_policy_stats['action_stats_0'][str(child.parent_action[:2])]['sum_payoffs']/child.parent._select_policy_stats['action_stats_0'][str(child.parent_action[:2])]['num_count']))
+        #print("Expected Payoff Value Agent 1 at timestep {}: {}".format(self.state.timestep, child.parent._select_policy_stats['action_stats_1'][str(child.parent_action[2:])]['sum_payoffs']/child.parent._select_policy_stats['action_stats_1'][str(child.parent_action[2:])]['num_count']))
+        #print("Selection Probability Agent 0: {}".format(child.parent._select_policy_stats['action_stats_0'][str(child.parent_action[:2])]['num_count']/child.parent._number_of_visits))
+        #print("Selection Probability Agent 1: {}".format(child.parent._select_policy_stats['action_stats_1'][str(child.parent_action[2:])]['num_count']/child.parent._number_of_visits))
         return child
     
-    def return_final_childs_with_probability(self, Game):
-        if Game.config.feature_flags['final_move']['robust-separate']:
-            child = self._robust_child_joint()
-            print("Robust child joint: {}".format(child.state.get_state_together()))
+    def rollout_policy(self, Game, current_node, moves_0, moves_1, possible_moves):
+        if current_node.state.timestep <= Game.config.max_timehorizon*Game.config.alpha_rollout:
+            if Game.config.feature_flags['rollout_policy']['random-uniform']:
+                # choose a random action to simulate rollout
+                action = possible_moves[np.random.randint(len(possible_moves))]
+            elif Game.config.feature_flags['rollout_policy']['random-informed']:
+                action = self._sample_action_informed_random(Game, current_node, moves_0, moves_1)
+        else:
+            # choose the action that turns the agents towards goal direction
+            action_0, action_1 = self._get_action_heuristic(Game, current_node, moves_0, moves_1)
+            action = action_0 + action_1
+        return action
+            
+    def backpropagate(self, Game, payoff_list, fixed_action=None):
+        # backpropagate statistics of the node
+        self._number_of_visits += 1
+       
+        for agent in Game.Model_params["agents"]:
+            self._aggr_payoffs[agent] += float(payoff_list[agent])
 
-    def n(self):
-        return self._number_of_visits
+        if self.parent:
+            # backpropagate if there is a parent
+            if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
+                if self.parent._select_policy_stats[0].get(str(self.parent_action[:2])): # update parent stats
+                    self.parent._select_policy_stats[0][str(self.parent_action[:2])]['num_count'] += 1
+                    self.parent._select_policy_stats[0][str(self.parent_action[:2])]['sum_payoffs'] += float(payoff_list[0])
+                    #print("backpropagate agent 0: {}".format(self.parent_action[:2]))
+                else: # create stats
+                    self.parent._select_policy_stats[0][str(self.parent_action[:2])] = {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': self.parent_action[:2]}
+                    #self.parent._select_policy_stats[0][str(self.parent_action[:2])]['action'] = self.parent_action[:2]
+                    #print("create action stat for agent 0: {}".format(self.parent_action[:2]))
+            if not [self.state.x1, self.state.y1, self.state.theta1, self.state.timestep] in Game.forbidden_states:
+                if  self.parent._select_policy_stats[1].get(str(self.parent_action[2:])): # update parent stats
+                    self.parent._select_policy_stats[1][str(self.parent_action[2:])]['num_count'] += 1
+                    self.parent._select_policy_stats[1][str(self.parent_action[2:])]['sum_payoffs'] += float(payoff_list[1])
+                    #print("backpropagate agent 1: {}".format(self.parent_action[2:]))
+                else: # create stats
+                    self.parent._select_policy_stats[1][str(self.parent_action[2:])] = {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': self.parent_action[2:]}
+                    #self.parent._select_policy_stats[1][str(self.parent_action[2:])]['action'] = self.parent_action[2:]
+                    #print("create action stat for agent 1: {}".format(self.parent_action[2:]))
+            
+            if Game.config.feature_flags['selection_policy']['regret-matching']:
+                if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
+                    for a in range(self._num_actions[0]):
+                        regret = payoff_list[0] - max(self._action_utilities[0][a], 0) if self.actions[0][a] == fixed_action[:2]  else 0-max(self._action_utilities[0][a], 0)
+                        self.update_regret_sum(a, regret, agent=0)
+                        print("Payoff_list: {}, Action_utilities: {}, Regret: {}".format(payoff_list, self._action_utilities, regret))
+                        print("actions: {}, Fixed action: {}".format(self.actions[0], fixed_action))
+                    self._action_utilities[0][self.actions[0].index(fixed_action[:2])] += payoff_list[0]
+                if not [self.state.x1, self.state.y1, self.state.theta1, self.state.timestep] in Game.forbidden_states:
+                    for a in range(self._num_actions[1]):
+                        regret = payoff_list[1] - max(self._action_utilities[1][a], 0) if self.actions[1][a] == fixed_action[2:] else 0-max(self._action_utilities[1][a], 0)
+                        self.update_regret_sum(a, regret, agent=1)
+                        print("Payoff_list: {}, Action_utilities: {}, Regret: {}".format(payoff_list, self._action_utilities, regret))
+                        print("actions: {}, Fixed action: {}".format(self.actions[1], fixed_action))
+                    self._action_utilities[1][self.actions[1].index(fixed_action[2:])] += payoff_list[1]
+            self.parent.backpropagate(Game, payoff_list)
 
-    def is_fully_expanded(self):
-        return len(self._untried_actions) == 0
+    def _tree_policy(self, Game, max_timestep=None):
+        current_node = self
+        while not is_terminal(Game, current_node.state, max_timestep = max_timestep):
+            #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
+            #print("Current node not terminal")
 
+            if Game.config.feature_flags['expansion_policy']['every-child']:
+                if not current_node.is_fully_expanded():
+                    # expand one child and return
+                    return current_node.expand(Game)
+                else:
+                    #print("Current node fully expanded, next child")
+                    current_node = current_node.select_policy_child(Game)
+                    # prevent parent from choosing the same action again
+            elif Game.config.feature_flags['expansion_policy']['random-informed']:
+                moves_0, moves_1, moves_joint = sample_legal_actions(Game, current_node.state)
+                action_to_expand = self._sample_action_informed_random(Game, current_node, moves_0, moves_1)
+                if any(action_to_expand == sublist for sublist in current_node._tried_actions):
+                    current_node = current_node.select_policy_child(Game)
+                else:
+                    # expand one child and return
+                    return current_node.expand(Game, action_to_expand)
+        #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
+        return current_node
+    
     def rollout(self, Game, max_timestep=None):
         # rollout policy: random action selection
         current_rollout_node = self
@@ -229,20 +273,22 @@ class MCTSNode:
             #print("Moves 0: {}, Moves 1: {}".format(moves_0, moves_1))
             #print("Possible moves: {}".format(possible_moves))
 
-            #TODO: change parameter punishment when stuck (or pruning..?)
-
             if len(moves_0) == 0 and len(moves_1) == 0:
                 Game.forbidden_states.append(current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep])
                 Game.forbidden_states.append(current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep])
                 print("Both agents stuck in environment, append current state on forbidden list, break")
+                #Todo: check if this is the right way to handle this
+                #accumulated_payoff_list = [0]*len(Game.Model_params["agents"])
                 break
             elif len(moves_0) == 0:
                 Game.forbidden_states.append(current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep])
                 print("Agent 0 stuck in environment, append current state on forbidden list, break")
+                #accumulated_payoff_list = [0]*len(Game.Model_params["agents"])
                 break
             elif len(moves_1) == 0:
                 Game.forbidden_states.append(current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep])
                 print("Agent 1 stuck in environment, append current state on forbidden list, break")
+                #accumulated_payoff_list = [0]*len(Game.Model_params["agents"])
                 break
 
             #print("Forbidden states: {}".format(Game.forbidden_states))
@@ -263,16 +309,55 @@ class MCTSNode:
 
         # updating final payoffs
             
-        #if agent_has_finished(Game, current_rollout_node.state, agent=0) or agent_has_finished(Game, current_rollout_node.state, agent=1):
-        #    final_payoff_sum_incr, final_payoff_each_incr = get_final_payoffs(Game, current_rollout_node.state)
-        #    final_payoff_list_sum.append(final_payoff_sum_incr)
         if is_terminal(Game, current_rollout_node.state, max_timestep=max_timestep):
-            final_payoff_sum_incr, final_payoff_each_incr = get_final_payoffs(Game, current_rollout_node.state)
+            final_payoff_sum_incr, final_payoff_each_incr = get_final_payoffs(Game, current_rollout_node.state, discount_factor=Game.config.discount_factor)
             final_payoff_list_sum.append(final_payoff_sum_incr)
 
+        #print("Interm Payoff List Sum: {}".format(interm_payoff_list_sum))
+        #print("Final Payoff List Sum: {}".format(final_payoff_list_sum))
         accumulated_payoff_list = get_total_payoffs(Game, interm_payoff_list_sum, final_payoff_list_sum)
 
         return rollout_trajectory, accumulated_payoff_list
+    
+
+    
+    #############################
+    ####   Helper Functions  ####
+    #############################
+
+    def _select_action_max(self, Game, agent = 0):
+        weights = [action_stat["sum_payoffs"]/action_stat['num_count'] for action_stat in self._select_policy_stats[agent].values()]
+        action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
+        return action_select
+    
+    def _select_action(self, Game, agent = 0):
+        if Game.config.feature_flags['selection_policy']['uct-decoupled']:
+            weights = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[agent].values()]
+            action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
+            #print("Weights: {}".format(weights))
+        elif Game.config.feature_flags['selection_policy']['regret-matching']:
+            strategy = self.get_strategy(agent=agent)
+            action_ix =  np.random.choice(range(len(strategy)), p=np.array(strategy)/ np.sum(strategy))
+            action_select = self.actions[agent][action_ix]
+        return action_select
+    
+    def _select_action_robust(self, Game, agent = 0):
+        weights = [action_stat["num_count"]/self._number_of_visits for action_stat in self._select_policy_stats[agent].values()]
+        print("Actions to choose Agent {}: {}".format(agent, self._select_policy_stats[agent].values()))
+        print("Weights num count: {}".format(weights))
+
+        if Game.config.feature_flags['strategy']['pure']:
+            action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
+            return action_select
+        elif Game.config.feature_flags['strategy']['mixed']:
+            probabilitic_sample_index = np.random.choice(range(len(weights)), p=np.array(weights)/ np.sum(weights))
+            action_select = list(self._select_policy_stats[agent].values())[probabilitic_sample_index]['action']
+            return action_select
+
+    """def return_final_childs_with_probability(self, Game):
+        if Game.config.feature_flags['final_move']['robust-separate']:
+            child = self._robust_child_joint()
+            print("Robust child joint: {}".format(child.state.get_state_together()))"""
     
     def _get_action_heuristic(self, Game, current_node, moves_0, moves_1):
         # get closest terminal state and the angle to it
@@ -341,74 +426,28 @@ class MCTSNode:
         
         action = action_0 + action_1
         return action
+    
+    #####  UCT #####
+    def calc_UCT(self, action_stat, c_param):
+        X = action_stat["sum_payoffs"]
+        n = action_stat["num_count"]
+        UCT = (X/n) + c_param * np.sqrt((np.log(self.n()) / n)) # payoff range normalizes the payoffs so that we get better exploration
+        return UCT
+    
+    ##### Regret Matching #####
+    def get_strategy(self, agent=0):
+        normalizing_sum = sum(max(regret, 0) for regret in self._regret_sum[agent])
+        strategy = [max(regret, 0) / normalizing_sum if normalizing_sum > 0 else 1.0 / len(self._regret_sum[agent])
+                    for action, regret in enumerate(self._regret_sum[agent])]
+        self._strategy_sum[agent] = [self._strategy_sum[agent][action] + strategy[action]
+                             for action in range(self._num_actions[agent])]
+        return strategy
+    
+    def update_regret_sum(self, action, regret, agent=0):
+        self._regret_sum[agent][action] += max(regret, 0)
+        print("Regret sum: {}".format(self._regret_sum))
 
-    def rollout_policy(self, Game, current_node, moves_0, moves_1, possible_moves):
-        if current_node.state.timestep <= Game.config.max_timehorizon*Game.config.alpha_rollout:
-            if Game.config.feature_flags['rollout_policy']['random-uniform']:
-                # choose a random action to simulate rollout
-                action = possible_moves[np.random.randint(len(possible_moves))]
-            elif Game.config.feature_flags['rollout_policy']['random-informed']:
-                action = self._sample_action_informed_random(Game, current_node, moves_0, moves_1)
-        else:
-            # choose the action that turns the agents towards goal direction
-            action_0, action_1 = self._get_action_heuristic(Game, current_node, moves_0, moves_1)
-            action = action_0 + action_1
-        return action
-            
-    def backpropagate(self, Game, payoff_list):
-        # backpropagate statistics of the node
-        self._number_of_visits += 1
-        
-        for agent in Game.Model_params["agents"]:
-            self._aggr_payoffs[agent] += float(payoff_list[agent])
-
-        if self.parent:
-            # backpropagate if there is a parent
-            if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
-                if self.parent._select_policy_stats['action_stats_0'].get(str(self.parent_action[:2])): # update parent stats
-                    self.parent._select_policy_stats['action_stats_0'][str(self.parent_action[:2])]['num_count'] += 1
-                    self.parent._select_policy_stats['action_stats_0'][str(self.parent_action[:2])]['sum_payoffs'] += float(payoff_list[0])
-                    #print("backpropagate agent 0: {}".format(self.parent_action[:2]))
-                else: # create stats
-                    self.parent._select_policy_stats['action_stats_0'][str(self.parent_action[:2])] = {'num_count': 1, 'sum_payoffs': 0}
-                    self.parent._select_policy_stats['action_stats_0'][str(self.parent_action[:2])]['action'] = self.parent_action[:2]
-                    #print("create action stat for agent 0: {}".format(self.parent_action[:2]))
-            if not [self.state.x1, self.state.y1, self.state.theta1, self.state.timestep] in Game.forbidden_states:
-                if  self.parent._select_policy_stats['action_stats_1'].get(str(self.parent_action[2:])): # update parent stats
-                    self.parent._select_policy_stats['action_stats_1'][str(self.parent_action[2:])]['num_count'] += 1
-                    self.parent._select_policy_stats['action_stats_1'][str(self.parent_action[2:])]['sum_payoffs'] += float(payoff_list[1])
-                    #print("backpropagate agent 1: {}".format(self.parent_action[2:]))
-                else: # create stats
-                    self.parent._select_policy_stats['action_stats_1'][str(self.parent_action[2:])] = {'num_count': 1, 'sum_payoffs': 0}
-                    self.parent._select_policy_stats['action_stats_1'][str(self.parent_action[2:])]['action'] = self.parent_action[2:]
-                    #print("create action stat for agent 1: {}".format(self.parent_action[2:]))
-            self.parent.backpropagate(Game, payoff_list)
-
-    def _tree_policy(self, Game, max_timestep=None):
-        current_node = self
-        while not is_terminal(Game, current_node.state, max_timestep = max_timestep):
-            #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
-            #print("Current node not terminal")
-
-            if Game.config.feature_flags['expansion_policy']['every-child']:
-                if not current_node.is_fully_expanded():
-                    # expand one child and return
-                    return current_node.expand(Game)
-                else:
-                    #print("Current node fully expanded, next child")
-                    current_node = current_node.select_policy_child(Game)
-                    # prevent parent from choosing the same action again
-            elif Game.config.feature_flags['expansion_policy']['random-informed']:
-                moves_0, moves_1, moves_joint = sample_legal_actions(Game, current_node.state)
-                action_to_expand = self._sample_action_informed_random(Game, current_node, moves_0, moves_1)
-                if any(action_to_expand == sublist for sublist in current_node._tried_actions):
-                    current_node = current_node.select_policy_child(Game)
-                else:
-                    # expand one child and return
-                    return current_node.expand(Game, action_to_expand)
-        #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
-        return current_node
-
+    
 
 #############################
 ####   MCTS Algorithm    ####
@@ -428,30 +467,39 @@ def run_mcts(Game, root_state, max_timestep=None):
     current_node = MCTSNode(Game=Game, state=init_state)
     
     # TREE POLICY
-    for iter in range(Game.MCTS_params['num_iter']):
+    for iter in range(int(Game.MCTS_params['num_iter'])):
         #print("Horizon {} | Iteration {}".format(root_state.timestep, iter))
-        v = current_node._tree_policy(Game, max_timestep=max_timestep)
+        walking_node = current_node._tree_policy(Game, max_timestep=max_timestep)
 
-        #print("Starting rollout")
         # ROLLOUT, k-times
         rollout_traj_accum = []
         payoff_accum = [0]*len(Game.Model_params["agents"])
         for k in range(Game.config.k_samples):
-            rollout_trajectory, rollout_payoff_list = v.rollout(Game, max_timestep=max_timestep)
-            rollout_traj_accum.append(rollout_trajectory)
+            rollout_trajectory, rollout_payoff_list = walking_node.rollout(Game, max_timestep=max_timestep)
             payoff_accum = [x + y for x, y in zip(payoff_accum, rollout_payoff_list)]
-
+            
+            # write every x rollout trajectories
+            if Game.config.feature_flags["run_mode"]["test"]:
+                if k % freq_stat_data == 0:
+                    csv_write_rollout_last(Game, rollout_trajectory, timehorizon = current_node.state.timestep, config=Game.config)
+        
+        # average accumulated payoff
+        payoff_accum = [x / Game.config.k_samples for x in payoff_accum]
+        #print("Payoff Accumulated: {}".format(payoff_accum))
 
         # write every x rollout trajectories
         if Game.config.feature_flags["run_mode"]["test"]:
-            if iter % freq_stat_data == 0:
-                csv_write_rollout_last(Game, rollout_trajectory, timehorizon = current_node.state.timestep, config=Game.config)
+            if iter+k % freq_stat_data == 0:
+                csv_write_rollout_last(Game, rollout_traj_accum, timehorizon = current_node.state.timestep, config=Game.config)
         
         #print("Backpropagating")
-                
-        v.backpropagate(Game, rollout_payoff_list)
+        if Game.config.feature_flags['selection_policy']['uct-decoupled']:
+            walking_node.backpropagate(Game, payoff_accum)
+        elif Game.config.feature_flags['selection_policy']['regret-matching']:
+            walking_node.parent.backpropagate(Game, payoff_accum, fixed_action=walking_node.parent_action)
 
-    next_node = current_node.select_final_child(Game=Game)
+    next_node = current_node._select_final_child(Game=Game)
+    policies = current_node._select_policy_stats
 
     if Game.config.feature_flags["run_mode"]["test"]:
         save_tree_to_file(current_node, path_to_tree.format(root_state.timestep))
@@ -467,4 +515,4 @@ def run_mcts(Game, root_state, max_timestep=None):
                             y1=next_node.state.y1,
                             theta1=next_node.state.theta1,
                             timestep=root_state.timestep+1)
-    return next_root_state, runtime
+    return next_root_state, runtime, policies
