@@ -1,4 +1,3 @@
-import os
 import glob
 import networkx as nx
 import numpy as np
@@ -6,26 +5,28 @@ from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import pandas as pd
-import sys
 from matplotlib.ticker import AutoMinorLocator
 
-from common import *
-from environment_utilities import *
+# import modules
+import os 
+import sys
+cwd = os.getcwd()
+parent_dir = os.path.dirname(cwd)
+sys.path.insert(0, parent_dir)
+from common_utilities import *
+from environment import *
 from matplotlib.patches import Rectangle
 from kinodynamic_utilities import distance, mm_unicycle
 
+#TODO: change to plot each agent
+
 def plot_single_run(Game, path_savefig, result_dict= None, timestep=None, main_agent=0):
-    colormap = {'red': (192/255, 67/255, 11/255), 
-                'darkred': (83/255, 29/255, 0/255),
-                'blue': (78/255, 127/255, 141/255), 
-                'darkblue': (38/255, 57/255, 63/255),
-                'yellow': (218/255, 181/255, 100/255), 
-                'grey': (71/255, 63/255, 61/255)}
-    
+
     if timestep is None:
         timestep = result_dict['T_terminal']
 
-    # plotting the trajectory of two agents on a 2D-plane and connecting states with a line and labeling states with timestep | trajectory: list of states [x1, y1, x2, y2, timestep]
+    # plotting the trajectory of two agents on a 2D-plane and connecting states with a line and labeling states with timestep | 
+    # trajectory: list of states [x1, y1, x2, y2, timestep]
     trajectory_0 = result_dict['trajectory_0']
     trajectory_1 = result_dict['trajectory_1']
     finish_line = Game.env.finish_line

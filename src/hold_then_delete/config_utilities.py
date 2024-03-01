@@ -1,9 +1,16 @@
 from pathlib import Path
 import json
 import yaml
-from common import *
-import numpy as np
+from common_utilities import *
 import copy
+
+# import modules
+import os 
+import sys
+cwd = os.getcwd()
+parent_dir = os.path.dirname(cwd)
+sys.path.insert(0, parent_dir)
+
 
 """
 Provides generic Config class useful for passing around parameters

@@ -9,10 +9,14 @@ from matplotlib.animation import FuncAnimation
 import pandas as pd
 import sys
 
-from common import *
-from environment_utilities import *
-from networkx_utilities import open_tree_from_file
+# import modules
+import sys
+sys.path.insert(0, '/home/enjay/0_thesis/01_MCTS')
+from utilities.common_utilities import *
+from environment import *
+from utilities.networkx_utilities import open_tree_from_file
 
+#TODO: change
 
 class FigureV0:
     def __init__(self):

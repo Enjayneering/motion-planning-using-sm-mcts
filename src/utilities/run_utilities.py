@@ -1,7 +1,14 @@
-import os
 import json
-
 from statistics import mean, variance
+
+# import modules
+import os 
+import sys
+cwd = os.getcwd()
+parent_dir = os.path.dirname(cwd)
+sys.path.insert(0, parent_dir)
+
+#TODO: DONE
 
 def get_exp_path_level_0(exp_subfolder, config, exp_comment="", input=""):
     with open(os.path.join(exp_subfolder, "index.txt"), 'r') as f:

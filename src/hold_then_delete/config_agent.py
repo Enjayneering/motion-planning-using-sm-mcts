@@ -1,5 +1,5 @@
 import numpy as np
-from config_utilities import *
+from hold_then_delete.config_utilities import *
 
 env_dict = {
     'racetrack_7x16_dis': {
@@ -236,7 +236,6 @@ default_dict = {
         'strategy': {'pure': True, 'mixed': False},
     }
     }
-default_config = Config(default_dict)
 
 
 ff_exp_01 = {
@@ -261,20 +260,10 @@ ff_test_01 = {
 
 
 overtaking_dict = {
-    'env_name': 'racetrack_7x16_dis',
-
     # MCTS Parameters
     'c_param': np.sqrt(2),
     'k_samples': 1,
     'num_iter': 800,
-
-    # Engineering Parameters
-    'alpha_rollout': 1,
-    'alpha_terminal': 1.5,
-    'delta_t': 1,
-    
-    # Statistical Analysis
-    'num_sim': 10,
 
     # Payoff Parameters
     'discount_factor': 0.15,
@@ -303,8 +292,6 @@ overtaking_dict = {
     'standard_dev_ang_vel_0': np.pi/2,
     'standard_dev_vel_1': 1,
     'standard_dev_ang_vel_1':  np.pi/2,
-
-    'feature_flags': ff_exp_01
 }
 
 intersection_dict = {
@@ -345,5 +332,20 @@ intersection_dict = {
     'standard_dev_ang_vel_1':  np.pi/4,
 
     'feature_flags': ff_exp_01
+}
+
+
+simdict = {
+    'env_name': 'racetrack_7x16_dis',
+
+    'feature_flags': ff_exp_01,
+
+    # Engineering Parameters
+    'alpha_rollout': 1,
+    'alpha_terminal': 1.5,
+    'delta_t': 1,
+    
+    # Statistical Analysis
+    'num_sim': 10,
 }
 

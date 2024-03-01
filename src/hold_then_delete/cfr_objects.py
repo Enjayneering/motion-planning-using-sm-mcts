@@ -6,7 +6,7 @@ import random
 import time
 
 from networkx_utilities import *
-from common import *
+from common_utilities import *
 from csv_utilities import *
 from payoff_utilities import *
 from kinodynamic_utilities import *

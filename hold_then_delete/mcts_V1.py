@@ -2,7 +2,7 @@ import numpy as np
 import copy
 import itertools
 import logging
-from common import timestep_max, env, c_param, a_progress, a_lead
+from common_utilities import timestep_max, env, c_param, a_progress, a_lead
 
 logging.basicConfig(filename='mcts.log', encoding='utf-8', level=logging.DEBUG)
 
