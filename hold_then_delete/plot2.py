@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import matplotlib.gridspec as gridspec
 import pandas as pd
-from common import map, path_to_global_state, path_to_rollout_curr, path_to_data
+from common_utilities import map, path_to_global_state, path_to_rollout_curr, path_to_data
 from networkx_utilities import open_tree_from_file
 import logging
 

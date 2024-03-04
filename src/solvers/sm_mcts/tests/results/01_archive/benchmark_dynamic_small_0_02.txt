@@ -1,0 +1,17 @@
+num_iter: 600
+c_param: 1.4142135623730951
+penalty_collision_init: 0.1
+penalty_collision_delay: 1
+penalty_stuck_in_env: -1
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0, 2.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: [(0, 'benchmark_dynamic_small_0'), (3, 'benchmark_dynamic_small_1')]
+Payoff Agent 0: [(0, 0), (1, 0), (1, -1.0)]
+Payoff Agent 1: [(0, 0), (1, 0), (1, 1.0)]
+Duration: 6.794558763504028
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,2,0,2,2,0,0
+3.0,2.0,0.0,4.0,2.0,0.0,1
+5.0,2.0,0.0,6.0,2.0,4.71238898038469,2

@@ -1,0 +1,32 @@
+delta_t: 1
+agents: [0, 1]
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+action_space: ['x0', 'y0', 'x1', 'y1']
+interm_payoffs: {'penalty_collision_0': {'pos': 0, 'weight': -4, 'agent': 0}, 'penalty_collision_1': {'pos': 1, 'weight': -0.5, 'agent': 1}, 'reward_progress_0': {'pos': 2, 'weight': 0.5, 'agent': 0}, 'reward_progress_1': {'pos': 3, 'weight': 0.5, 'agent': 1}}
+final_payoffs: {'penalty_timestep_0': {'pos': 0, 'weight': 0, 'agent': 0}, 'penalty_timestep_1': {'pos': 1, 'weight': 0, 'agent': 1}, 'reward_lead_0': {'pos': 2, 'weight': 1, 'agent': 0}, 'reward_lead_1': {'pos': 3, 'weight': 1, 'agent': 1}}
+len_interm_payoffs: 4
+len_final_payoffs: 4
+num_iter: 1000
+c_param: 1.4142135623730951
+penalty_collision_init: 0.1
+penalty_collision_delay: 1
+penalty_stuck_in_env: -1
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0, 2.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: [(0, 'benchmark_dynamic_small2'), (2, 'benchmark_dynamic_small2_1'), (5, 'benchmark_dynamic_small2_2')]
+Payoff Agent 0: [(0, 0), (1, 0.07248829735845702), (2, -0.1639346888893679), (3, -0.4003576751371928), (4, -0.509047519826135), (5, 0.3822626354849228), (6, 0.33657107151105503), (7, 0.2908795075371873), (8, 0.21761695198225062), (9, 0.19066516398590871), (9, -4.8093348360140915)]
+Payoff Agent 1: [(0, 0), (1, 0.9465610371698071), (2, 1.417008163888829), (3, 1.387455290607851), (4, 1.8738690600217331), (5, 2.8602828294356155), (6, 3.354571383938882), (7, 3.3488599384421485), (8, 3.3397021189977814), (9, 3.8363331454982386), (9, 8.836333145498239)]
+Duration: 49.02708292007446
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,2,0,1,4,0,0
+2.0,2.0,4.71238898038469,3.0,4.0,0.0,1
+2.0,2.0,3.141592653589793,4.0,4.0,1.5707963267948966,2
+2.0,2.0,1.5707963267948966,4.0,4.0,0.0,3
+2.0,2.0,0.0,5.0,4.0,0.0,4
+4.0,2.0,0.0,7.0,4.0,0.0,5
+4.0,2.0,0.0,8.0,4.0,4.71238898038469,6
+4.0,2.0,0.0,8.0,4.0,4.71238898038469,7
+4.0,2.0,1.5707963267948966,8.0,2.0,0.0,8
+4.0,2.0,0.0,9.0,2.0,4.71238898038469,9

@@ -1,0 +1,31 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+collision_distance: 1
+agents: [0, 1]
+num_iter: 500
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0], 'ang_velocity_0': [0]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [0]}
+Environment trigger: intersection_3x3
+collision_payoff_0: [0.6321205587653456, 0.6321205587653456, 0.6321205587653456, 0.6321205587653456]
+collision_payoff_1: [0.6321205587653456, 0.6321205587653456, 0.6321205587653456, 0.6321205587653456]
+progress_payoff_0: [0.0, 0.0, 0.0, 0.0]
+progress_payoff_1: [0.0, 0.0, 0.0, 0.0]
+payoff_total: [[0.5267671323044546, 0.5267671323044546], [0.5267671323044546, 0.5267671323044546], [0.5267671323044546, 0.5267671323044546], [0.5545449100822324, 0.6656560211933436]]
+time_payoff_0: [0.0]
+time_payoff_1: [0.0]
+lead_payoff_0: [0.16666666666666666]
+lead_payoff_1: [0.33333333333333337]
+winning_payoff_0: [0.0]
+winning_payoff_1: [0.5]
+Config: {'env_name': 'intersection_3x3', 'alpha_rollout': 1, 'alpha_terminal': 1.5, 'num_sim': 5, 'num_iter': 500, 'delta_t': 1, 'c_param': 1.4142135623730951, 'k_samples': 10, 'collision_distance': 1, 'goal_distance': 1, 'collision_ignorance': 0.5, 'discount_factor': 1, 'weight_distance': 1, 'weight_progress': 0, 'weight_timestep': 0, 'weight_lead': 1, 'weight_winning': 1, 'weight_interm': 5, 'weight_final': 1, 'velocity_0': [0.0, 1.0], 'ang_velocity_0': [0], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [0], 'standard_dev_vel_0': 2, 'standard_dev_ang_vel_0': 0.7853981633974483, 'standard_dev_vel_1': 1, 'standard_dev_ang_vel_1': 0.7853981633974483, 'feature_flags': {'run_mode': {'test': True, 'exp': False, 'live-plot': True}, 'final_move': {'robust-joint': True, 'robust-separate': False, 'max': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'uct-decoupled': False, 'cfr': True}, 'rollout_policy': {'random-uniform': True, 'random-informed': False}, 'expansion_policy': {'every-child': True, 'random-informed': False}, 'strategy': {'pure': True, 'mixed': False}}, 'max_timehorizon': 4}
+Duration: 4.569604158401489
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,0,1.5707963267948966,0,1,0.0,0
+1,0,1.5707963267948966,0,1,0.0,0
+1.0,0.0,1.5707963267948966,1.0,1.0,0.0,1
+1.0,0.0,1.5707963267948966,1.0,1.0,0.0,2
+1.0,0.0,1.5707963267948966,1.0,1.0,0.0,3
+1.0,1.0,1.5707963267948966,2.0,1.0,0.0,4
