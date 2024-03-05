@@ -10,10 +10,11 @@ parent_folder = os.path.dirname(current_folder)
 path_to_repository = parent_folder+"/"
 path_to_src = path_to_repository+"src/"
 
+
 # test file structure
-path_to_tests = path_to_repository+"tests/"
-path_to_results = path_to_tests+"results/"
+path_to_tests = "/home/enjay/0_thesis/01_MCTS/tests/"
 path_to_data = path_to_tests+"data/"
+path_to_results = path_to_tests+"results/"
 path_to_trees = path_to_data+"trees/"
 path_to_tree = path_to_trees+"/tree_{}.csv"
 path_to_global_state = path_to_data+"global_state.csv"
@@ -23,7 +24,8 @@ path_to_rollout_tmp = path_to_rollout_last + "~"
 
 
 # experimental file structure
-path_to_experiments = path_to_repository+"experiments/"
+
+path_to_experiments = "/home/enjay/0_thesis/01_MCTS/data/"
 new_exp_folder = path_to_experiments+""
 
 freq_stat_data = 10
@@ -51,11 +53,12 @@ def is_terminal(Game, state_obj, max_timestep=None):
 def get_max_timehorizon(Game):
     min_time = get_min_time_to_complete(Game)
 
-    max_game_timehorizon = int(Game.config.alpha_terminal * min_time)+1
+    max_game_timehorizon = int(Game.config.alpha_terminal * min_time)
     #print("Max game timehorizon: {}".format(max_game_timehorizon))
     return max_game_timehorizon
 
 def get_min_time_to_complete(Game, curr_state=None):
+    # state: [x0, y0, theta0, x1, y1, theta1, time]
     min_times = []
     
     if curr_state is None:
@@ -63,7 +66,7 @@ def get_min_time_to_complete(Game, curr_state=None):
 
     final_state = Game.terminal_state
     dist_0 = distance(curr_state[0:2], final_state[0:2])
-    dist_1 = distance(curr_state[4:6], final_state[4:6])
+    dist_1 = distance(curr_state[3:5], final_state[3:5])
     #dist_1 = distance(curr_state[3:5], final_state[3:5])
     max_velocity_0 = np.max(Game.config["velocity_0"])
     max_velocity_1 = np.max(Game.config["velocity_1"])
@@ -81,7 +84,7 @@ def coll_count(joint_trajectory):
     return coll_count
 
 def agent_has_finished(Game, state_obj, agent=0):
-    max_progress = Game.env.centerlines[agent][-5][-1] # TODO: specify goal
+    max_progress = Game.env.centerlines[agent][-1][-1] # TODO: specify goal
     if find_closest_waypoint(Game.env.centerlines[agent], state_obj.get_state(agent=agent))[-1] >= max_progress:
         return True
     else:
@@ -120,8 +123,13 @@ def get_agent_progress(centerline, prev_state, next_state):
     # action = [speed, angular_speed]
     prev_closest_coordinate = find_closest_waypoint(centerline, prev_state)
     next_closest_coordinate = find_closest_waypoint(centerline, next_state)
-    progress = next_closest_coordinate[-1] - prev_closest_coordinate[-1]
+
+    progress = next_closest_coordinate[-1] - prev_closest_coordinate[-1] # extract progress value
     return progress
+
+def get_agent_advancement(centerline, state):
+    closest_coordinate = find_closest_waypoint(centerline, state)
+    return closest_coordinate[-1]
 
 def find_closest_waypoint(centerline, state):
     closest_waypoint = None
@@ -135,7 +143,7 @@ def find_closest_waypoint(centerline, state):
     return closest_waypoint
 
 def get_env_progress(Game, state):
-    if Game.env.centerlines is not None:
+    if Game.env.env_centerline is not None:
         closest_waypoint = None
         min_distance = float('inf')
 

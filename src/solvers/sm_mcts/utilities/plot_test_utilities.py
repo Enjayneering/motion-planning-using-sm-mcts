@@ -159,6 +159,7 @@ class FigureV0:
             self.ax1.annotate(timestep_trajectory[i], (x0_trajectory[i], y0_trajectory[i]), color='r', textcoords="offset points", xytext=(0,10))
             self.ax1.annotate(timestep_trajectory[i], (x1_trajectory[i], y1_trajectory[i]), color='b', textcoords="offset points", xytext=(-10,0))
         # plot pixel environment
+        ix = timestep_trajectory.iloc[-1]
         self.ax1.imshow(Game.env.get_current_grid(timestep_trajectory.iloc[-1])['grid'], cmap='binary')
 
         # plot orientations as arrows

@@ -1,7 +1,6 @@
 import os
 import time
 
-from .config import *
 from .mcts_objects import State, run_mcts
 from .utilities.common_utilities import *
 from .utilities.kinodynamic_utilities import *
@@ -154,6 +153,8 @@ class CompetitiveGame:
             if self.config.feature_flags["run_mode"]["exp"]:
                 result_dict['max_timestep'] = max_timestep
             max_timestep -= 1
+        print("Terminal state: {}".format(current_state_obj.get_state_together()))
+        print("Timestep: {}".format(current_state_obj.timestep))
     
         if self.config.feature_flags["run_mode"]["test"]:
                 csv_write_global_state(self, self.global_states[-1])
@@ -181,7 +182,7 @@ class CompetitiveGame:
 
         if self.config.feature_flags["run_mode"]["test"]:
             with open(os.path.join(path_to_results, self.name + ".txt"), 'a') as f:
-                f.write(f"Environment trigger: {self.config.env_name}\n")
+                f.write(f"Environment trigger: {self.config.name}\n")
                 for key, value in self.payoff_data_log.items():
                     f.write(f"{key}: {value}\n")
 

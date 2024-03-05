@@ -1,8 +1,0 @@
-num_iter: 200
-c_param: 1.4142135623730951
-penalty_collision_init: 0.1
-penalty_collision_delay: 1
-penalty_stuck_in_env: -1
-action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
-action_set_1: {'velocity_1': [0.0, 1.0, 2.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
-Duration: 0.6442959308624268

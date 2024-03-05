@@ -23,7 +23,11 @@ class Environment:
         tck, u = interpolate.splprep(points.T, u=distance, s=0, k=k)
 
         # Interpolate the points along the path at metric_dist intervals
-        new_distance = np.arange(0, distance.max(), metric_dist)
+        #new_distance = np.arange(0, distance.max(), metric_dist)
+        # including last point
+        num_points = int(distance.max() / metric_dist) + 1
+        new_distance = np.linspace(0, distance.max(), num_points)
+        
         new_points = interpolate.splev(new_distance, tck)
 
         # Convert the interpolated points to a list of tuples

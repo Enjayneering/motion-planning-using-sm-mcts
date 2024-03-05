@@ -7,12 +7,10 @@ import itertools
 import numpy as np
 
 from .sm_mcts.competitive_game import CompetitiveGame
-from .sm_mcts.config import *
 from .sm_mcts.utilities.plot_test_utilities import *
 from .sm_mcts.utilities.plot_utilities import *
 from .sm_mcts.utilities.common_utilities import *
 from .sm_mcts.utilities.csv_utilities import *
-from .sm_mcts.utilities.config_utilities import *
 from .sm_mcts.utilities.run_utilities import *
 from .sm_mcts.utilities.environment_utilities import *
 

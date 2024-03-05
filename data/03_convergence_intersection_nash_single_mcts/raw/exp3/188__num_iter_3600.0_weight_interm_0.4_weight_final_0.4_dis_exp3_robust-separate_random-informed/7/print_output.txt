@@ -1,0 +1,19 @@
+Searching game tree in timestep 0...
+Max timehorizon: 2
+Actions to choose Agent 0: dict_values([{'num_count': 3322, 'sum_payoffs': 620.1567827551912, 'action': [1.0, 0]}, {'num_count': 278, 'sum_payoffs': 39.840217096299035, 'action': [0.0, 0]}])
+Weights num count: [0.9227777777777778, 0.07722222222222222]
+Actions to choose Agent 1: dict_values([{'num_count': 243, 'sum_payoffs': 33.88221709763964, 'action': [0.0, 0]}, {'num_count': 3357, 'sum_payoffs': 628.848532753237, 'action': [1.0, 0]}])
+Weights num count: [0.0675, 0.9325]
+Selected final action: [1.0, 0, 1.0, 0]
+Total payoff list: [0.0, 0.0]
+Searching game tree in timestep 1...
+Max timehorizon: 1
+Actions to choose Agent 0: dict_values([{'num_count': 3352, 'sum_payoffs': 701.4487498421562, 'action': [1.0, 0]}, {'num_count': 248, 'sum_payoffs': 43.379999990239696, 'action': [0.0, 0]}])
+Weights num count: [0.9311111111111111, 0.06888888888888889]
+Actions to choose Agent 1: dict_values([{'num_count': 386, 'sum_payoffs': 81.79874998159592, 'action': [1.0, 0]}, {'num_count': 3214, 'sum_payoffs': 634.0724998573247, 'action': [0.0, 0]}])
+Weights num count: [0.10722222222222222, 0.8927777777777778]
+Selected final action: [1.0, 0, 0.0, 0]
+Total payoff list: [0.0, 0.0]
+Terminal state: [1.0, 2.0, 1.5707963267948966, 1.0, 1.0, 0.0, 2]
+Timestep: 2
+Runtime: 1.398542881011963 s
