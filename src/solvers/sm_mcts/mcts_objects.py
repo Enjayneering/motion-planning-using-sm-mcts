@@ -10,7 +10,7 @@ from .utilities.networkx_utilities import *
 from .utilities.payoff_utilities import *
 from .utilities.kinodynamic_utilities import *
 
-logging.basicConfig(filename='mcts.log', encoding='utf-8', level=logging.DEBUG)
+#logging.basicConfig(filename='mcts.log', encoding='utf-8', level=logging.DEBUG)
 
 def roundme(number):
     return number #np.round(number, 2)
