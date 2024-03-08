@@ -1,0 +1,37 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+collision_distance: 1
+agents: [0, 1]
+num_iter: 3000
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: racetrack_7x16
+collision_payoff_0: [0.6321205587653456, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999]
+collision_payoff_1: [0.6321205587653456, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999]
+progress_payoff_0: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+progress_payoff_1: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+payoff_total: [[0.21070685292178185, 0.21070685292178185], [0.2720200931108909, 0.2720200931108909], [0.292457839840594, 0.292457839840594], [0.3026767132054455, 0.3026767132054455], [0.3088080372243564, 0.3088080372243564], [0.312895586570297, 0.312895586570297], [0.3158152646745403, 0.3158152646745403], [0.31800502325272273, 0.31800502325272273], [0.3197081688135313, 0.3197081688135313], [0.7443511085426014, 0.34223470642619935]]
+time_payoff_0: [0.0]
+time_payoff_1: [0.0]
+lead_payoff_0: [0.30158730158730157]
+lead_payoff_1: [0.031746031746031744]
+winning_payoff_0: [0.3333333333333333]
+winning_payoff_1: [0.0]
+Config: {'env_name': 'racetrack_7x16', 'alpha_rollout': 1, 'alpha_terminal': 1.5, 'num_sim': 1, 'num_iter': 3000, 'delta_t': 1, 'c_param': 1.4142135623730951, 'k_samples': 1, 'collision_distance': 1, 'goal_distance': 1, 'collision_ignorance': 0.5, 'discount_factor': 1, 'weight_distance': 1, 'weight_progress': 0, 'weight_timestep': 1, 'weight_lead': 1, 'weight_winning': 1, 'weight_interm': 1, 'weight_final': 2, 'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'standard_dev_vel_0': 2, 'standard_dev_ang_vel_0': 0.7853981633974483, 'standard_dev_vel_1': 1, 'standard_dev_ang_vel_1': 0.7853981633974483, 'feature_flags': {'run_mode': {'test': True, 'exp': False, 'live-plot': False}, 'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False}, 'collision_handling': {'punishing': True, 'pruning': False}, 'selection_policy': {'uct-decoupled': False, 'cfr': True}, 'rollout_policy': {'random-uniform': True, 'random-informed': False}, 'expansion_policy': {'every-child': True, 'random-informed': False}, 'strategy': {'pure': True, 'mixed': False}}, 'max_timehorizon': 10}
+Duration: 631.6180114746094
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,3,0.0,3,3,0.0,0
+1,3,0.0,3,3,0.0,0
+3.0,3.0,1.5707963267948966,4.0,3.0,-1.5707963267948966,1
+3.0,5.0,0.0,4.0,2.0,0.0,2
+3.0,5.0,0.0,4.0,2.0,0.0,3
+4.0,5.0,0.0,5.0,2.0,-1.5707963267948966,4
+6.0,5.0,0.0,5.0,1.0,-3.141592653589793,5
+7.0,5.0,0.0,5.0,1.0,-3.141592653589793,6
+9.0,5.0,0.0,5.0,1.0,-3.141592653589793,7
+11.0,5.0,0.0,5.0,1.0,-3.141592653589793,8
+13.0,5.0,0.0,5.0,1.0,-1.5707963267948966,9
+14.0,5.0,-1.5707963267948966,5.0,1.0,0.0,10

@@ -1,0 +1,8 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+collision_distance: 0.5
+agents: [0, 1]
+num_iter: 5000
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0], 'ang_velocity_0': [0]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [0]}

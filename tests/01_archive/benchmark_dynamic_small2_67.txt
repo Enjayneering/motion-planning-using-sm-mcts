@@ -1,0 +1,29 @@
+delta_t: 1
+agents: [0, 1]
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+action_space: ['x0', 'y0', 'x1', 'y1']
+interm_payoffs: {'penalty_collision_0': {'pos': 0, 'weight': -1, 'agent': 0}, 'penalty_collision_1': {'pos': 1, 'weight': -1, 'agent': 1}, 'reward_progress_0': {'pos': 2, 'weight': 0.2, 'agent': 0}, 'reward_progress_1': {'pos': 3, 'weight': 0.2, 'agent': 1}}
+final_payoffs: {'penalty_timestep_0': {'pos': 0, 'weight': -0.05, 'agent': 0}, 'penalty_timestep_1': {'pos': 1, 'weight': -0.05, 'agent': 1}, 'reward_lead_0': {'pos': 2, 'weight': 5, 'agent': 0}, 'reward_lead_1': {'pos': 3, 'weight': 5, 'agent': 1}}
+len_interm_payoffs: 4
+len_final_payoffs: 4
+num_iter: 1000
+c_param: 1.4142135623730951
+penalty_collision_init: 0.1
+penalty_collision_delay: 1
+penalty_stuck_in_env: -1
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: [(0, 'benchmark_dynamic_small2'), (1, 'benchmark_dynamic_small2_1'), (5, 'benchmark_dynamic_small2_2')]
+Payoff Agent 0: [(0, 0), (1, 1.8931220743396142), (2, 1.6500053399054), (3, 2.9410094536155285), (4, 3.3986802339923234), (5, 3.7563510143691183), (6, 4.4162797340367), (6, 29.1162797340367)]
+Payoff Agent 1: [(0, 0), (1, 1.8931220743396142), (2, 1.6500053399053998), (3, 1.607676120282195), (4, 2.06534690065899), (5, 2.423017681035785), (6, 2.4162797340366993), (6, -22.8837202659633)]
+Duration: 34.34446310997009
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+2,2,0,1,4,0,0
+3.0,2.0,1.5707963267948966,2.0,4.0,4.71238898038469,1
+3.0,4.0,0.0,1.9999999999999998,3.0,4.71238898038469,2
+5.0,4.0,0.0,1.9999999999999998,3.0,0.0,3
+6.0,4.0,0.0,3.0,3.0,0.0,4
+7.0,4.0,0.0,4.0,3.0,1.5707963267948966,5
+9.0,4.0,4.71238898038469,4.0,4.0,0.0,6

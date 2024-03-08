@@ -1,0 +1,37 @@
+state_space: ['x0', 'y0', 'theta0', 'x1', 'y1', 'theta1', 'timestep']
+delta_t: 1
+collision_distance: 1
+agents: [0, 1]
+num_iter: 1000
+c_param: 1.4142135623730951
+action_set_0: {'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+action_set_1: {'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966]}
+Environment trigger: racetrack_7x16
+collision_payoff_0: [0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999]
+collision_payoff_1: [0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999, 0.9999999999]
+progress_payoff_0: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+progress_payoff_1: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+payoff_total: [[0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.3333333333, 0.3333333333], [0.8571428571095239, 0.47619047615714283]]
+time_payoff_0: [0.0]
+time_payoff_1: [0.0]
+lead_payoff_0: [0.2857142857142857]
+lead_payoff_1: [0.21428571428571427]
+winning_payoff_0: [0.5]
+winning_payoff_1: [0.0]
+Config: {'env_name': 'racetrack_7x16', 'alpha_rollout': 1, 'alpha_terminal': 1.5, 'num_sim': 1, 'num_iter': 1000, 'delta_t': 1, 'c_param': 1.4142135623730951, 'collision_distance': 1, 'goal_distance': 1, 'collision_ignorance': 0.5, 'discount_factor': 1, 'weight_distance': 1, 'weight_progress': 0, 'weight_timestep': 0, 'weight_lead': 1, 'weight_winning': 1, 'weight_interm': 1, 'weight_final': 2, 'velocity_0': [0.0, 1.0, 2.0], 'ang_velocity_0': [-1.5707963267948966, 0.0, 1.5707963267948966], 'velocity_1': [0.0, 1.0], 'ang_velocity_1': [-1.5707963267948966, 0.0, 1.5707963267948966], 'standard_dev_vel_0': 2, 'standard_dev_ang_vel_0': 0.7853981633974483, 'standard_dev_vel_1': 1, 'standard_dev_ang_vel_1': 0.7853981633974483, 'feature_flags': {'run_mode': {'test': True, 'exp': False}, 'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False}, 'collision_handling': {'punishing': False, 'pruning': True}, 'selection_policy': {'uct-decoupled': True, 'max': False, 'cfr': False}, 'rollout_policy': {'random-uniform': False, 'random-informed': True}, 'expansion_policy': {'every-child': True, 'random-informed': False}, 'strategy': {'pure': True, 'mixed': False}}, 'max_timehorizon': 10}
+Duration: 86.11006832122803
+
+Content of global_state.csv:
+x0,y0,theta0,x1,y1,theta1,timestep
+1,3,0.0,3,3,0.0,0
+1,3,0.0,3,3,0.0,0
+2.0,3.0,0.0,4.0,3.0,0.0,1
+3.0,3.0,1.5707963267948966,5.0,3.0,0.0,2
+3.0,5.0,0.0,6.0,3.0,0.0,3
+5.0,5.0,0.0,7.0,3.0,0.0,4
+7.0,5.0,0.0,8.0,3.0,0.0,5
+9.0,5.0,0.0,9.0,3.0,0.0,6
+11.0,5.0,0.0,10.0,3.0,0.0,7
+13.0,5.0,-1.5707963267948966,10.0,3.0,0.0,8
+13.0,4.0,0.0,11.0,3.0,0.0,9
+15.0,4.0,-1.5707963267948966,12.0,3.0,1.5707963267948966,10
