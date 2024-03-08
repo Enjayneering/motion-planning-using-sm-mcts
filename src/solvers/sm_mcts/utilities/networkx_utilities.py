@@ -12,11 +12,11 @@ def init_tree_file():
         if os.path.isfile(file_path):
             os.remove(file_path)
 
-def save_tree_to_file(node_current_timestep, path_to_tree):
+def save_tree_to_file(root_node, path_to_tree):
     tree = nx.DiGraph()
-    tree.add_node(node_current_timestep)
+    tree.add_node(root_node)
 
-    stack = [node_current_timestep]
+    stack = [root_node]
     while stack:
         current_node = stack.pop()
         for child in current_node.children:

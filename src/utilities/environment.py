@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import interpolate
-from experiment_configs import *
+#from experiment_configs import *
 
 class Environment:
     # define 2D environment with continuous free space and discretized obstacle space

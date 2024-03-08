@@ -9,14 +9,15 @@ sys.path.append(current_dir+"solvers/sm_mcts")
 sys.path.append(current_dir+"solvers/sm_mcts/utilities")"""
 
 from solvers import *
-from experiment_configs import *
 from utilities import *
 
 from solvers.mcts_interface import run_mcts_interface
-from experiment_configs.env_conf import env_conf
+
+
 from experiment_configs.model_conf import model_conf
 from experiment_configs.agent_conf import agent_conf
 from experiment_configs.mcts_conf import mcts_conf
+
 from folder_structure import *
 from utilities.common_utilities import is_terminal
 from utilities.plot_utilities import plot_single_run
@@ -25,9 +26,11 @@ from utilities.environment import Environment
 import json
 import time
 
+from environments import intersection, street
+
 if __name__ == '__main__':
     # Experiment within environment
-    ExpEnv = Environment(env_conf)
+    ExpEnv = Environment(street.env_conf)
 
     curr_timestep = 0
     curr_joint_state = ExpEnv.init_state+[curr_timestep] # list [x0, y0, theta0, x1, y1, theta1, timestep]

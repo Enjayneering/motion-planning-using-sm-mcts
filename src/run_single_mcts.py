@@ -23,12 +23,12 @@ from solvers.sm_mcts.utilities.environment_utilities import *
 
 #from sm_mcts.environments import *
 from configs.single_experiment_configs.mcts_nash_convergence.exp_config import build_experiments
-from environments import intersection
+from environments import intersection, street
 
 
 def run_test(game_dict):
-    Game = CompetitiveGame(Environment(Config(game_dict)), Config(game_dict))
-    for _ in range(Game.config.num_sim):
+    GamePlanner = CompetitiveGame(Environment(Config(game_dict)), Config(game_dict))
+    for _ in range(GamePlanner.config.num_sim):
         start_time = time.time()
 
         print("Starting Race Game at time: {}".format(start_time))
@@ -37,8 +37,8 @@ def run_test(game_dict):
         stop_event = multiprocessing.Event()  # Event to signal when plot.py should stop
 
         processes = []
-        processes.append(multiprocessing.Process(target=plot_independent, args=(Game, stop_event)))
-        processes.append(multiprocessing.Process(target=Game.run_game, args=()))
+        processes.append(multiprocessing.Process(target=plot_independent, args=(GamePlanner, stop_event)))
+        processes.append(multiprocessing.Process(target=GamePlanner.run_game, args=()))
 
         # Start all processes
         for process in processes:
@@ -60,8 +60,8 @@ def run_test(game_dict):
         duration = time.time() - start_time
 
         # Save duration to text file
-        with open(os.path.join(path_to_results, Game.name + ".txt"), 'a') as f:
-            f.write("Config: {}\n".format(Game.config))
+        with open(os.path.join(path_to_results, GamePlanner.name + ".txt"), 'a') as f:
+            f.write("Config: {}\n".format(GamePlanner.config))
             f.write(f"Duration: {duration}\n")
             f.write("\nContent of global_state.csv:\n")
             with open(os.path.join(path_to_data, "global_state.csv"), 'r') as csv_file:
@@ -79,7 +79,7 @@ def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment
         json.dump(game_config, f)
 
     for run_ix in range(game_config.num_sim):
-        Game = CompetitiveGame(Environment(game_config), game_config)
+        GamePlanner = CompetitiveGame(Environment(game_config), game_config)
         exp_ix = run_ix % 10000
         subex_filepath= os.path.join(exp_path_level_0, str(exp_ix))
 
@@ -91,10 +91,10 @@ def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment
         sys.stdout = print_file
 
         # RUN EXPERIMENT
-        result_dict, policy_dict = Game.run_game(timesteps_sim=timestep_sim)
+        result_dict, policy_dict = GamePlanner.run_game(timesteps_sim=timestep_sim)
 
         # PLOT TRAJECTORIES
-        plot_trajectory(Game, result_dict, subex_filepath, all_timesteps=False)
+        plot_trajectory(GamePlanner, result_dict, subex_filepath, all_timesteps=False)
 
         # Write the result dictionary to the JSON file
         with open(os.path.join(subex_filepath, "results.json"), "w") as f:
@@ -111,14 +111,14 @@ def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment
     save_statistical_data(exp_path_level_0, global_data="global_results.json")
 
 
-def plot_trajectory(Game, result_dict, exp_path, all_timesteps=False):
+def plot_trajectory(GamePlanner, result_dict, exp_path, all_timesteps=False):
     if all_timesteps:
         for t in range(result_dict['T_terminal']+1):
-            plot_single_run(Game, exp_path, result_dict=result_dict, timestep=t, main_agent=0)
-            plot_single_run(Game, exp_path, result_dict=result_dict, timestep=t, main_agent=1)
+            plot_single_run(GamePlanner, exp_path, result_dict=result_dict, timestep=t, main_agent=0)
+            plot_single_run(GamePlanner, exp_path, result_dict=result_dict, timestep=t, main_agent=1)
     else:
-        plot_single_run(Game, exp_path, result_dict=result_dict, main_agent=0)
-        plot_single_run(Game, exp_path, result_dict=result_dict, main_agent=1)
+        plot_single_run(GamePlanner, exp_path, result_dict=result_dict, main_agent=0)
+        plot_single_run(GamePlanner, exp_path, result_dict=result_dict, main_agent=1)
 
 def create_global_index(exp_path_level_1):
     index_file_path = os.path.join(exp_path_level_1, "index.txt")

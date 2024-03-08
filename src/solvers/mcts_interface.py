@@ -13,6 +13,7 @@ from .sm_mcts.utilities.common_utilities import *
 from .sm_mcts.utilities.csv_utilities import *
 from .sm_mcts.utilities.run_utilities import *
 from .sm_mcts.utilities.environment_utilities import *
+from .sm_mcts.utilities.config_utilities import *
 
 
 

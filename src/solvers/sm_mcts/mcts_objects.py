@@ -556,6 +556,7 @@ def run_mcts(Game, root_state, max_timestep=None):
 
     if Game.config.feature_flags["run_mode"]["test"]:
         save_tree_to_file(current_node, path_to_tree.format(root_state.timestep))
+        save_tree_to_file(current_node, "/home/enjay/0_thesis/01_MCTS/plot_scripts/plot_intersection_states/tree_{}.txt".format(root_state.timestep))
         #print("Next State: {}".format(next_node.state.get_state_together()))
     
     runtime = time.time() - start_time 

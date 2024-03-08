@@ -116,8 +116,8 @@ def sample_legal_actions(Game, state_object):
     sampled_actions_together_pruned = [action_pair[0] + action_pair[1] for action_pair in sampled_actions_seperate_pruned] # adding both lists to one list
 
     #print("sampled_actions_together_pruned: {}".format(sampled_actions_together_pruned))
-    random.shuffle(sampled_actions_0_pruned)
-    random.shuffle(sampled_actions_1_pruned)
-    random.shuffle(sampled_actions_together_pruned)
+    #random.shuffle(sampled_actions_0_pruned)
+    #random.shuffle(sampled_actions_1_pruned)
+    #random.shuffle(sampled_actions_together_pruned)
 
     return sampled_actions_0_pruned, sampled_actions_1_pruned, sampled_actions_together_pruned
