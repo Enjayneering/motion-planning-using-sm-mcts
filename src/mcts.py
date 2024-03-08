@@ -12,7 +12,7 @@ from utilities.payoff_utilities import *
 from utilities.kinodynamic_utilities import *
 from utilities.mcts_utilities import *
 
-logging.basicConfig(filename='mcts.log', encoding='utf-8', level=logging.DEBUG)
+#logging.basicConfig(filename='mcts.log', encoding='utf-8', level=logging.DEBUG)
 
 class MCTS:
     def __init__(self, root_state, curr_timestep, game_timehorizon, config_mcts):
