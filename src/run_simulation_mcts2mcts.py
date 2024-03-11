@@ -11,7 +11,7 @@ from utilities.environment_utilities import Environment
 
 
 # Import experiment configuration
-from global_configs import mcts_vs_mcts
+from configs_global_mcts2mcts import mcts_vs_mcts
 
 
 def run_simulation_mcts2mcts(sim_name, experiment, num_simulations):

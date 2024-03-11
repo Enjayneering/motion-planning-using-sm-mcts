@@ -1,12 +1,3 @@
-"""import os
-import sys
-# Get the current script's directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Add the child utilities directory to sys.path
-sys.path.append(current_dir+"solvers")
-sys.path.append(current_dir+"solvers/sm_mcts")
-sys.path.append(current_dir+"solvers/sm_mcts/utilities")"""
-
 import time
 import multiprocessing
 import json
@@ -23,7 +14,7 @@ from solvers.sm_mcts.utilities.run_utilities import *
 from solvers.sm_mcts.utilities.environment_utilities import *
 
 #from sm_mcts.environments import *
-from single_configs import mcts_nash_convergence
+from configs_single_mcts import mcts_nash_convergence
 
 
 def run_test(game_dict):

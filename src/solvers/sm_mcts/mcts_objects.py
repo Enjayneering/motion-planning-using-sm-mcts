@@ -499,14 +499,14 @@ def run_mcts(Game, root_state, max_timestep=None):
     start_time = time.time()
 
     # create Node for local tree search
-    init_state = State(x0=root_state.x0,
+    """init_state = State(x0=root_state.x0,
                         y0=root_state.y0,
                         theta0=root_state.theta0,
                         x1=root_state.x1,
                         y1=root_state.y1,
                         theta1=root_state.theta1,
-                        timestep=0)
-    current_node = MCTSNode(Game=Game, state=init_state)
+                        timestep=0)"""
+    current_node = MCTSNode(Game=Game, state=root_state)
     
     # TREE POLICY
     for iter in range(int(Game.MCTS_params['num_iter'])):

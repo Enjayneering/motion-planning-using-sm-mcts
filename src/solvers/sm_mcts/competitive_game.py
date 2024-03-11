@@ -15,12 +15,15 @@ class CompetitiveGame:
     def __init__(self, env, game_config, init_state=None):        
         self.config = game_config
         self.env = env
+
+        # init start and goal
         if init_state is not None:
             # init state is list
             self.init_state = init_state
         else:       
             self.init_state = [self.env.init_state['x0'], self.env.init_state['y0'], self.env.init_state['theta0'], self.env.init_state['x1'], self.env.init_state['y1'], self.env.init_state['theta1']]
         self.terminal_state = [self.env.goal_state['x0'], self.env.goal_state['y0'], self.env.goal_state['theta0'], self.env.goal_state['x1'], self.env.goal_state['y1'], self.env.goal_state['theta1']]
+        
         self.name = get_next_game_name(path_to_results, game_config.name)
 
         self.MCTS_params = self._set_mcts_params()
@@ -154,7 +157,8 @@ class CompetitiveGame:
 
             if self.config.feature_flags["run_mode"]["exp"]:
                 result_dict['max_timestep'] = max_timestep
-            max_timestep -= 1
+                result_dict['game_length'] = max_timestep-next_state_obj.timestep
+            #max_timestep -= 1
         print("Terminal state: {}".format(current_state_obj.get_state_together()))
         print("Timestep: {}".format(current_state_obj.timestep))
     
