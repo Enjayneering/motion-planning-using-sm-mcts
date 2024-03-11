@@ -49,13 +49,14 @@ def plot_single_run(env, path_savefig, result_dict= None, timestep=None, main_ag
     #gridcolor = [(218/255, 181/255, color_range[i]) for i in range(len(grid_maps))]
     #for i, grid_map in enumerate(grid_maps):
     
-    plot_map(ax, array=last_map, facecolor=colormap['yellow'], edgecolor=colormap['grey'])
+    plot_map(ax, array=last_map["grid"], facecolor=colormap['yellow'], edgecolor=colormap['grey'])
 
     # Plot coordinate system
     plotCOS(ax, x_orig=0, y_orig=0, scale=0.8, colormap=colormap)
                  
     # plot finish line
-    plot_finish_line(ax, finish_line=finish_line, ymax=ymax)
+    #plot_finish_line(ax, finish_line=finish_line, ymax=ymax)
+    
     #plot_goal_states(ax, goal_state=Game.env.goal_state, agent=0, color=colormap['red'])
     #plot_goal_states(ax, goal_state=Game.env.goal_state, agent=1, color=colormap['blue'])
     plot_centerline(ax, centerlines=env.centerlines, agent=0, color=colormap['red'], alpha=0.5)
@@ -169,12 +170,12 @@ def plot_map(ax, array, facecolor=None, edgecolor=None, timestep_max=None, roadc
                 ax.plot(col, row, 'o', color='dimgrey', markersize=1, alpha=1)
                 ax.add_patch(Rectangle((col-0.5, row-0.5), 1, 1, color=roadcolor, linewidth=0, alpha=1, zorder=1))
 
-def get_current_grid(grid_dict, timestep):
-    for grid_timeindex in reversed(grid_dict.keys()):
-        if int(grid_timeindex) <= timestep:
-            current_grid = grid_dict[grid_timeindex]
+def get_current_grid(dynamic_grid, timestep):
+    for grid_element in reversed(dynamic_grid):
+        if grid_element['timestep'] <= timestep:
+            current_grid = grid_element
             break
-    return current_grid['grid']
+    return current_grid
 """
     occupancy_grid_define = current_grid.replace('.', '0').replace('0', '0').replace('x', '0').replace('1', '0').replace('#', '1').replace('+', '2').replace('F', '0')
     lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]

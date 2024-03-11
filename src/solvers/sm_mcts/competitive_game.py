@@ -7,11 +7,13 @@ from .utilities.kinodynamic_utilities import *
 from .utilities.payoff_utilities import *
 from .utilities.csv_utilities import *
 from .utilities.networkx_utilities import *
+from .utilities.config_utilities import *
+from .utilities.environment_utilities import *
 
 
 class CompetitiveGame:
-    def __init__(self, env, config, init_state=None):        
-        self.config = config
+    def __init__(self, env, game_config, init_state=None):        
+        self.config = game_config
         self.env = env
         if init_state is not None:
             # init state is list
@@ -19,7 +21,7 @@ class CompetitiveGame:
         else:       
             self.init_state = [self.env.init_state['x0'], self.env.init_state['y0'], self.env.init_state['theta0'], self.env.init_state['x1'], self.env.init_state['y1'], self.env.init_state['theta1']]
         self.terminal_state = [self.env.goal_state['x0'], self.env.goal_state['y0'], self.env.goal_state['theta0'], self.env.goal_state['x1'], self.env.goal_state['y1'], self.env.goal_state['theta1']]
-        self.name = get_next_game_name(path_to_results, self)
+        self.name = get_next_game_name(path_to_results, game_config.name)
 
         self.MCTS_params = self._set_mcts_params()
         self.Model_params = self._set_model_params()

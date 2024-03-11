@@ -12,18 +12,18 @@ import multiprocessing
 import json
 import itertools
 
+from utilities.config_utilities import *
 from solvers.sm_mcts.competitive_game import CompetitiveGame
 from solvers.sm_mcts.utilities.plot_test_utilities import *
 from solvers.sm_mcts.utilities.plot_utilities import *
 from solvers.sm_mcts.utilities.common_utilities import *
 from solvers.sm_mcts.utilities.csv_utilities import *
-from configs.single_experiment_configs.config_utilities import *
+
 from solvers.sm_mcts.utilities.run_utilities import *
 from solvers.sm_mcts.utilities.environment_utilities import *
 
 #from sm_mcts.environments import *
-from configs.single_experiment_configs.mcts_nash_convergence.exp_config import build_experiments
-from environments import intersection, street
+from single_configs import mcts_nash_convergence
 
 
 def run_test(game_dict):
@@ -142,7 +142,7 @@ def run_exp_vary_parameter(exp_path_level_1, game_dict, exp_params, timestep_sim
 
 if __name__ == "__main__":
     
-    experiments = build_experiments(env=intersection)
+    experiments = mcts_nash_convergence.build_experiments()
 
     for experiment in experiments:
         if experiment['dict']['feature_flags']["run_mode"]["exp"]:
@@ -154,8 +154,7 @@ if __name__ == "__main__":
             
             exp_start = time.time()
 
-            #run_experiment(exp_path_level_1, game_config=Config(experiment['dict']), timestep_sim=None, input=str(config.num_iter))
-            # (start, stepsize, num_steps)
+            #SPECIFY MORE EXPERIMENT PARAMETERS TO INVESTIGATE
             exp_params = {'num_iter': (100, 500, 10),
                           'weight_interm': (0.0, 0.2, 5),
                           'weight_final': (0.0, 0.2, 5)}

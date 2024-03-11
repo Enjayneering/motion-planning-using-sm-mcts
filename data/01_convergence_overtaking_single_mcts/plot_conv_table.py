@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from process_data_utilities import *
 sys.path.append('/home/enjay/0_thesis/01_MCTS/src')
 from plot_data_utilities import *
-from utilities.environment import *
+from utilities.env_utilities import *
 
 import numpy as np
 from scipy.ndimage import uniform_filter1d

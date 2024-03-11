@@ -21,7 +21,7 @@ def is_terminal(env, state, timestep, max_timestep=None):
             return False
         
 def agent_has_finished(env, state, agent=0):
-    max_progress = env.centerlines[agent][-5][-1] # TODO: specify goal
+    max_progress = env.centerlines[agent][-1][-1] # TODO: specify goal
     if find_closest_waypoint(env.centerlines[agent], state)[-1] >= max_progress:
         return True
     else:
