@@ -54,19 +54,48 @@ class State:
 #############################  
 
 class MCTSNode:
-    def __init__(self, Game, state, trajectories0=None, trajectories1=None, parent=None, parent_action=None):
-        # predefined trajectories for bimatrix game
-        self.trajectories = {0: trajectories0, 1: trajectories1}
-        self.chosen_trajectory = {0: None, 1: None}
-
+    def __init__(self, Game, state, trajectories=None, parent=None, parent_action=None):
         self.state = state
-        self.actions = {0: sample_legal_actions(Game, self.state)[0], 1: sample_legal_actions(Game, self.state)[1]}
         self.parent = parent
         self.parent_action = parent_action
         self.children = []
+        
+        # predefined trajectories for bimatrix game
+        if trajectories is None:
+            self.trajectories = {0: None, 1: None}
+        else:
+            self.trajectories = trajectories
+        self.traj_chosen = {0: None, 1: None}
+        
+        self.actions = {0: None, 1: None}
 
-        
-        
+        # if root node, then add all first trajectory actions to the node
+        # if child node, then add only next determined action to the node
+        for agent in [0,1]:
+            if not Game.config['predef_traj'][agent]['active']:
+                # sample actions from action set
+                self.actions[agent] = sample_legal_actions(Game, self.state)[agent]
+            else:
+                # use predefined trajectories
+                if self.parent is None:
+                    # choose first action from trajectory
+                    if len(self.trajectories[agent]) == 1:
+                        # trajectory already chosen
+                        self.traj_chosen[agent] = self.trajectories[agent][0] #pick the first and only trajectory of the list
+                        self.actions[agent] = [self.traj_chosen[agent][self.state.timestep]]
+                    else:
+                        self.actions[agent] = [sublist[0] for sublist in self.trajectories[agent]]
+                else:
+                    # choose next action from trajectory
+                    self.traj_chosen[agent] = self.parent.traj_chosen[agent]
+
+                    # if trajectory is too short, just wait
+                    if self.state.timestep < len(self.traj_chosen[agent]):
+                        self.actions[agent] = [self.traj_chosen[agent][self.state.timestep]]
+                    else:
+                        self.actions[agent] = [[1.0, 0.0]]
+                    
+         
         ########## MCTS parameters ##########
         if Game.config.feature_flags['selection_policy']['uct-decoupled']:
             self._number_of_visits = 1
@@ -85,7 +114,9 @@ class MCTSNode:
             self.action_xh = {0: [0] * self._num_actions[0], 1: [0] * self._num_actions[1]}
             self._policy_exp3 = {0: [1/self._num_actions[0]] * self._num_actions[0], 1: [1/self._num_actions[1]] * self._num_actions[1]}
 
-        self._untried_actions = sample_legal_actions(Game, self.state)[-1]
+        self._untried_actions = combine_actionsets(self.actions[0], self.actions[1])
+        if type(self._untried_actions[0]) == float:
+            print("problem")
         self._tried_actions = []
         self._select_policy_stats = {0: {}, 1: {}} # storing nodes {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': self.parent_action[:2]}
         self._aggr_payoffs = [0]*len(Game.Model_params["agents"])
@@ -104,7 +135,20 @@ class MCTSNode:
     def expand(self, Game, action=None):
         if action is None:
             # Pop random action out of the list
-            action = self._untried_actions.pop(np.random.randint(len(self._untried_actions)))
+            random_ix = np.random.randint(len(self._untried_actions))
+            action = self._untried_actions.pop(random_ix)
+            if type(action) == float:
+                print("Action is float: ", action)
+
+            # decide on trajectory to choose
+            if Game.config['predef_traj'][0]['active'] and not self.parent:
+                action_0 = action[:2]
+                ix_traj = self.actions[0].index(action_0)
+                self.traj_chosen[0] = self.trajectories[0][ix_traj]
+            if Game.config['predef_traj'][1]['active'] and not self.parent:
+                action_1 = action[2:]
+                ix_traj = self.actions[1].index(action_1)
+                self.traj_chosen[1] = self.trajectories[1][ix_traj]
         else:
             # Delete the specified action from the list
             self._untried_actions.remove(action)
@@ -114,55 +158,25 @@ class MCTSNode:
         self.children.append(child_node)
         #print("Child node: {}".format(child_node.state.get_state_together()))
         return child_node
-
-    """def _get_untried_actions(self, Game):
-        untried_action_0, untried_action_1, untried_actions = sample_legal_actions(Game, self.state)
-        return untried_actions"""
-    
-    """def _separate_actions(self, actions_together):
-        # Remove duplicate actions
-        actions_0 = list(set(tuple(action[:2]) for action in actions_together))
-        actions_1 = list(set(tuple(action[2:]) for action in actions_together))
-        actions_0 = [list(action) for action in actions_0]
-        actions_1 = [list(action) for action in actions_1]
-        random.shuffle(actions_0)
-        random.shuffle(actions_1)
-        return actions_0, actions_1"""
     
     def select_policy_child(self, Game):
         # resolve selecting actions that lead to a collision
-        """if Game.config.feature_flags['collision_handling']['pruning']:
-            if Game.config.feature_flags['selection_policy']['uct-decoupled']:
-                weights_0 = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[0].values()]
-                weights_1 = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[1].values()]
-            elif Game.config.feature_flags['selection_policy']['regret-matching']:
-               pass
-            while True:
-                # select action with highest UCT value and ensure it is not leading to a collision
-                selected_action_0 = list(self._select_policy_stats[0].values())[np.argmax(weights_0)]['action']
-                selected_action_1 = list(self._select_policy_stats[1].values())[np.argmax(weights_1)]['action']
-                x0, y0, theta0 = mm_unicycle(self.state.get_state(agent=0), selected_action_0, delta_t=Game.Model_params["delta_t"])
-                x1, y1, theta1 = mm_unicycle(self.state.get_state(agent=1), selected_action_1, delta_t=Game.Model_params["delta_t"])
-                if distance([x0, y0], [x1, y1]) < Game.Model_params["collision_distance"]:
-                    weights_0[np.argmax(weights_0)] = -np.inf
-                    weights_1[np.argmax(weights_1)] = -np.inf
-                    #print("Weights_0: {}, Weights_1: {}".format(weights_0, weights_1))
-                    #print("Collision detected from state {} to state {}".format(self.state.get_state_together(), [x0, y0, theta0, x1, y1, theta1, self.state.timestep+Game.Model_params["delta_t"]]))
-                else:
-                    break"""
-        if Game.config.feature_flags['collision_handling']['punishing']:
-            # get configurations of policies for each agent
-            policy_0 = next((key for key, value in Game.config.feature_flags['selection_policy'].items() if value), None)
-            policy_1 = next((key for key, value in Game.config.feature_flags['selection_policy'].items() if value), None)
-            selected_action_0 = self._select_action(Game, agent=0, policy=policy_0)
-            selected_action_1 = self._select_action(Game, agent=1, policy=policy_1)
+
+        # get configurations of policies for each agent
+        policy_0 = next((key for key, value in Game.config.feature_flags['selection_policy'].items() if value), None)
+        policy_1 = next((key for key, value in Game.config.feature_flags['selection_policy'].items() if value), None)
+        selected_action_0 = self._select_action(Game, agent=0, policy=policy_0)
+        selected_action_1 = self._select_action(Game, agent=1, policy=policy_1)
         
         selected_action = selected_action_0 + selected_action_1
         #print( "Selected action: {}".format(selected_action))
         if any(selected_action == sublist for sublist in self._tried_actions):
+            # choose child if already expanded
             child = [child for child in self.children if child.parent_action == selected_action][0]
         else:
             #expand tree
+            if type(selected_action) == float:
+                print("Selected action is float: ", selected_action)
             child = self.expand(Game, selected_action)
         #print("Selected child: {}".format(child.state.get_state_together()))
         return child
@@ -284,6 +298,8 @@ class MCTSNode:
                 if any(action_to_expand == sublist for sublist in current_node._tried_actions):
                     current_node = current_node.select_policy_child(Game)
                 else:
+                    if type(action_to_expand) == float:
+                        print("Action is float:", action_to_expand)
                     # expand one child and return
                     return current_node.expand(Game, action_to_expand)
         #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
@@ -301,7 +317,14 @@ class MCTSNode:
         # intermediate timesteps
         while not is_terminal(Game, current_rollout_node.state, max_timestep=max_timestep):
             #print("Rollout State: {}".format(current_rollout_node.state.get_state_together()))
-            moves_0, moves_1, possible_moves = sample_legal_actions(Game, current_rollout_node.state)
+            if not Game.config["predef_traj"][0]["active"] or not Game.config["predef_traj"][1]["active"]:
+                # sample actions like usual
+                moves_0, moves_1 = sample_legal_actions(Game, current_rollout_node.state)
+            if Game.config["predef_traj"][0]["active"]:
+                moves_0 = self.actions[0]
+            if Game.config["predef_traj"][1]["active"]:
+                moves_1 = self.actions[1]
+            possible_moves = combine_actionsets(moves_0, moves_1)
 
             #print("Moves 0: {}, Moves 1: {}".format(moves_0, moves_1))
             #print("Possible moves: {}".format(possible_moves))
@@ -357,14 +380,16 @@ class MCTSNode:
     ####   Helper Functions  ####
     #############################
 
-    def _select_action_max(self, Game, agent = 0):
+    def _select_action_max(self, agent = 0):
         weights = [action_stat["sum_payoffs"]/action_stat['num_count'] for action_stat in self._select_policy_stats[agent].values()]
         action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
         return action_select
     
+    # selection policy
     def _select_action(self, Game, agent = 0, policy=None):
         # main selection policy within the tree
-        if policy == 'uct-decoupled':
+        action_select = None
+        if policy == 'uct-decoupled' and not Game.config['predef_traj'][agent]['active']:
             weights = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[agent].values()]
             action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
             #print("Weights: {}".format(weights))
@@ -376,7 +401,18 @@ class MCTSNode:
             strategy = self.get_strategy_exp3(Game, agent=agent)
             action_ix =  np.random.choice(range(len(strategy)), p=np.array(strategy)/ np.sum(strategy))
             action_select = self.actions[agent][action_ix]
-        elif policy == 'predefined_trajectory':
+        if Game.config['predef_traj'][agent]['active']:
+            if self.trajectories[agent] is not None:
+                # if we can choose from a set of predefined trajectories
+                action_ix = np.random.choice(range(len(self.actions[agent])))
+                action_select = self.actions[agent][action_ix]
+                
+                # save chosen trajectory
+                self.traj_chosen[agent] = self.trajectories[agent][action_ix]
+            elif self.traj_chosen[agent] is not None:
+                # if we already have chosen a predefined trajectory
+                action_select = self.traj_chosen[agent][self.state.timestep]
+        if action_select is None:
             pass
         return action_select
     
@@ -502,10 +538,10 @@ class MCTSNode:
 ####   MCTS Algorithm    ####
 #############################
     
-def run_mcts(Game, root_state, max_timestep):
+def run_mcts(Game, root_state, max_timestep, trajectories=None):
     start_time = time.time()
 
-    current_node = MCTSNode(Game=Game, state=root_state)
+    current_node = MCTSNode(Game=Game, state=root_state, trajectories=trajectories)
     
     # TREE POLICY
     for iter in range(int(Game.MCTS_params['num_iter'])):
@@ -567,4 +603,4 @@ def run_mcts(Game, root_state, max_timestep):
                             y1=next_node.state.y1,
                             theta1=next_node.state.theta1,
                             timestep=root_state.timestep+1)
-    return next_root_state, runtime, policies
+    return next_root_state, runtime, policies, next_node.traj_chosen

@@ -1,9 +1,10 @@
 import heapq
 import numpy as np
 from scipy.stats import norm
-from utilities.common_utilities import *
 
-from a_star_utilities import *
+from .utilities.common_utilities import *
+
+from .a_star_utilities import *
 
 #loc = (x, y, theta)
 
@@ -53,6 +54,18 @@ def compute_heuristics(my_map, goal):
         h_values[loc] = node['cost']
     return h_values
 
+def compute_heuristics_goal_line(grid, goal_x):
+    height, width = grid.shape
+    h_values = dict()
+
+    for y in range(height):
+        for x in range(width):
+            # Compute the Manhattan distance to the goal line
+            distance = abs(x - goal_x)
+            h_values[(x, y)] = distance
+
+    return h_values
+
 
 def build_constraint_table(constraints):
     ##############################
@@ -88,10 +101,10 @@ def get_path(goal_node):
     curr = goal_node
     while curr['parent_action'] is not None:
         action_path.append(curr['parent_action'])
-        state_path.append(curr['loc'])
+        state_path.append(tuple([float(val) for val in curr['loc']]))
         time_path.append(curr['timestep'])
         curr = curr['parent']
-    state_path.append(curr['loc'])
+    state_path.append(tuple([float(val) for val in curr['loc']]))
     time_path.append(curr['timestep'])
     state_path.reverse()
     action_path.reverse()
@@ -151,8 +164,10 @@ def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10
         constraints - constraints defining where robot should or cannot go at each timestep
         max_iter - maximum numbers of iteration until the search stops
     """
+    
     density_map = generate_density_map(env.get_current_grid(start_timestep)['grid'].shape, start_loc[:2], goal_loc[:2], scale=scale_dense)
     #density_map = generate_random_density_map(env.get_current_grid(start_timestep)['grid'].shape, scale=scale_dense)
+    #density_map = np.zeros(env.get_current_grid(start_timestep)['grid'].shape).T
     
     trajectories = {'actions': [], 'states': [], 'times': []}
     ##############################
@@ -182,9 +197,9 @@ def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10
         #############################
         
         # Adjust so that we collect best trajectories
-        if curr['loc'] == goal_loc and not any(curr['timestep'] < time_constraint for time_constraint in constraint_table['timestep']):
+        if curr['loc'][0] >= goal_loc[0]: # if x is greater than goal x
             action_path, state_path, time_path = get_path(curr)
-            print('Trajectory found: ', action_path)
+            #print('Trajectory found: ', action_path)
             return action_path, state_path, time_path
         
         legal_actions = sample_legal_actions(env, curr['loc'], action_set, curr['timestep'], delta_t)
@@ -225,7 +240,6 @@ def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10
                 else:
                     closed_list[(child_move['loc'], child_move['timestep'])] = child_move # if child is not in closed list, it is added
                     push_node(open_list, child_move) # we have to check for children, so we add it to open list
-            
     return None  # Failed to find solutions
 
 

@@ -2,8 +2,14 @@ import time
 import multiprocessing
 import json
 import itertools
+import sys
+
+import exp_config
+
+sys.path.insert(0, '/home/enjay/0_thesis/01_MCTS/src')
 
 from utilities.config_utilities import *
+from folder_structure import *
 from solvers.sm_mcts.competitive_game import CompetitiveGame
 from solvers.sm_mcts.utilities.plot_test_utilities import *
 from solvers.sm_mcts.utilities.plot_utilities import *
@@ -13,8 +19,6 @@ from solvers.sm_mcts.utilities.csv_utilities import *
 from solvers.sm_mcts.utilities.run_utilities import *
 from solvers.sm_mcts.utilities.environment_utilities import *
 
-#from sm_mcts.environments import *
-from configs_single_mcts import mcts_nash_convergence
 
 
 def run_test(game_dict):
@@ -133,23 +137,24 @@ def run_exp_vary_parameter(exp_path_level_1, game_dict, exp_params, timestep_sim
 
 if __name__ == "__main__":
     
-    experiments = mcts_nash_convergence.build_experiments()
+    experiments, global_exp_dir = exp_config.build_experiments()
+    path_to_experiment = os.path.join(path_to_data,global_exp_dir)
 
     for experiment in experiments:
+        if not os.path.exists(path_to_experiment):
+            os.mkdir(path_to_experiment)
         if experiment['dict']['feature_flags']["run_mode"]["exp"]:
-            exp_path_level_1 = os.path.join(path_to_experiments, experiment['name'])
+            exp_path_level_1 = os.path.join(path_to_experiment, experiment['name'])
 
-            if not os.path.exists(os.path.join(path_to_experiments, exp_path_level_1)):
-                os.mkdir(os.path.join(path_to_experiments, exp_path_level_1))
-            create_global_index(os.path.join(path_to_experiments, exp_path_level_1))
+            if not os.path.exists(os.path.join(path_to_experiment, exp_path_level_1)):
+                os.mkdir(os.path.join(path_to_experiment, exp_path_level_1))
+            create_global_index(os.path.join(path_to_experiment, exp_path_level_1))
             
             exp_start = time.time()
 
             #SPECIFY MORE EXPERIMENT PARAMETERS TO INVESTIGATE
-            exp_params = {'num_iter': (100, 500, 10),
-                          'weight_interm': (0.0, 0.2, 5),
-                          'weight_final': (0.0, 0.2, 5)}
-            run_exp_vary_parameter(exp_path_level_1, game_dict=experiment['dict'], exp_params=exp_params, timestep_sim=1)
+            exp_params = experiment['exp_params']
+            run_exp_vary_parameter(exp_path_level_1, game_dict=experiment['dict'], exp_params=exp_params, timestep_sim=experiment['timestep_sim'])
             
             exp_duration = time.time() - exp_start
 

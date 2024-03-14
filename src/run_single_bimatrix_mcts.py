@@ -83,7 +83,7 @@ def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment
         sys.stdout = print_file
 
         # RUN EXPERIMENT
-        result_dict, policy_dict = GamePlanner.run_game(timesteps_sim=timestep_sim)
+        result_dict, policy_dict, traj_dict = GamePlanner.run_game(timesteps_sim=timestep_sim)
 
         # PLOT TRAJECTORIES
         plot_trajectory(GamePlanner, result_dict, subex_filepath, all_timesteps=False)
@@ -93,6 +93,9 @@ def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment
             json.dump(result_dict, f)
         with open(os.path.join(subex_filepath, "policies.json"), "w") as f:
             json.dump(policy_dict, f)
+        with open(os.path.join(subex_filepath, "precomp_traj.json"), "w") as f:
+            for key, value in traj_dict.items():
+                json.dump({key: value}, f, indent=4)
         
         # Restore the standard output
         sys.stdout = sys.__stdout__
@@ -147,10 +150,10 @@ if __name__ == "__main__":
             exp_start = time.time()
 
             #SPECIFY MORE EXPERIMENT PARAMETERS TO INVESTIGATE
-            exp_params = {'num_iter': (100, 500, 10),
-                          'weight_interm': (0.0, 0.2, 5),
-                          'weight_final': (0.0, 0.2, 5)}
-            run_exp_vary_parameter(exp_path_level_1, game_dict=experiment['dict'], exp_params=exp_params, timestep_sim=1)
+            exp_params = {'num_iter': (1000, 500, 2),
+                          'weight_interm': (0.5, 0.25, 2),
+                          'weight_final': (0.5, 0.25, 2)}
+            run_exp_vary_parameter(exp_path_level_1, game_dict=experiment['dict'], exp_params=exp_params, timestep_sim=experiment['dict']['timestep_sim'])
             
             exp_duration = time.time() - exp_start
 

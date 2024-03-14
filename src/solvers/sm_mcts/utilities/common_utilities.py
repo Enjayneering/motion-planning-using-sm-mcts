@@ -13,20 +13,17 @@ path_to_src = path_to_repository+"src/"
 
 # test file structure
 path_to_tests = "/home/enjay/0_thesis/01_MCTS/tests/"
-path_to_data = path_to_tests+"data/"
+path_to_test_data = path_to_tests+"data/"
 path_to_results = path_to_tests+"results/"
-path_to_trees = path_to_data+"trees/"
+path_to_trees = path_to_test_data+"trees/"
 path_to_tree = path_to_trees+"/tree_{}.csv"
-path_to_global_state = path_to_data+"global_state.csv"
-path_to_rollout_curr = path_to_data+"rollout_curr.csv"
-path_to_rollout_last = path_to_data+"rollout_last.csv"
+path_to_global_state = path_to_test_data+"global_state.csv"
+path_to_rollout_curr = path_to_test_data+"rollout_curr.csv"
+path_to_rollout_last = path_to_test_data+"rollout_last.csv"
 path_to_rollout_tmp = path_to_rollout_last + "~"
 
 
-# experimental file structure
 
-path_to_experiments = "/home/enjay/0_thesis/01_MCTS/data/"
-new_exp_folder = path_to_experiments+""
 
 freq_stat_data = 10
 

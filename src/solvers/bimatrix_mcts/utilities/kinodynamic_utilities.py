@@ -91,10 +91,10 @@ def sample_legal_actions(Game, state_object):
     # state = [x, y, theta]
     # action = [vel, angular_vel]
 
-    values_speed_0 = Game.Kinodynamic_params['action_set_0']['velocity_0']
-    values_speed_1 = Game.Kinodynamic_params['action_set_1']['velocity_1']
-    values_angular_speed_0 = Game.Kinodynamic_params['action_set_0']['ang_velocity_0']
-    values_angular_speed_1 = Game.Kinodynamic_params['action_set_1']['ang_velocity_1']
+    values_speed_0 = Game.Kinodynamic_params['action_set_0']['velocity']
+    values_speed_1 = Game.Kinodynamic_params['action_set_1']['velocity']
+    values_angular_speed_0 = Game.Kinodynamic_params['action_set_0']['ang_velocity']
+    values_angular_speed_1 = Game.Kinodynamic_params['action_set_1']['ang_velocity']
 
     action_tuples_0   = itertools.product(values_speed_0, values_angular_speed_0)
     action_tuples_1   = itertools.product(values_speed_1, values_angular_speed_1)
@@ -120,4 +120,14 @@ def sample_legal_actions(Game, state_object):
     #random.shuffle(sampled_actions_1_pruned)
     #random.shuffle(sampled_actions_together_pruned)
 
-    return sampled_actions_0_pruned, sampled_actions_1_pruned, sampled_actions_together_pruned
+    return sampled_actions_0_pruned, sampled_actions_1_pruned
+
+def combine_actionsets(actionset_0, actionset_1):
+    # combine both list elements in all possible combinations
+    action_pair = list(itertools.product(actionset_0, actionset_1))
+    actions_seperate = [list(action_pair) for action_pair in action_pair]
+    actions_together = [action_pair[0] + action_pair[1] for action_pair in actions_seperate] # adding both lists to one list
+    #print("Actions together:",actions_together)
+    return actions_together
+
+

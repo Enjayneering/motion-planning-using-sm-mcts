@@ -2,7 +2,7 @@ import numpy as np
 
 
 config_dict = {
-    'name': 'exp3',
+    'name': 'duct',
 
     # MCTS Parameters
     'c_param': np.sqrt(2),
@@ -36,7 +36,7 @@ config_dict = {
     'weight_final_lead': 1,
 
     # Behavioural Parameters
-    'collision_ignorance': 0.5, #[0,1]
+    'collision_ignorance': 0.5, #[0,1] # like a slider that can go to 0 (Agent 0 ignores collisions fully uo to agent 1 | 0.5 means both account fully for collisions)
     
     'velocity_0': np.linspace(0, 1, 2).tolist(),
     'ang_velocity_0': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
@@ -49,11 +49,11 @@ config_dict = {
     'standard_dev_ang_vel_1':  np.pi/2,
 
     'feature_flags': {
-        'run_mode': {'test': True, 'exp': False, 'live-plot': True},
+        'run_mode': {'test': False, 'exp': True, 'live-plot': True},
         'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
         'collision_handling': {'punishing': True, 'pruning': False},
-        'selection_policy': {'uct-decoupled': False, 'regret-matching': False, 'exp3': True},
-        'rollout_policy': {'random-uniform': False, 'random-informed': True},
+        'selection_policy': {'uct-decoupled': True, 'regret-matching': False, 'exp3': False},
+        'rollout_policy': {'random-uniform': True, 'random-informed': False},
         'expansion_policy': {'every-child': True, 'random-informed': False},
         'strategy': {'pure': True, 'mixed': False},
     }

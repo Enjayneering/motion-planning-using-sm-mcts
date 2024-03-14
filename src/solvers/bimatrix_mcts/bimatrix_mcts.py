@@ -10,6 +10,8 @@ from .utilities.networkx_utilities import *
 from .utilities.config_utilities import *
 from .utilities.environment_utilities import *
 
+from .shortest_path_planner import ShortestPathPlanner
+
 
 class BiMatrixMCTS:
     def __init__(self, env, game_config, init_state=None):        
@@ -59,10 +61,10 @@ class BiMatrixMCTS:
     
     def _set_kinodynamic_params(self):
         Kinodynamic_params = {
-        "action_set_0": {"velocity_0": self.config.velocity_0,
-                        "ang_velocity_0": self.config.ang_velocity_0},
-        "action_set_1": {"velocity_1": self.config.velocity_1,
-                        "ang_velocity_1": self.config.ang_velocity_1},
+        "action_set_0": {"velocity": self.config.velocity_0,
+                        "ang_velocity": self.config.ang_velocity_0},
+        "action_set_1": {"velocity": self.config.velocity_1,
+                        "ang_velocity": self.config.ang_velocity_1},
         }
         return Kinodynamic_params
 
@@ -86,6 +88,8 @@ class BiMatrixMCTS:
     
     
     def run_game(self, timesteps_sim=None):
+        # timestep sim, so that we can use the algorithm for simulation
+
         # create a text trap and redirect stdout
         #text_trap = io.StringIO()
         #sys.stdout = text_trap
@@ -102,11 +106,26 @@ class BiMatrixMCTS:
         elif self.config.feature_flags["run_mode"]["exp"]:
             # initialize result dictionary
             result_dict = {}
+            precomputed_traj = None
         policy_dict = {}
 
         # RUN TRAJECTORY PLANNER
         start_time = time.time()
         max_timestep = self.config.max_timehorizon
+
+        # Precompute set of trajectories
+        trajectories = {0: None, 1: None}
+        glob_traj_dict = {0: None, 1: None}
+        for agent in [0,1]:
+            if self.config['predef_traj'][agent]['active']:
+                num_traj = self.config['predef_traj'][agent]['num_traj']
+                SPPlanner = ShortestPathPlanner(self.env, action_set=self.Kinodynamic_params['action_set_{}'.format(agent)], start_state=current_state_obj.get_state(agent=agent), start_timestep=current_state_obj.timestep, ix_agent=agent, dt=self.Model_params["delta_t"])
+                traj_dict = SPPlanner.get_trajectories(num_trajectories=num_traj, scale_dense=self.config['predef_traj'][agent]['scale_dense'], block_from_ends=self.config['predef_traj'][agent]['block_from_ends'])
+                trajectories[agent] = traj_dict['actions']
+                glob_traj_dict[agent] = traj_dict
+                #print("Trajectories for agent {}: {}".format(agent, trajectories[agent]))
+                print(f"\n {len(trajectories[agent])} trajectories found for agent {agent}!\n")
+
 
         while not is_terminal(self, current_state_obj, max_timestep=self.config.max_timehorizon) and (timesteps_sim is None or current_state_obj.timestep < timesteps_sim):
             print("Searching game tree in timestep {}...".format(current_state_obj.timestep))
@@ -114,9 +133,12 @@ class BiMatrixMCTS:
                 csv_init_rollout_last(self)
 
             print("Max timehorizon: {}".format(max_timestep))
+             
             # RUN SINGLE MCTS ALGORITHM IN CURRENT TIMESTEP  
-            next_state_obj, runtime, policies = run_mcts(self, current_state_obj, max_timestep=max_timestep)
-            
+            next_state_obj, runtime, policies, traj_chosen = run_mcts(self, current_state_obj, max_timestep=max_timestep, trajectories=trajectories)
+
+            trajectories = {0: [traj_chosen[0]],
+                            1: [traj_chosen[1]]}
 
             if self.config.feature_flags["run_mode"]["exp"]:
                 result_dict["alphat_eff_gamelength_{}".format(max_timestep)] = max_timestep/get_min_time_to_complete(self, curr_state=current_state_obj.get_state_together())
@@ -142,7 +164,8 @@ class BiMatrixMCTS:
             self.payoff_data_log["payoff_total"].append(total_payoff_list)
             
             # Append agents policies at each timestep
-            policy_dict[max_timestep] = policies
+            game_length = max_timestep-next_state_obj.timestep
+            policy_dict[game_length] = policies
 
             if self.config.feature_flags["run_mode"]["test"]:
                 csv_write_global_state(self, self.global_states[-1])
@@ -151,7 +174,7 @@ class BiMatrixMCTS:
             current_state_obj = next_state_obj
 
             if self.config.feature_flags["run_mode"]["exp"]:
-                result_dict['game_length'] = max_timestep-next_state_obj.timestep
+                result_dict['game_length'] = game_length
             #max_timestep -= 1
         print("Terminal state: {}".format(current_state_obj.get_state_together()))
         print("Timestep: {}".format(current_state_obj.timestep))
@@ -194,5 +217,5 @@ class BiMatrixMCTS:
             result_dict["trajectory_0"] = [[float(value) for value in state.get_state(agent=0)]+[state.timestep] for state in self.global_states]
             result_dict["trajectory_1"] = [[float(value) for value in state.get_state(agent=1)]+[state.timestep] for state in self.global_states]
             result_dict.update(self.payoff_data_log) # merge dictionaries
-            return result_dict, policy_dict
+            return result_dict, policy_dict, glob_traj_dict
     

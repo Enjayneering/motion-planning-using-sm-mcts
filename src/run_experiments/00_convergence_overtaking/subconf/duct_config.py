@@ -2,7 +2,7 @@ import numpy as np
 
 
 config_dict = {
-    'name': 'duct',
+    #'name': 'duct',
 
     # MCTS Parameters
     'c_param': np.sqrt(2),
@@ -36,12 +36,12 @@ config_dict = {
     'weight_final_lead': 1,
 
     # Behavioural Parameters
-    'collision_ignorance': 0.5, #[0,1]
+    'collision_ignorance': 0.5, #[0,1] # like a slider that can go to 0 (Agent 0 ignores collisions fully uo to agent 1 | 0.5 means both account fully for collisions)
     
-    'velocity_0': np.linspace(0, 1, 2).tolist(),
-    'ang_velocity_0': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
+    'velocity_0': np.linspace(0, 2, 3).tolist(),
+    'ang_velocity_0': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
     'velocity_1': np.linspace(0, 1, 2).tolist(),
-    'ang_velocity_1': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
+    'ang_velocity_1': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
 
     'standard_dev_vel_0': 2,
     'standard_dev_ang_vel_0': np.pi/2,

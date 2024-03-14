@@ -9,3 +9,6 @@ main_dir = os.path.dirname(src_dir)
 results_dir = os.path.join(main_dir, "results")
 data_dir = os.path.join(main_dir, "data")
 
+# experimental file structure
+
+path_to_data = "/home/enjay/0_thesis/01_MCTS/data/"

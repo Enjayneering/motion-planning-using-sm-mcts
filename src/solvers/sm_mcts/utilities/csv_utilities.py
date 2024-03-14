@@ -6,12 +6,6 @@ import glob
 from .common_utilities import *
 
 def csv_init_global_state(Game):
-    # removing all files from data
-    """file_list = os.listdir(path_to_data)
-    for file in file_list:
-        file_path = os.path.join(path_to_data, file)
-        os.remove(file_path)"""
-
     # writing global state data to csv file
     with open(path_to_global_state, mode='w') as csv_file:
         fieldnames = Game.Model_params["state_space"]
