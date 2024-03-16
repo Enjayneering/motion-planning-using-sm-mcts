@@ -6,7 +6,11 @@ import sys
 
 import exp_config
 
-sys.path.insert(0, '/home/enjay/0_thesis/01_MCTS/src')
+import os
+current_dir = os.path.dirname(os.path.realpath(__file__))
+exp_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+src_dir = os.path.abspath(os.path.join(exp_dir, os.pardir))
+sys.path.insert(0, src_dir)
 
 from utilities.config_utilities import *
 from folder_structure import *

@@ -6,7 +6,7 @@ from environments import street as env
 def build_experiments():
     experiments = []
 
-    global_exp_dir = "00_convergence_overtaking"
+    global_exp_dir = "001_convergence_following"
 
     # basic experiment
     dict_0 = copy_new_dict(default_config.default_dict, duct_config.config_dict, env.confdict)

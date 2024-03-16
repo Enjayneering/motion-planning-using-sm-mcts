@@ -54,7 +54,7 @@ class Environment:
     def get_finish_line(self, env_def):
         grid = env_def[0]
         if any([char in grid for char in ['F']]):
-            print("Running in Racing mode with finish line!")
+            #print("Running in Racing mode with finish line!")
             occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('F', '1').replace('x', '9')
             lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
             transformed_grid = [list(map(int, line)) for line in lines]
@@ -207,7 +207,7 @@ def get_goal_state(env_raceconfig):
     for agent in range(0,2):
         grid = env_raceconfig[f'{agent}']
         if any([char in grid for char in ['G']]):
-            print("Running in free mode with goal regions!")
+            #print("Running in free mode with goal regions!")
             occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('S', '0').replace('G','1').replace('+', '9').replace('x', '8')
             lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
             transformed_grid = [list(map(int, line)) for line in lines]

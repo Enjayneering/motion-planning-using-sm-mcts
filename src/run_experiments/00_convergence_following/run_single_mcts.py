@@ -6,7 +6,11 @@ import sys
 
 import exp_config
 
-sys.path.insert(0, '/home/enjay/0_thesis/01_MCTS/src')
+import os
+current_dir = os.path.dirname(os.path.realpath(__file__))
+exp_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+src_dir = os.path.abspath(os.path.join(exp_dir, os.pardir))
+sys.path.insert(0, src_dir)
 
 from utilities.config_utilities import *
 from folder_structure import *
@@ -65,7 +69,7 @@ def run_test(game_dict):
         print("Finished with duration: {} s".format(duration))
 
 def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment="", input=""):
-    print("Running MCTS in Experimental mode!")
+    #print("Running MCTS in Experimental mode!")
 
     exp_path_level_0 = get_exp_path_level_0(exp_path_level_1, config=game_config, exp_comment=exp_comment, input=input)
     
