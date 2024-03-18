@@ -3,7 +3,7 @@ __pycache__/
 
 *.png
 
-/data
+/data_raw
 /other_plots
 /hold_then_delete
 /results
