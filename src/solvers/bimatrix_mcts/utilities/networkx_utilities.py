@@ -6,6 +6,8 @@ from .common_utilities import *
 
 def init_tree_file():
     # Delete all existing tree files
+    if not os.path.exists(path_to_trees):
+        os.makedirs(os.path.dirname(path_to_trees), exist_ok=True)
     file_list = os.listdir(path_to_trees)
     for file_name in file_list:
         file_path = os.path.join(path_to_trees, file_name)
@@ -22,6 +24,9 @@ def save_tree_to_file(root_node, path_to_tree):
         for child in current_node.children:
             tree.add_edge(current_node, child)
             stack.append(child)
+    
+    if not os.path.exists(path_to_trees):
+        os.makedirs(os.path.dirname(path_to_trees), exist_ok=True)
 
     with open(path_to_tree, 'wb') as f:
         pickle.dump(tree, f)

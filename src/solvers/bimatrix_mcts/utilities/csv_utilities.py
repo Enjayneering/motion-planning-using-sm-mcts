@@ -13,6 +13,8 @@ def csv_init_global_state(Game):
         os.remove(file_path)"""
 
     # writing global state data to csv file
+    if not os.path.exists(path_to_global_state):
+        os.makedirs(os.path.dirname(path_to_global_state), exist_ok=True)
     with open(path_to_global_state, mode='w') as csv_file:
         fieldnames = Game.Model_params["state_space"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -67,6 +69,8 @@ def get_next_game_name(path_to_results, name):
 
 
 def test_write_params(Game):
+    if not os.path.exists(path_to_results):
+        os.makedirs(os.path.dirname(path_to_results), exist_ok=True)
     with open(os.path.join(path_to_results, Game.name + ".txt"), 'w') as f:
         for key, value in Game.Model_params.items():
             f.write(f"{key}: {value}\n")
