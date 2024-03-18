@@ -1,0 +1,10 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+*.png
+
+/data
+/other_plots
+/hold_then_delete
+/results
+/tests
