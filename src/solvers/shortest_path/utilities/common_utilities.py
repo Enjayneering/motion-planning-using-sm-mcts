@@ -3,24 +3,22 @@ import os
 import numpy as np
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
-parent_folder = os.path.dirname(current_folder)
-
-# paths
-#path_to_repository = "/home/enjay/0_thesis/01_MCTS/"
-path_to_repository = parent_folder+"/"
-path_to_src = path_to_repository+"src/"
-
+algo_folder = os.path.dirname(current_folder)
+solver_folder = os.path.dirname(algo_folder)
+path_to_src = os.path.dirname(solver_folder)
+path_to_master = os.path.dirname(path_to_src)
 
 # test file structure
-path_to_tests = "/home/enjay/0_thesis/01_MCTS/tests/"
-path_to_data = path_to_tests+"data/"
+path_to_tests = os.path.join(path_to_master, "tests/")
+path_to_test_data = path_to_tests+"data/"
 path_to_results = path_to_tests+"results/"
-path_to_trees = path_to_data+"trees/"
+path_to_trees = path_to_test_data+"trees/"
 path_to_tree = path_to_trees+"/tree_{}.csv"
-path_to_global_state = path_to_data+"global_state.csv"
-path_to_rollout_curr = path_to_data+"rollout_curr.csv"
-path_to_rollout_last = path_to_data+"rollout_last.csv"
+path_to_global_state = path_to_test_data+"global_state.csv"
+path_to_rollout_curr = path_to_test_data+"rollout_curr.csv"
+path_to_rollout_last = path_to_test_data+"rollout_last.csv"
 path_to_rollout_tmp = path_to_rollout_last + "~"
+
 
 
 # experimental file structure

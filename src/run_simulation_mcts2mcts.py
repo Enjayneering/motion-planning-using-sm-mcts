@@ -21,10 +21,8 @@ def run_simulation_mcts2mcts(sim_name, experiment, num_simulations):
     experiments = experiment.build_experiments()
 
     # create folder structure
-    exp_raw_dir = os.path.join(sim_data_dir, "raw")
-    exp_processed_dir = os.path.join(sim_data_dir, "processed")
+    exp_raw_dir = sim_data_dir
     os.makedirs(exp_raw_dir, exist_ok=True)
-    os.makedirs(exp_processed_dir, exist_ok=True)
 
     for experiment in experiments:
 
@@ -95,4 +93,4 @@ def run_simulation_mcts2mcts(sim_name, experiment, num_simulations):
 
 
 if __name__ == '__main__':
-    run_simulation_mcts2mcts(sim_name = "mcts_vs_mcts", experiment = mcts_vs_mcts, num_simulations = 10)
+    run_simulation_mcts2mcts(sim_name = "11_mcts_vs_mcts", experiment = mcts_vs_mcts, num_simulations = 10)

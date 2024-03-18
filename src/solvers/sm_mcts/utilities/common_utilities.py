@@ -3,16 +3,13 @@ import os
 import numpy as np
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
-parent_folder = os.path.dirname(current_folder)
-
-# paths
-#path_to_repository = "/home/enjay/0_thesis/01_MCTS/"
-path_to_repository = parent_folder+"/"
-path_to_src = path_to_repository+"src/"
-
+algo_folder = os.path.dirname(current_folder)
+solver_folder = os.path.dirname(algo_folder)
+path_to_src = os.path.dirname(solver_folder)
+path_to_master = os.path.dirname(path_to_src)
 
 # test file structure
-path_to_tests = "/home/enjay/0_thesis/01_MCTS/tests/"
+path_to_tests = os.path.join(path_to_master, "tests/")
 path_to_test_data = path_to_tests+"data/"
 path_to_results = path_to_tests+"results/"
 path_to_trees = path_to_test_data+"trees/"

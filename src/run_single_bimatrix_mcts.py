@@ -52,11 +52,13 @@ def run_test(game_dict):
         duration = time.time() - start_time
 
         # Save duration to text file
+        if not os.path.exists(path_to_results):
+            os.mkdir(path_to_results)
         with open(os.path.join(path_to_results, GamePlanner.name + ".txt"), 'a') as f:
             f.write("Config: {}\n".format(GamePlanner.config))
             f.write(f"Duration: {duration}\n")
             f.write("\nContent of global_state.csv:\n")
-            with open(os.path.join(path_to_data, "global_state.csv"), 'r') as csv_file:
+            with open(os.path.join(path_to_test_data, "global_state.csv"), 'r') as csv_file:
                 f.write(csv_file.read())
 
         print("Finished with duration: {} s".format(duration))

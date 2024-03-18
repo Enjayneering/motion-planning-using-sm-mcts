@@ -3,6 +3,8 @@ from utilities.environment_utilities import Environment
 from configs import agent_conf, model_conf, street
 
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
 import numpy as np
 
 class ShortestPathPlanner:

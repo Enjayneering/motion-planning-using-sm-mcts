@@ -7,7 +7,7 @@ src_dir = os.path.dirname(os.path.abspath(__file__))
 main_dir = os.path.dirname(src_dir)
 
 results_dir = os.path.join(main_dir, "results")
-data_dir = os.path.join(main_dir, "data")
+data_dir = os.path.join(main_dir, "data_raw")
 
 # experimental file structure
 path_to_data = data_dir

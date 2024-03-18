@@ -85,8 +85,7 @@ class ShortestPathPlanner:
                 dx = np.cos(thetas[j])
                 dy = np.sin(thetas[j])
                 plt.arrow(xs[j], ys[j], dx, dy, color=colors[i % len(colors)], head_width=0.05, head_length=0.1)
-        cwd = os.getcwd()
-        plt.savefig(os.path.join(cwd, "trajectories.png"))
+        plt.savefig(os.path.join(path_to_test_data, "trajectories.png"))
         return trajectories
     
 def add_constraints(constraints, state_traj, time_traj, h_values, agent):
