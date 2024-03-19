@@ -6,7 +6,7 @@ from environments import intersection as env
 def build_experiments():
     experiments = []
 
-    global_exp_dir = "04_intersection"
+    global_exp_dir = "01_intersection"
 
     # basic experiment
     dict_0 = copy_new_dict(default_config.default_dict, duct_config.config_dict, env.confdict)
