@@ -70,7 +70,7 @@ def run_test(game_dict):
 
 def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment="", input=""):
     print("Running MCTS in Experimental mode!")
-
+    
     exp_path_level_0 = get_exp_path_level_0(exp_path_level_1, config=game_config, exp_comment=exp_comment, input=input)
     
     # WRITE CONFIGURATION FILE
@@ -136,12 +136,17 @@ def run_exp_vary_parameter(exp_path_level_1, game_dict, exp_params, timestep_sim
         update_dict = {parameter: value for parameter, value in zip(linspace.keys(), param_values)}
         exp_name = "_".join([f"{parameter}_{value}" for parameter, value in zip(linspace.keys(), param_values)])
         exp_config = Config(copy_new_dict(game_dict, update_dict))
+        print("Run experiment with update config: ", update_dict)
         run_experiment(exp_path_level_1, game_config=exp_config, timestep_sim=timestep_sim, input=exp_name)
 
 
 if __name__ == "__main__":
     
     experiments, global_exp_dir = exp_config.build_experiments()
+
+    if not os.path.exists(path_to_data):
+        os.mkdir(path_to_data)
+        
     path_to_experiment = os.path.join(path_to_data,global_exp_dir)
 
     # Print all names of the list elements of experiments together with their indices
