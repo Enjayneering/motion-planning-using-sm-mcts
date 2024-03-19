@@ -1,5 +1,4 @@
 import os
-import sys
 
 # Get the current script's directory
 src_dir = os.path.dirname(os.path.abspath(__file__))

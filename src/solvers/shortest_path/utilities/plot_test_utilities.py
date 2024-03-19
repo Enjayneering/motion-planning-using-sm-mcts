@@ -13,7 +13,6 @@ import sys
 
 from .common_utilities import *
 from .environment_utilities import *
-from .networkx_utilities import open_tree_from_file
 
 
 class FigureV0:

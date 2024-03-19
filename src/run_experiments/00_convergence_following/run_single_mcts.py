@@ -5,8 +5,8 @@ import itertools
 import sys
 
 import exp_config
-
 import os
+
 current_dir = os.path.dirname(os.path.realpath(__file__))
 exp_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 src_dir = os.path.abspath(os.path.join(exp_dir, os.pardir))

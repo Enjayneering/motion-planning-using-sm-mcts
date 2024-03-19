@@ -1,9 +1,7 @@
-from .a_star import *
-from .utilities.environment_utilities import Environment
-#from .configs import agent_conf, model_conf, street
-
 import matplotlib.pyplot as plt
 import numpy as np
+
+from .a_star import *
 
 class ShortestPathPlanner:
     def __init__(self, env, action_set, start_state=None, start_timestep=0, dt=1, ix_agent=0):

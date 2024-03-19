@@ -1,8 +1,6 @@
 import os
 import json
 
-from statistics import mean, variance
-
 def get_exp_path_level_0(exp_subfolder, config, exp_comment="", input=""):
     with open(os.path.join(exp_subfolder, "index.txt"), 'r') as f:
         global_index = int(f.read())

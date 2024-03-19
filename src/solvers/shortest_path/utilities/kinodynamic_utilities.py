@@ -1,8 +1,5 @@
 import numpy as np
 import itertools
-from shapely import LineString
-import random
-
 from .common_utilities import *
 
 

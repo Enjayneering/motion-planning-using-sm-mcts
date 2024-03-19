@@ -1,9 +1,7 @@
 import heapq
 import numpy as np
-from scipy.stats import norm
 
 from .utilities.common_utilities import *
-
 from .a_star_utilities import *
 
 #loc = (x, y, theta)

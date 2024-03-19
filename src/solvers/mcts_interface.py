@@ -1,9 +1,5 @@
 # This interface provides a way to use the MCTS algorithm as a receding horizon controller for a competitive game.
 # It can be called from a supersccript to initialize the game and run the MCTS algorithm.
-import time
-import multiprocessing
-import json
-import itertools
 import numpy as np
 
 from .sm_mcts.competitive_game import CompetitiveGame

@@ -1,12 +1,10 @@
 import os
 import numpy as np
-from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 from .common_utilities import *
 from .environment_utilities import *
-from .kinodynamic_utilities import distance, mm_unicycle
 
 def plot_single_run(Game, path_savefig, result_dict= None, timestep=None, main_agent=0):
     colormap = {'red': (192/255, 67/255, 11/255), 
