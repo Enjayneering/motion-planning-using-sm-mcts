@@ -27,7 +27,8 @@ Ensure you have the following installed:
 For convenience it is possible to build a docker image and run the script within a container.
 
 ## Convergence behaviour of the implementation
-![image.png](https://github.com/Enjayneering/motion-planning-using-sm-mcts/blob/master/strategy_convergence.png))
+![image.png](https://github.com/Enjayneering/motion-planning-using-sm-mcts/blob/master/strategy_convergence.png)
+
 Note that due to the implementation in Python, this algorithm is quite slow...
 
 Work based on the paper:
