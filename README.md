@@ -33,7 +33,7 @@ Note that due to the implementation in Python, this algorithm is quite slow...
 
 ## License
 This project is licensed under the MIT License.
-© 2024 Jannis Boening. All rights reserved.
+© 2024 Enjayneering. All rights reserved.
 
 ## Related Paper
 Lanctot, Marc; Lisy, Viliam; Winands, Mark H. M. (2013). Monte Carlo Tree Search in Simultaneous Move Games with Applications to Goofspiel.
