@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+*.png
+
 /data_raw
 /other_plots
 /hold_then_delete
