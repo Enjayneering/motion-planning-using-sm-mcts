@@ -19,10 +19,10 @@ config_dict = {
     'num_sim': 10,
 
     # Payoff Parameters
-    'discount_factor': 0.9,
+    'discount_factor': 1.0,
 
-    'weight_interm': 0.5,
-    'weight_final': 1,
+    'weight_interm': 1.0,
+    'weight_final': 0.2,
     
     #interm payoffs
     'weight_distance': 0,
@@ -43,10 +43,10 @@ config_dict = {
     'velocity_1': np.linspace(0, 1, 2).tolist(),
     'ang_velocity_1': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
 
-    'standard_dev_vel_0': 2,
-    'standard_dev_ang_vel_0': np.pi/2,
+    'standard_dev_vel_0': 1,
+    'standard_dev_ang_vel_0': 0,
     'standard_dev_vel_1': 1,
-    'standard_dev_ang_vel_1':  np.pi/2,
+    'standard_dev_ang_vel_1': 0,
 
     'feature_flags': {
         'run_mode': {'test': False, 'exp': True, 'live-plot': True},

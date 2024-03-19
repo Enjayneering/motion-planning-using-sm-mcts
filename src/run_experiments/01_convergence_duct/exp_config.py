@@ -13,10 +13,7 @@ def build_experiments():
     experiments.append({'name': 'duct', 
                         'timestep_sim': None,
                         'dict': dict_0,
-                        'exp_params': {'num_iter': (100, 500, 10),
-                          'weight_interm': (0.0, 0.5, 2),
-                          'weight_final': (0.0, 0.5, 2),
-                          'discount_factor': (0.0, 0.2, 5),}})
+                        'exp_params': {'num_iter': (100, 500, 10),}})
     return experiments, global_exp_dir
 
 
