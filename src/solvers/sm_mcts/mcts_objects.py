@@ -484,6 +484,9 @@ class MCTSNode:
         wh = np.array([self.action_xh[agent][action]-xh_max for action in range(self._num_actions[agent])])
         denominator = np.sum(np.exp(eta*wh))
         strategy = [(((1-gamma)*np.exp(eta*wh[action]))/denominator + eta) for action in range(self._num_actions[agent])]
+
+        # update strategy
+        self._policy_exp3[agent] = strategy
         return strategy
 
     
