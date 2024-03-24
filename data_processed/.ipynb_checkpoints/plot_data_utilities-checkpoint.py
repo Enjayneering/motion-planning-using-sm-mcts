@@ -3,9 +3,9 @@ import sys
 import numpy as np
 from matplotlib.patches import Circle, Rectangle
 import matplotlib.pyplot as plt
-from process_data_utilities import *
+#from process_data_utilities import *
 sys.path.append('/home/enjay/0_thesis/01_MCTS/src')
-from utilities.env_utilities import *
+from utilities.environment_utilities import *
 
 
 def plot_config_map(ax, config, result_dict= None, traj_timesteps = None, env_timestep=None, finish_line=None, main_agent=0, game_length=None):

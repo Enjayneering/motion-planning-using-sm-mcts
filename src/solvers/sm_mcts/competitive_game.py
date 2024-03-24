@@ -157,7 +157,6 @@ class CompetitiveGame:
 
             if self.config.feature_flags["run_mode"]["exp"]:
                 result_dict['max_timestep'] = max_timestep
-                result_dict['game_length'] = max_timestep-next_state_obj.timestep
             #max_timestep -= 1
         print("Terminal state: {}".format(current_state_obj.get_state_together()))
         print("Timestep: {}".format(current_state_obj.timestep))

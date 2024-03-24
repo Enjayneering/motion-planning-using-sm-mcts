@@ -69,6 +69,7 @@ def run_test(game_dict):
         print("Finished with duration: {} s".format(duration))
 
 def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment="", input=""):
+    index = 0
     print("Running MCTS in Experimental mode!")
 
     exp_path_level_0 = get_exp_path_level_0(exp_path_level_1, config=game_config, exp_comment=exp_comment, input=input)
@@ -106,8 +107,9 @@ def run_experiment(exp_path_level_1, game_config, timestep_sim=None, exp_comment
         print_file.close()
     
     # COLLECT AND SAVE GLOBAL STATISTICAL DATA
-    save_global_data(exp_path_level_0)
-    save_statistical_data(exp_path_level_0, global_data="global_results.json")
+    save_global_data(str(index)+exp_path_level_0)
+    save_statistical_data(str(index)+exp_path_level_0, global_data="global_results.json")
+    index += 1
 
 
 def plot_trajectory(GamePlanner, result_dict, exp_path, all_timesteps=False):
@@ -152,7 +154,7 @@ if __name__ == "__main__":
 
             if not os.path.exists(os.path.join(path_to_experiment, exp_path_level_1)):
                 os.mkdir(os.path.join(path_to_experiment, exp_path_level_1))
-            create_global_index(os.path.join(path_to_experiment, exp_path_level_1))
+            #create_global_index(os.path.join(path_to_experiment, exp_path_level_1))
             
             exp_start = time.time()
 
