@@ -22,7 +22,7 @@ config_dict = {
     'discount_factor': 1.0,
 
     'weight_interm': 1.0,
-    'weight_final': 0.2,
+    'weight_final': 1.0,
     
     #interm payoffs
     'weight_distance': 0,
@@ -39,9 +39,9 @@ config_dict = {
     'collision_ignorance': 0.5, #[0,1]
     
     'velocity_0': np.linspace(0, 1, 2).tolist(),
-    'ang_velocity_0': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
+    'ang_velocity_0': [0.0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
     'velocity_1': np.linspace(0, 1, 2).tolist(),
-    'ang_velocity_1': [0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
+    'ang_velocity_1': [0.0], #np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
 
     'standard_dev_vel_0': 1,
     'standard_dev_ang_vel_0': 0,
@@ -53,7 +53,7 @@ config_dict = {
         'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
         'collision_handling': {'punishing': True, 'pruning': False},
         'selection_policy': {'uct-decoupled': False, 'regret-matching': False, 'exp3': True},
-        'rollout_policy': {'random-uniform': True, 'random-informed': False},
+        'rollout_policy': {'random-uniform': False, 'random-informed': True},
         'expansion_policy': {'every-child': True, 'random-informed': False},
         'strategy': {'pure': True, 'mixed': False},
     }

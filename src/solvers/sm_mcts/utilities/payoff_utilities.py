@@ -300,8 +300,8 @@ def get_final_payoffs(Game, final_state_obj, discount_factor=1):
         #min_lead_1 = -Game.env.env_centerline[-1][-1]
         #max_lead_0 = Game.env.env_centerline[-1][-1]
         #max_lead_1 = Game.env.env_centerline[-1][-1]
-        min_lead_0 = -Game.env.centerlines[0][-1][-1]
-        min_lead_1 = -Game.env.centerlines[1][-1][-1]
+        min_lead_0 = -Game.env.centerlines[1][-1][-1]
+        min_lead_1 = -Game.env.centerlines[0][-1][-1]
         max_lead_0 = Game.env.centerlines[0][-1][-1]
         max_lead_1 = Game.env.centerlines[1][-1][-1]
 

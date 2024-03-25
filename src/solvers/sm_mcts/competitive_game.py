@@ -1,5 +1,6 @@
 import os
 import time
+import pandas as pd
 
 from .mcts_objects import State, run_mcts
 from .utilities.common_utilities import *
@@ -39,6 +40,7 @@ class CompetitiveGame:
         self.interm_payoff_list_global = []
         self.final_payoff_list_global = []
         self.payoff_data_log = {} # stores all payoff data for each timestep of the horizon
+        self.payoff_data_log["payoff_total"] = []
 
     def _set_model_params(self):
         Model_params = {
@@ -105,27 +107,49 @@ class CompetitiveGame:
         elif self.config.feature_flags["run_mode"]["exp"]:
             # initialize result dictionary
             result_dict = {}
+        
         policy_dict = {}
+        policy_df = pd.DataFrame()
 
         # RUN TRAJECTORY PLANNER
         start_time = time.time()
         max_timestep = self.config.max_timehorizon
+        game_length = max_timestep
 
         while not is_terminal(self, current_state_obj, max_timestep=self.config.max_timehorizon) and (timesteps_sim is None or current_state_obj.timestep < timesteps_sim):
+            game_length = max_timestep-current_state_obj.timestep
+            
             print("Searching game tree in timestep {}...".format(current_state_obj.timestep))
             if self.config.feature_flags["run_mode"]["test"]:
                 csv_init_rollout_last(self)
 
             # RUN SINGLE MCTS ALGORITHM IN CURRENT TIMESTEP
 
-            print("Max timehorizon: {}".format(max_timestep))
+            print("Game length: {}".format(game_length))
                 
             next_state_obj, runtime, policies = run_mcts(self, current_state_obj, max_timestep=max_timestep)
+
+            #### flatten policy data to data frame
+            
+            for agent, policy_dict in policies.items():
+                for action, policy_data in policy_dict.items():
+                    new_row = {}
+                    new_row["agent"] = agent
+                    for key, value in policy_data.items():
+                        new_row[key] = value
+                    # round action and to string
+                    new_row["action"] = str([round(value, 2) for value in new_row["action"]])
+                    row_df = pd.DataFrame(new_row, index=[0])
+                    policy_df = pd.concat([policy_df, row_df], ignore_index=True)
+
+            #print("Policy data: {}".format(policy_df))
+            #print(policy_df["action"].unique())
             
 
             if self.config.feature_flags["run_mode"]["exp"]:
-                result_dict["alphat_eff_gamelength_{}".format(max_timestep)] = max_timestep/get_min_time_to_complete(self, curr_state=current_state_obj.get_state_together())
-                result_dict["runtime_gamelength_{}".format(max_timestep)] = runtime
+                #result_dict["alphat_eff_gamelength_{}".format(max_timestep)] = max_timestep/get_min_time_to_complete(self, curr_state=current_state_obj.get_state_together())
+                result_dict["runtime"] = runtime
+                result_dict["game_length"] = game_length
 
             interm_payoff_sum_incr, interm_payoff_each_incr = get_intermediate_payoffs(self, current_state_obj, next_state_obj)
             self.interm_payoff_list_global.append(interm_payoff_sum_incr)
@@ -142,12 +166,10 @@ class CompetitiveGame:
             print("Total payoff list: {}".format(total_payoff_list))
 
             # Add total payoff to global payoff log
-            if self.payoff_data_log.get("payoff_total") is None:
-                self.payoff_data_log["payoff_total"] = []
             self.payoff_data_log["payoff_total"].append(total_payoff_list)
             
             # Append agents policies at each timestep
-            policy_dict[max_timestep] = policies
+            policy_dict[game_length] = policies
 
             if self.config.feature_flags["run_mode"]["test"]:
                 csv_write_global_state(self, self.global_states[-1])
@@ -155,9 +177,6 @@ class CompetitiveGame:
             self.global_states.append(next_state_obj)
             current_state_obj = next_state_obj
 
-            if self.config.feature_flags["run_mode"]["exp"]:
-                result_dict['max_timestep'] = max_timestep
-            #max_timestep -= 1
         print("Terminal state: {}".format(current_state_obj.get_state_together()))
         print("Timestep: {}".format(current_state_obj.timestep))
     
@@ -194,10 +213,12 @@ class CompetitiveGame:
         elif self.config.feature_flags["run_mode"]["exp"]:
             # COLLECT AND SAVE DATA
             result_dict["winner"] = get_winner(self, self.global_states[-1])
-            result_dict["runtime"] = end_time - start_time
+            result_dict["runtime_selfplay"] = end_time - start_time
             result_dict["T_terminal"] = self.global_states[-1].timestep
             result_dict["trajectory_0"] = [[float(value) for value in state.get_state(agent=0)]+[state.timestep] for state in self.global_states]
             result_dict["trajectory_1"] = [[float(value) for value in state.get_state(agent=1)]+[state.timestep] for state in self.global_states]
             result_dict.update(self.payoff_data_log) # merge dictionaries
-            return result_dict, policy_dict
+
+            #print("Policy data: {}".format(policy_df))
+            return result_dict, policy_df
     

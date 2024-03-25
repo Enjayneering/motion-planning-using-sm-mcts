@@ -14,7 +14,8 @@ def build_experiments():
                         'timestep_sim': None,
                         'dict': dict_0,
                         'exp_params': {'num_iter': (100, 500, 10),
-                                       'gamma_exp3': (0.1, 0.1, 4),}})
+                                       'gamma_exp3': (0.1, 0.1, 4),
+                                       'weight_final': (0.0, 0.1, 11),}})
     return experiments, global_exp_dir
 
 

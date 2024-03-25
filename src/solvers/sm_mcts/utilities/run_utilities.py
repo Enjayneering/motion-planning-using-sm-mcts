@@ -8,11 +8,11 @@ def get_exp_path_level_0(exp_subfolder, config, exp_comment="", input=""):
     #    global_index = int(f.read())
     
     # INITIALIZE FOLDER
-    start_config = "dis" # sym: "symmetric", adv: "advantageous", dis: "disadvantageous" (perspective of Agent 0)
+    #start_config = "dis" # sym: "symmetric", adv: "advantageous", dis: "disadvantageous" (perspective of Agent 0)
     selection = [flag for flag in config.feature_flags["selection_policy"] if config.feature_flags["selection_policy"][flag] == True][0]
     final_move_selection = [flag for flag in config.feature_flags["final_move"] if config.feature_flags["final_move"][flag] == True][0]
     rollout_policy = [flag for flag in config.feature_flags["rollout_policy"] if config.feature_flags["rollout_policy"][flag] == True][0]
-    exp_name = f"{exp_comment}_{input}_{start_config}_{selection}_{final_move_selection}_{rollout_policy}"
+    exp_name = f"{exp_comment}_{input}_{selection}_{final_move_selection}_{rollout_policy}"
 
     exp_filepath = os.path.join(exp_subfolder, exp_name)
 

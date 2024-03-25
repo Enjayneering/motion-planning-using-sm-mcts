@@ -6,7 +6,8 @@ confdict = {
 
         # Payoff Parameters
         'discount_factor': 0.9,
-        'weight_interm': 0.5,
+
+        'weight_interm': 1,
         'weight_final': 1,
         
         'weight_distance': 0,
@@ -30,7 +31,8 @@ confdict = {
 
         # Payoff Parameters
         'discount_factor': 0.9,
-        'weight_interm': 0.5,
+        
+        'weight_interm': 1,
         'weight_final': 1,
         
         'weight_distance': 0,

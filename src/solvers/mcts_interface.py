@@ -1,6 +1,8 @@
 # This interface provides a way to use the MCTS algorithm as a receding horizon controller for a competitive game.
 # It can be called from a supersccript to initialize the game and run the MCTS algorithm.
 import numpy as np
+import pandas as pd
+from pandas import json_normalize 
 
 from .sm_mcts.competitive_game import CompetitiveGame
 from .sm_mcts.utilities.plot_test_utilities import *
@@ -36,7 +38,7 @@ def run_mcts_interface(ix_agent, curr_state, env_conf, agent_conf, model_conf, m
 
         # MCTS Parameters
         'c_param': np.sqrt(2),
-        'k_samples': 1,
+        'k_samples': 1, # not further investigated here
         'num_iter': mcts_conf['num_iter'],
         'gamma_exp3': mcts_conf['gamma_exp3'],
 
@@ -90,9 +92,11 @@ def run_mcts_interface(ix_agent, curr_state, env_conf, agent_conf, model_conf, m
     Game_for_agent = CompetitiveGame(Environment(Config(env_conf)), Config(game_dict), init_state=curr_state)
 
     # Run MCTS
-    result_dict, policy_dict = Game_for_agent.run_game(timestep_sim)
+    result_dict, policy_df = Game_for_agent.run_game(timestep_sim) #timestep sim =1
+
+
     
-    algo_data = {'result_dict': result_dict, 'policy_dict': policy_dict}
+    algo_data = {'result_dict': result_dict, 'policy_df': policy_df}
 
     # Transform back to original perspective
     """if ix_agent == 1:
