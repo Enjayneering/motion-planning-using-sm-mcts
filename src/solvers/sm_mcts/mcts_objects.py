@@ -74,9 +74,12 @@ class MCTSNode:
             self._num_actions = {0: len(self.actions[0]), 1: len(self.actions[1])}
             self.action_num_count = {0: [0] * self._num_actions[0], 1: [0] * self._num_actions[1]}
             self.action_xh = {0: [0] * self._num_actions[0], 1: [0] * self._num_actions[1]}
-            self._policy_exp3 = {0: [1/self._num_actions[0]] * self._num_actions[0], 1: [1/self._num_actions[1]] * self._num_actions[1]}
+            self._policy_exp3 = {
+                0: [0 if self._num_actions[0] == 0 else 1/self._num_actions[0]] * self._num_actions[0],
+                1: [0 if self._num_actions[1] == 0 else 1/self._num_actions[1]] * self._num_actions[1]
+            }
 
-        self._untried_actions = sample_legal_actions(Game, self.state)[-1]
+        self._untried_actions = sample_legal_actions(Game, self.state)[-1] #joint actions stored in [-1]
         self._tried_actions = []
         self._select_policy_stats = {0: {}, 1: {}} # storing nodes {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': self.parent_action[:2]}
         self._aggr_payoffs = [0]*len(Game.Model_params["agents"])
@@ -141,6 +144,7 @@ class MCTSNode:
                     #print("Collision detected from state {} to state {}".format(self.state.get_state_together(), [x0, y0, theta0, x1, y1, theta1, self.state.timestep+Game.Model_params["delta_t"]]))
                 else:
                     break"""
+        
         if Game.config.feature_flags['collision_handling']['punishing']:
             # get configurations of policies for each agent
             policy_0 = next((key for key, value in Game.config.feature_flags['selection_policy'].items() if value), None)
@@ -151,9 +155,10 @@ class MCTSNode:
         selected_action = selected_action_0 + selected_action_1
         #print( "Selected action: {}".format(selected_action))
         if any(selected_action == sublist for sublist in self._tried_actions):
+            # follow action edge to the next child
             child = [child for child in self.children if child.parent_action == selected_action][0]
         else:
-            #expand tree
+            #expand tree if child not yet visited
             child = self.expand(Game, selected_action)
         #print("Selected child: {}".format(child.state.get_state_together()))
         return child
@@ -202,25 +207,29 @@ class MCTSNode:
             self._aggr_payoffs[agent] += float(payoff_list[agent])
 
         # update node stats
-        if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
-            if self._select_policy_stats[0].get(str(fixed_action[:2])): # update parent stats
-                self._select_policy_stats[0][str(fixed_action[:2])]['num_count'] += 1
-                self._select_policy_stats[0][str(fixed_action[:2])]['sum_payoffs'] += float(payoff_list[0])
-                #print("backpropagate agent 0: {}".format(self.parent_action[:2]))
-            else: # create stats
-                self._select_policy_stats[0][str(fixed_action[:2])] = {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': fixed_action[:2]}
-                #self.parent._select_policy_stats[0][str(self.parent_action[:2])]['action'] = self.parent_action[:2]
-                #print("create action stat for agent 0: {}".format(self.parent_action[:2]))
-        if not [self.state.x1, self.state.y1, self.state.theta1, self.state.timestep] in Game.forbidden_states:
-            if  self._select_policy_stats[1].get(str(fixed_action[2:])): # update parent stats
-                self._select_policy_stats[1][str(fixed_action[2:])]['num_count'] += 1
-                self._select_policy_stats[1][str(fixed_action[2:])]['sum_payoffs'] += float(payoff_list[1])
-                #print("backpropagate agent 1: {}".format(self.parent_action[2:]))
-            else: # create stats
-                self._select_policy_stats[1][str(fixed_action[2:])] = {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': fixed_action[2:]}
-                #self.parent._select_policy_stats[1][str(self.parent_action[2:])]['action'] = self.parent_action[2:]
-                #print("create action stat for agent 1: {}".format(self.parent_action[2:]))
+            
+        # Agent 0
+        #if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
+        if self._select_policy_stats[0].get(str(fixed_action[:2])): # update parent stats
+            self._select_policy_stats[0][str(fixed_action[:2])]['num_count'] += 1
+            self._select_policy_stats[0][str(fixed_action[:2])]['sum_payoffs'] += float(payoff_list[0])
+            #print("backpropagate agent 0: {}".format(self.parent_action[:2]))
+        else: # create stats
+            self._select_policy_stats[0][str(fixed_action[:2])] = {'num_count': 1, 'sum_payoffs': float(payoff_list[0]), 'action': fixed_action[:2]}
+            #self.parent._select_policy_stats[0][str(self.parent_action[:2])]['action'] = self.parent_action[:2]
+            #print("create action stat for agent 0: {}".format(self.parent_action[:2]))
+        #if not [self.state.x1, self.state.y1, self.state.theta1, self.state.timestep] in Game.forbidden_states:
         
+        # Agent 1
+        if  self._select_policy_stats[1].get(str(fixed_action[2:])): # update parent stats
+            self._select_policy_stats[1][str(fixed_action[2:])]['num_count'] += 1
+            self._select_policy_stats[1][str(fixed_action[2:])]['sum_payoffs'] += float(payoff_list[1])
+            #print("backpropagate agent 1: {}".format(self.parent_action[2:]))
+        else: # create stats
+            self._select_policy_stats[1][str(fixed_action[2:])] = {'num_count': 1, 'sum_payoffs': float(payoff_list[1]), 'action': fixed_action[2:]}
+            #self.parent._select_policy_stats[1][str(self.parent_action[2:])]['action'] = self.parent_action[2:]
+            #print("create action stat for agent 1: {}".format(self.parent_action[2:]))
+    
         if Game.config.feature_flags['selection_policy']['regret-matching']:
             if not [self.state.x0, self.state.y0, self.state.theta0, self.state.timestep] in Game.forbidden_states:
                 for a in range(self._num_actions[0]):
@@ -251,11 +260,14 @@ class MCTSNode:
                
         
         if self.parent:
-            fixed_action = self.parent_action
-            self.parent.backpropagate(Game, payoff_list, fixed_action)
+            self.parent.backpropagate(Game, payoff_list, self.parent_action)
 
-    def _tree_policy(self, Game, max_timestep=None):
+    def _tree_policy(self, Game, max_timestep):
         current_node = self
+
+        if self.state.get_state(agent=0)+[self.state.timestep] == ([4.0, 3.0, -1.57, 2] or [4.0, 3.0, 1.57, 2]):
+            pass
+
         while not is_terminal(Game, current_node.state, max_timestep = max_timestep):
             #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
             #print("Current node not terminal")
@@ -279,7 +291,7 @@ class MCTSNode:
         #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
         return current_node
     
-    def rollout(self, Game, max_timestep=None):
+    def rollout(self, Game, max_timestep):
         # rollout policy: random action selection
         current_rollout_node = self
 
@@ -289,28 +301,42 @@ class MCTSNode:
         final_payoff_list_sum = []
 
         # intermediate timesteps
-        while not is_terminal(Game, current_rollout_node.state, max_timestep=max_timestep):
+        while not is_terminal(Game, current_rollout_node.state, max_timestep=max_timestep*Game.config.alpha_rollout):
             #print("Rollout State: {}".format(current_rollout_node.state.get_state_together()))
             moves_0, moves_1, possible_moves = sample_legal_actions(Game, current_rollout_node.state)
 
             #print("Moves 0: {}, Moves 1: {}".format(moves_0, moves_1))
             #print("Possible moves: {}".format(possible_moves))
 
+            state_0 = current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep]
+            state_1 = current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep]
+            
             if len(moves_0) == 0 and len(moves_1) == 0:
-                Game.forbidden_states.append(current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep])
-                Game.forbidden_states.append(current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep])
+                # if there are no possible moves for both agents, append current state to forbidden list and break
                 print("Both agents stuck in environment, append current state on forbidden list, break")
+
+                if state_0 not in Game.forbidden_states:
+                    Game.forbidden_states.append(state_0)
+                    print(current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep])
+                if state_1 not in Game.forbidden_states:
+                    Game.forbidden_states.append(state_1)
+                    print(current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep])
+
                 #Todo: check if this is the right way to handle this
                 #accumulated_payoff_list = [0]*len(Game.Model_params["agents"])
                 break
             elif len(moves_0) == 0:
-                Game.forbidden_states.append(current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep])
-                print("Agent 0 stuck in environment, append current state on forbidden list, break")
+                if state_0 not in Game.forbidden_states:
+                    Game.forbidden_states.append(state_0)
+                    print("Agent 0 stuck in environment, append current state on forbidden list, break")
+                    print(current_rollout_node.state.get_state(agent=0)+[current_rollout_node.state.timestep])
                 #accumulated_payoff_list = [0]*len(Game.Model_params["agents"])
                 break
             elif len(moves_1) == 0:
-                Game.forbidden_states.append(current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep])
-                print("Agent 1 stuck in environment, append current state on forbidden list, break")
+                if state_1 not in Game.forbidden_states:
+                    Game.forbidden_states.append(state_1)
+                    print("Agent 1 stuck in environment, append current state on forbidden list, break")
+                    print(current_rollout_node.state.get_state(agent=1)+[current_rollout_node.state.timestep])
                 #accumulated_payoff_list = [0]*len(Game.Model_params["agents"])
                 break
 
@@ -347,7 +373,7 @@ class MCTSNode:
     ####   Helper Functions  ####
     #############################
 
-    def _select_action_max(self, Game, agent = 0):
+    def _select_action_max(self, agent = 0):
         weights = [action_stat["sum_payoffs"]/action_stat['num_count'] for action_stat in self._select_policy_stats[agent].values()]
         action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
         return action_select
@@ -356,8 +382,15 @@ class MCTSNode:
         # main selection policy within the tree
         if policy == 'uct-decoupled':
             weights = [self.calc_UCT(action_stat, Game.MCTS_params['c_param']) for action_stat in self._select_policy_stats[agent].values()]
-            action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
-            #print("Weights: {}".format(weights))
+            
+            # ensure selected action does not lead to a collision
+            while True:
+                action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
+                poss_next_state = list(mm_unicycle(self.state.get_state(agent=agent), action_select, delta_t=Game.config.delta_t)) + [int(self.state.timestep+Game.config.delta_t)]
+                if poss_next_state in Game.forbidden_states:
+                    weights[np.argmax(weights)] = -np.inf
+                else:
+                    break
         elif policy == 'regret-matching':
             strategy = self.get_strategy_rm(agent=agent)
             action_ix =  np.random.choice(range(len(strategy)), p=np.array(strategy)/ np.sum(strategy))
@@ -372,14 +405,27 @@ class MCTSNode:
     
     def _select_action_robust(self, Game, agent = 0):
         weights = [action_stat["num_count"]/self._number_of_visits for action_stat in self._select_policy_stats[agent].values()]
-        print("Actions to choose Agent {}: {}".format(agent, self._select_policy_stats[agent].values()))
-        print("Weights num count: {}".format(weights))
+        #print("Actions to choose Agent {}: {}".format(agent, self._select_policy_stats[agent].values()))
+        #print("Weights num count: {}".format(weights))
+
+
 
         if Game.config.feature_flags['strategy']['pure']:
-            action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action']
+            action_select = list(self._select_policy_stats[agent].values())[np.argmax(weights)]['action'] # select action list with highest number of visits
             return action_select
         elif Game.config.feature_flags['strategy']['mixed']:
-            probabilitic_sample_index = np.random.choice(range(len(weights)), p=np.array(weights)/ np.sum(weights))
+            # Get the indices of the three actions with the highest weights
+            top_three_indices = np.argpartition(weights, -3)[-3:]
+            
+            # Create a new weights array where all weights not in the top three are set to zero
+            new_weights = np.zeros_like(weights)
+            new_weights[top_three_indices] = np.array(weights)[top_three_indices]
+            
+            # Normalize the new weights so they sum to 1
+            new_weights /= np.sum(new_weights)
+            
+            # Sample from the new weights
+            probabilitic_sample_index = np.random.choice(range(len(new_weights)), p=new_weights)
             action_select = list(self._select_policy_stats[agent].values())[probabilitic_sample_index]['action']
             return action_select
 
@@ -389,8 +435,28 @@ class MCTSNode:
             print("Robust child joint: {}".format(child.state.get_state_together()))"""
     
     def _get_action_heuristic(self, Game, current_node, moves_0, moves_1):
+
+        #progress lines
+        progress_0 = Game.env.centerlines[0]
+        progress_1 = Game.env.centerlines[1]
+
+        weights_0 = [get_agent_progress(progress_0, current_node.state.get_state(agent=0), mm_unicycle(current_node.state.get_state(agent=0), action, delta_t=Game.config.delta_t)) for action in moves_0]
+        weights_1 = [get_agent_progress(progress_1, current_node.state.get_state(agent=1), mm_unicycle(current_node.state.get_state(agent=1), action, delta_t=Game.config.delta_t)) for action in moves_1]
+
+        max_weight_0 = np.max(weights_0)
+        max_weight_1 = np.max(weights_1)
+
+        # Get the indices of all actions with the maximum weight
+        max_indices_0 = np.where(weights_0 == max_weight_0)[0]
+        max_indices_1 = np.where(weights_1 == max_weight_1)[0]
+
+        # Randomly select among the actions with the maximum weight
+        action_0 = np.random.choice(moves_0[max_indices_0])
+        action_1 = np.random.choice(moves_1[max_indices_1])
+
         # get closest terminal state and the angle to it
-        if Game.env.finish_line is not None:
+
+        """if Game.env.finish_line is not None:
             terminal_state_0 = [Game.env.finish_line, current_node.state.y0] # [x,y]
             terminal_state_1 = [Game.env.finish_line, current_node.state.y1]
         elif Game.env.goal_state is not None:
@@ -428,7 +494,7 @@ class MCTSNode:
         weights_1 = weights_angle_norm_1 + weights_dist_norm_1
 
         action_0 = moves_0[np.argmin(weights_0)]
-        action_1 = moves_1[np.argmin(weights_1)]
+        action_1 = moves_1[np.argmin(weights_1)]"""
         return action_0, action_1
     
     def _sample_action_informed_random(self, Game, current_node, moves_0, moves_1):
@@ -495,7 +561,7 @@ class MCTSNode:
 ####   MCTS Algorithm    ####
 #############################
     
-def run_mcts(Game, root_state, max_timestep=None):
+def run_mcts(Game, root_state, max_timestep):
     start_time = time.time()
 
     # create Node for local tree search

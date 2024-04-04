@@ -149,8 +149,9 @@ class FigureV0:
         #plot_goal_states(self.ax1, Game.env.goal_state)
 
         # plot centerlines
-        plot_centerline(self.ax1, Game.env.centerlines, agent=0, color='r', alpha=0.5)
-        plot_centerline(self.ax1, Game.env.centerlines, agent=1, color='b', alpha=0.5)
+        
+        #plot_centerline(self.ax1, Game.env.centerlines, agent=0, color='r', alpha=0.5)
+        #plot_centerline(self.ax1, Game.env.centerlines, agent=1, color='b', alpha=0.5)
 
         self.ax1.plot(x0_trajectory, y0_trajectory, "ro-", label='Trajectory Agent 0')
         self.ax1.plot(x1_trajectory, y1_trajectory, "bo-", label='Trajectory Agent 1')
@@ -206,7 +207,7 @@ def plot_together(i, figplot, Game, stop_event, animation_container):
     figplot.clear_ax()
 
     # plot tree and trajectory
-    figplot.visualize_tree()
+    #figplot.visualize_tree()
     figplot.update_trajectory(Game)
 
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(Game.MCTS_params['num_iter']))

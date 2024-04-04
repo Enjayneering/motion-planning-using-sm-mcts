@@ -22,7 +22,8 @@ class CompetitiveGame:
             # init state is list
             self.init_state = init_state
         else:       
-            self.init_state = [self.env.init_state['x0'], self.env.init_state['y0'], self.env.init_state['theta0'], self.env.init_state['x1'], self.env.init_state['y1'], self.env.init_state['theta1']]
+            self.init_state = [self.env.init_state[0], self.env.init_state[1], self.env.init_state[2], self.env.init_state[3], self.env.init_state[4], self.env.init_state[5], 0]
+
         self.terminal_state = [self.env.goal_state['x0'], self.env.goal_state['y0'], self.env.goal_state['theta0'], self.env.goal_state['x1'], self.env.goal_state['y1'], self.env.goal_state['theta1']]
         
         self.name = get_next_game_name(path_to_results, game_config.name)
@@ -31,11 +32,18 @@ class CompetitiveGame:
         self.Model_params = self._set_model_params()
         self.Kinodynamic_params = self._set_kinodynamic_params()
 
-        self.config['max_timehorizon'] = get_max_timehorizon(self)
+        self.config['max_timehorizon'] = get_max_timehorizon(self)+self.init_state[6] # add initial timestep for having absolute timestep
 
         self.goal_state = self._get_goal_state()
         self.forbidden_states = []
-        self.global_states = [self._init_state()] # stores all nodes of the tree, represents the final trajectory
+        self.global_states = [State(x0=self.init_state[0],
+                            y0=self.init_state[1],
+                            theta0=self.init_state[2],
+                            x1=self.init_state[3],
+                            y1=self.init_state[4],
+                            theta1=self.init_state[5],
+                            timestep=self.init_state[6])
+                            ] # stores all nodes of the tree, represents the final trajectory
         
         self.interm_payoff_list_global = []
         self.final_payoff_list_global = []
@@ -78,7 +86,7 @@ class CompetitiveGame:
         }
         return MCTS_params
         
-    def _init_state(self):
+    """def _init_state(self):
         # initialize root node
         initial_state = State(x0=self.init_state[0],
                             y0=self.init_state[1],
@@ -87,7 +95,7 @@ class CompetitiveGame:
                             y1=self.init_state[4],
                             theta1=self.init_state[5],
                             timestep=0)
-        return initial_state
+        return initial_state"""
     
     
     def run_game(self, timesteps_sim=None):
@@ -116,7 +124,7 @@ class CompetitiveGame:
         max_timestep = self.config.max_timehorizon
         game_length = max_timestep
 
-        while not is_terminal(self, current_state_obj, max_timestep=self.config.max_timehorizon) and (timesteps_sim is None or current_state_obj.timestep < timesteps_sim):
+        while not is_terminal(self, current_state_obj, max_timestep=self.config.max_timehorizon) and (timesteps_sim is None or (current_state_obj.timestep-self.global_states[0].timestep) < timesteps_sim):
             game_length = max_timestep-current_state_obj.timestep
             
             print("Searching game tree in timestep {}...".format(current_state_obj.timestep))
@@ -178,7 +186,7 @@ class CompetitiveGame:
             current_state_obj = next_state_obj
 
         print("Terminal state: {}".format(current_state_obj.get_state_together()))
-        print("Timestep: {}".format(current_state_obj.timestep))
+        #print("Timestep: {}".format(current_state_obj.timestep))
     
         if self.config.feature_flags["run_mode"]["test"]:
                 csv_write_global_state(self, self.global_states[-1])
@@ -202,7 +210,7 @@ class CompetitiveGame:
         total_payoff_list = get_total_payoffs(self, self.interm_payoff_list_global, self.final_payoff_list_global)
 
         # Add total payoff to global payoff log
-        self.payoff_data_log["payoff_total"][-1] = total_payoff_list
+        self.payoff_data_log["payoff_total"].append(total_payoff_list)
 
         if self.config.feature_flags["run_mode"]["test"]:
             with open(os.path.join(path_to_results, self.name + ".txt"), 'a') as f:

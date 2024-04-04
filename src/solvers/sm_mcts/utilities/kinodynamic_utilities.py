@@ -11,8 +11,8 @@ def mm_unicycle(state, action, delta_t=1):
     # action = [speed, angular_speed]
     x_new = state[0] + action[0]*np.cos(state[2])*delta_t
     y_new = state[1] + action[0]*np.sin(state[2])*delta_t
-    theta_new = np.fmod((state[2] + action[1]*delta_t), 2*np.pi) # modulo to keep angle between 0 and 2pi
-    return x_new, y_new, theta_new
+    theta_new = np.fmod((state[2] + action[1]*delta_t), np.pi) # modulo to keep angle between 0 and +-pi
+    return round(x_new,1), round(y_new,1), round(theta_new,2)
 
 
 def is_collision(Game, state_0, state_1):
@@ -74,10 +74,11 @@ def is_in_free_space(Game, state, action, init_timestep, num_linesearch = 4):
     #print("no collision")
     return True
 
-def is_in_forbidden_state(Game, state, action, init_timestep):
+def is_in_forbidden_state(Game, state, action, curr_timestep):
     x_next, y_next, theta_next = mm_unicycle(state, action, delta_t=Game.Model_params["delta_t"])
-    time_next = init_timestep+Game.Model_params["delta_t"]
+    time_next = int(curr_timestep+Game.Model_params["delta_t"])
     if [x_next, y_next, theta_next, time_next] in Game.forbidden_states:
+        #print("action in forbidden state: {}".format([x_next, y_next, theta_next, time_next]))
         return True
     else:
         return False

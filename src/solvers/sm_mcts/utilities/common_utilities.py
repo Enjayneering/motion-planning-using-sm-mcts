@@ -34,6 +34,7 @@ def is_terminal(Game, state_obj, max_timestep=None):
                 #print("Terminal state_obj reached")
                 return True
         elif Game.env.centerlines is not None:
+            # if anz agent has reached the end of his progress line
             if agent_has_finished(Game, state_obj, agent=0) or agent_has_finished(Game, state_obj, agent=1):
                 #print("Terminal state_obj reached")
                 #print("state_obj {}: {}".format(state_obj.timestep, state_obj.get_state_obj()))
@@ -47,7 +48,7 @@ def is_terminal(Game, state_obj, max_timestep=None):
 def get_max_timehorizon(Game):
     min_time = get_min_time_to_complete(Game)
 
-    max_game_timehorizon = int(Game.config.alpha_terminal * min_time)
+    max_game_timehorizon = int(Game.config.alpha_terminal * min_time)+1
     #print("Max game timehorizon: {}".format(max_game_timehorizon))
     return max_game_timehorizon
 
@@ -57,15 +58,22 @@ def get_min_time_to_complete(Game, curr_state=None):
     
     if curr_state is None:
             curr_state = Game.init_state
+    
+    centerline_0 = Game.env.centerlines[0]
+    centerline_1 = Game.env.centerlines[1]
+    max_progress_0 = centerline_0[-1][-1]
+    max_progress_1 = centerline_1[-1][-1]
 
-    final_state = Game.terminal_state
+    """final_state = Game.terminal_state
     dist_0 = distance(curr_state[0:2], final_state[0:2])
     dist_1 = distance(curr_state[3:5], final_state[3:5])
     #dist_1 = distance(curr_state[3:5], final_state[3:5])
     max_velocity_0 = np.max(Game.config["velocity_0"])
     max_velocity_1 = np.max(Game.config["velocity_1"])
     min_times.append(dist_0/max_velocity_0)
-    min_times.append(dist_1/max_velocity_1)    
+    min_times.append(dist_1/max_velocity_1)"""
+    min_times.append(max_progress_0/np.max(Game.config["velocity_0"]))
+    min_times.append(max_progress_1/np.max(Game.config["velocity_1"]))
     return min(min_times)
 
 def coll_count(joint_trajectory):

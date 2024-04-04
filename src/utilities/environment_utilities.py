@@ -58,7 +58,7 @@ class Environment:
             occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('F', '1').replace('x', '9')
             lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
             transformed_grid = [list(map(int, line)) for line in lines]
-            occupancy_grid = np.array(transformed_grid)     
+            occupancy_grid = np.array([line for line in transformed_grid if len(line) > 0])   
 
             finish_line = np.where(occupancy_grid == 1)[1] #column value
             return finish_line[0]
@@ -73,7 +73,7 @@ class Environment:
                 occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('S', '0').replace('G','1').replace('+', '9').replace('x', '8')
                 lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
                 transformed_grid = [list(map(int, line)) for line in lines]
-                occupancy_grid = np.array(transformed_grid)  
+                occupancy_grid = np.array([line for line in transformed_grid if len(line) > 0]) 
 
                 centerline = []
 
@@ -106,7 +106,7 @@ class Environment:
             occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('S', '0').replace('G','1').replace('+', '9').replace('x', '8').replace('F', '9')
             lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
             transformed_grid = [list(map(int, line)) for line in lines]
-            occupancy_grid = np.array(transformed_grid)  
+            occupancy_grid = np.array([line for line in transformed_grid if len(line) > 0]) 
 
             centerline = []
 
@@ -133,7 +133,10 @@ class Environment:
         occupancy_grid_define = grid.replace('.', '0').replace('0', '0').replace('1', '0').replace('#', '1').replace('+', '2').replace('O', '0').replace('I', '0').replace('F', '0').replace('x', '0')
         lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
         transformed_grid = [list(map(int, line)) for line in lines]
-        occupancy_grid = np.array(transformed_grid)
+        occupancy_grid = np.array([line for line in transformed_grid if len(line) > 0])
+
+        print(occupancy_grid)
+        print(occupancy_grid.shape)
         return occupancy_grid
     
     def get_current_grid(self, timestep):
@@ -147,6 +150,8 @@ class Environment:
             static_grid = self.get_occupancy_grid(grid)
             min_x = 0
 
+            print("static grid shape:" , static_grid.shape)
+            
             for column in range(static_grid.shape[1]):
                 if any(static_grid[:,min_x] == 0):
                     #print("min progress: {}".format(min_x))
@@ -211,7 +216,7 @@ def get_goal_state(env_raceconfig):
             occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('S', '0').replace('G','1').replace('+', '9').replace('x', '8')
             lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
             transformed_grid = [list(map(int, line)) for line in lines]
-            occupancy_grid = np.array(transformed_grid)     
+            occupancy_grid = np.array([line for line in transformed_grid if len(line) > 0])  
 
             agent_y_goal, agent_x_goal = np.where(occupancy_grid == 1) # single value
 
@@ -237,7 +242,7 @@ def get_init_state(env_raceconfig):
         occupancy_grid_define = grid.replace('.', '9').replace('#', '9').replace('S','0').replace('G', '1').replace('+', '9').replace('x', '8')
         lines = [line.replace(' ', '') for line in occupancy_grid_define.split('\n') if line]
         transformed_grid = [list(map(int, line)) for line in lines]
-        occupancy_grid = np.array(transformed_grid)     
+        occupancy_grid = np.array([line for line in transformed_grid if len(line) > 0]) 
 
         agent_y_init, agent_x_init = np.where(occupancy_grid == 0) # single value
 
