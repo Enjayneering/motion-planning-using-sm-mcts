@@ -150,8 +150,8 @@ class FigureV0:
 
         # plot centerlines
         
-        #plot_centerline(self.ax1, Game.env.centerlines, agent=0, color='r', alpha=0.5)
-        #plot_centerline(self.ax1, Game.env.centerlines, agent=1, color='b', alpha=0.5)
+        plot_centerline(self.ax1, Game.env.centerlines, agent=0, color='r', alpha=0.5)
+        plot_centerline(self.ax1, Game.env.centerlines, agent=1, color='b', alpha=0.5)
 
         self.ax1.plot(x0_trajectory, y0_trajectory, "ro-", label='Trajectory Agent 0')
         self.ax1.plot(x1_trajectory, y1_trajectory, "bo-", label='Trajectory Agent 1')
@@ -186,10 +186,17 @@ def get_last_tree():
             pass
         return tree
 
-def plot_centerline(ax, centerlines, agent=0, color='black', alpha=1):
+def plot_centerline(ax, centerlines, agent=0, color='black', alpha=0.8):
     x_centerline = [c[0] for c in centerlines[agent]]
     y_centerline = [c[1] for c in centerlines[agent]]
-    ax.plot(x_centerline, y_centerline, "x--", color=color, alpha=alpha, label=f'Centerline Agent {agent}', zorder=1)
+    # Plot the centerline
+    for index in range(len(x_centerline)-1):
+        ax.plot([x_centerline[index], x_centerline[index+1]], [y_centerline[index], y_centerline[index+1]], color=color, alpha=alpha, zorder=1, linestyle='--')
+        
+        angle = 270 - np.arctan2(y_centerline[index+1] - y_centerline[index], x_centerline[index+1] - x_centerline[index]) * 180 / np.pi
+        
+        ax.plot(x_centerline[index+1], y_centerline[index+1], marker=(3, 0, angle), markersize=10, linestyle='None', color=color, alpha=alpha)
+
 
 def plot_goal_states(ax, goal_state):
     if goal_state is not None:
@@ -207,7 +214,7 @@ def plot_together(i, figplot, Game, stop_event, animation_container):
     figplot.clear_ax()
 
     # plot tree and trajectory
-    #figplot.visualize_tree()
+    figplot.visualize_tree()
     figplot.update_trajectory(Game)
 
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(Game.MCTS_params['num_iter']))

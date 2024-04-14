@@ -11,7 +11,7 @@ def mm_unicycle(state, action, delta_t=1):
     # action = [speed, angular_speed]
     x_new = state[0] + action[0]*np.cos(state[2])*delta_t
     y_new = state[1] + action[0]*np.sin(state[2])*delta_t
-    theta_new = np.fmod((state[2] + action[1]*delta_t), np.pi) # modulo to keep angle between 0 and +-pi
+    theta_new = np.fmod((state[2] + action[1]*delta_t), 2*np.pi) # modulo to keep angle between 0 and +-pi
     return round(x_new,1), round(y_new,1), round(theta_new,2)
 
 

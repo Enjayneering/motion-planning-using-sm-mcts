@@ -212,8 +212,8 @@ def plot_together(i, figplot, Game, stop_event, animation_container):
     figplot.ax0.set_title("MCTS Tree with {} iterations".format(Game.MCTS_params['num_iter']))
     figplot.ax1.set_title("Trajectory")
     figplot.ax1.legend(loc='lower center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, framealpha=0.5)
-    xmax = max((line.count("#")+line.count(".")) for line in Game.config.env_def[0].split('\n'))
-    ymax = Game.config.env_def[0].count('\n') - 1
+    xmax = Game.env.x_max
+    ymax = Game.env.y_max
     #print("xmax: {}, ymax: {}".format(xmax, ymax))
     figplot.ax1.set_xlim([-0.5, xmax+0.5])
     figplot.ax1.set_ylim([-0.5, ymax+0.5][::-1]) 

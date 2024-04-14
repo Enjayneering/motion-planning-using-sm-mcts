@@ -70,6 +70,7 @@ class MCTSNode:
         # if child node, then add only next determined action to the node
         for agent in [0,1]:
             if not Game.config['predef_traj'][agent]['active']:
+                # if extensive form without predefined trajectory
                 # sample actions from action set
                 self.actions[agent] = sample_legal_actions(Game, self.state)[agent]
             else:
@@ -81,7 +82,15 @@ class MCTSNode:
                         self.traj_chosen[agent] = self.trajectories[agent][0] #pick the first and only trajectory of the list
                         self.actions[agent] = [self.traj_chosen[agent][self.state.timestep]]
                     else:
-                        self.actions[agent] = [sublist[0] for sublist in self.trajectories[agent]]
+                        # if multiple trajectories:
+                        if len(self.trajectories[agent]) > 1 and len(self.trajectories[agent][0]) > 1:
+                            self.actions[agent] = [sublist[0] for sublist in self.trajectories[agent]]
+                        # if only one trajectory and it's not a list
+                        else:
+                            if len(self.trajectories[agent][0]) == 1:
+                                self.actions[agent] = [self.trajectories[agent][0][0]]
+                            else:
+                                self.actions[agent] = [[0.0,0.0]]
                 else:
                     # choose next action from trajectory
                     self.traj_chosen[agent] = self.parent.traj_chosen[agent]
@@ -148,7 +157,11 @@ class MCTSNode:
                 self.traj_chosen[1] = self.trajectories[1][ix_traj]
         else:
             # Delete the specified action from the list
-            self._untried_actions.remove(action)
+            try:
+                self._untried_actions.remove(action)
+            except:
+                print("Exception: ", action)
+                pass
         self._tried_actions.append(action)
         next_state = self.state.move(action, delta_t=Game.Model_params["delta_t"])
         child_node = MCTSNode(Game, next_state, parent=self, parent_action=action)
@@ -408,7 +421,7 @@ class MCTSNode:
                 self.traj_chosen[agent] = self.trajectories[agent][action_ix]
             elif self.traj_chosen[agent] is not None:
                 # if we already have chosen a predefined trajectory
-                action_select = self.traj_chosen[agent][self.state.timestep]
+                action_select = self.traj_chosen[agent][self.state.timestep % len(self.traj_chosen[agent])] # ensure that after exceeding the index, we start from the beginning
         if action_select is None:
             pass
         return action_select

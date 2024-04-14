@@ -63,6 +63,8 @@ def get_min_time_to_complete(Game, curr_state=None):
     centerline_1 = Game.env.centerlines[1]
     max_progress_0 = centerline_0[-1][-1]
     max_progress_1 = centerline_1[-1][-1]
+    agent_0_progress = get_agent_advancement(centerline_0, curr_state[0:3])
+    agent_1_progress = get_agent_advancement(centerline_1, curr_state[3:6])
 
     """final_state = Game.terminal_state
     dist_0 = distance(curr_state[0:2], final_state[0:2])
@@ -72,8 +74,8 @@ def get_min_time_to_complete(Game, curr_state=None):
     max_velocity_1 = np.max(Game.config["velocity_1"])
     min_times.append(dist_0/max_velocity_0)
     min_times.append(dist_1/max_velocity_1)"""
-    min_times.append(max_progress_0/np.max(Game.config["velocity_0"]))
-    min_times.append(max_progress_1/np.max(Game.config["velocity_1"]))
+    min_times.append((max_progress_0-agent_0_progress)/np.max(Game.config["velocity_0"]))
+    min_times.append((max_progress_1-agent_1_progress)/np.max(Game.config["velocity_1"]))
     return min(min_times)
 
 def coll_count(joint_trajectory):

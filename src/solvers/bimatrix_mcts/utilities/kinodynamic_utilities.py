@@ -123,11 +123,16 @@ def sample_legal_actions(Game, state_object):
     return sampled_actions_0_pruned, sampled_actions_1_pruned
 
 def combine_actionsets(actionset_0, actionset_1):
-    # combine both list elements in all possible combinations
-    action_pair = list(itertools.product(actionset_0, actionset_1))
-    actions_seperate = [list(action_pair) for action_pair in action_pair]
-    actions_together = [action_pair[0] + action_pair[1] for action_pair in actions_seperate] # adding both lists to one list
-    #print("Actions together:",actions_together)
+    # Ensure both action sets are lists of lists
+    actionset_0 = [action if isinstance(action, list) else [action] for action in actionset_0]
+    actionset_1 = [action if isinstance(action, list) else [action] for action in actionset_1]
+
+    # Combine both list elements in all possible combinations
+    action_pairs = list(itertools.product(actionset_0, actionset_1))
+
+    # Combine each pair of actions into a single list
+    actions_together = [action_pair[0] + action_pair[1] for action_pair in action_pairs]
+
     return actions_together
 
 

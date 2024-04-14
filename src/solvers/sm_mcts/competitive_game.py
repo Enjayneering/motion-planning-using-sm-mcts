@@ -116,13 +116,12 @@ class CompetitiveGame:
             # initialize result dictionary
             result_dict = {}
         
-        policy_dict = {}
+        #policy_dict = {}
         policy_df = pd.DataFrame()
 
         # RUN TRAJECTORY PLANNER
         start_time = time.time()
         max_timestep = self.config.max_timehorizon
-        game_length = max_timestep
 
         while not is_terminal(self, current_state_obj, max_timestep=self.config.max_timehorizon) and (timesteps_sim is None or (current_state_obj.timestep-self.global_states[0].timestep) < timesteps_sim):
             game_length = max_timestep-current_state_obj.timestep
@@ -177,7 +176,7 @@ class CompetitiveGame:
             self.payoff_data_log["payoff_total"].append(total_payoff_list)
             
             # Append agents policies at each timestep
-            policy_dict[game_length] = policies
+            #policy_dict[game_length] = policies
 
             if self.config.feature_flags["run_mode"]["test"]:
                 csv_write_global_state(self, self.global_states[-1])

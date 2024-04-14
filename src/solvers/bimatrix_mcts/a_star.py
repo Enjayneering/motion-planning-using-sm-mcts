@@ -52,14 +52,14 @@ def compute_heuristics(my_map, goal):
         h_values[loc] = node['cost']
     return h_values
 
-def compute_heuristics_goal_line(grid, goal_x):
+def compute_heuristics_goal_line(grid, goal_x, goal_y):
     height, width = grid.shape
     h_values = dict()
 
     for y in range(height):
         for x in range(width):
-            # Compute the Manhattan distance to the goal line
-            distance = abs(x - goal_x)
+            # Compute the Manhattan distance to the goal
+            distance = abs(x - goal_x) + abs(y - goal_y)
             h_values[(x, y)] = distance
 
     return h_values
@@ -116,19 +116,19 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
     #               any given constraint. For efficiency the constraints are indexed in a constraint_table
     #               by time step, see build_constraint_table.
     collision = False
-    curr_loc = curr_loc[:2]
-    next_loc = next_loc[:2]
+    curr_loc = tuple([int(val) for val in curr_loc[:2]])
+    next_loc = tuple([int(val) for val in next_loc[:2]])
     for index, time in enumerate(constraint_table['timestep']):
-        if next_time == time:
-            """if len(constraint_table['loc'][index]) > 1: # edge constraint
-                if curr_loc == constraint_table['loc'][index] and next_loc == constraint_table['loc'][index]: 
-                        #print("Theres a collision on the edge of {} and {} at timestep {}".format(curr_loc, next_loc, time))    
-                        collision =  True """
+        # current state was already visited
+        if curr_loc == constraint_table['loc'][index]:
+            #print("Theres a collision caused by agent {} at time {} in cell {}".format(constraint_table['agent'][index], time, next_loc))    
+            collision = True
+            break
 
-            if next_loc == constraint_table['loc'][index]: # vertex constraint
-                    #print("Theres a collision caused by agent {} at time {} in cell {}".format(constraint_table['agent'][index], time, next_loc))    
-                    collision = True
-                    break
+        if next_time == time and next_loc == constraint_table['loc'][index]:
+            #print("Theres a collision caused by agent {} at time {} in cell {}".format(constraint_table['agent'][index], time, next_loc))    
+            collision = True
+            break
 
         """if constraint_table['goal_dist'][index] is not None:
             if constraint_table['goal_dist'][index] == 0 and time <= next_time: # constraints after reaching goal
@@ -149,12 +149,12 @@ def pop_node(open_list):
 
 def compare_nodes(n1, n2):
     """Return true is n1 is better than n2."""
-    return n1['g_val'] + n1['h_val'] + n1['d_val'] < n2['g_val'] + n2['h_val'] + n2['d_val']
+    return n1['g_val'] + n1['h_val'] + n1['d_val'] < n2['g_val'] - n2['h_val'] + n2['d_val']
     # only judje by number of timesteps taken
     #return n1['g_val'] < n2['g_val']
 
 
-def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10, action_set=None, delta_t=1, start_timestep=0, scale_dense=1):
+def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10, action_set=None, delta_t=1, start_timestep=0, scale_dense=0):
     """ my_map      - binary obstacle map
         start_loc   - start position
         goal_loc    - goal position
@@ -185,7 +185,7 @@ def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10
 
     
  
-    root = {'loc': start_loc, 'timestep': start_timestep, 'g_val': 0, 'h_val': h_value, 'd_val': density_map[start_loc[:2]], 'parent_action': None, 'parent': None}
+    root = {'loc': start_loc, 'timestep': start_timestep, 'g_val': 0, 'h_val': h_value, 'd_val': density_map[int(start_loc[0]), int(start_loc[1])], 'parent_action': None, 'parent': None}
     push_node(open_list, root)
     closed_list[(root['loc'], root['timestep'])] = root
 
@@ -195,7 +195,7 @@ def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10
         #############################
         
         # Adjust so that we collect best trajectories
-        if curr['loc'][0] >= goal_loc[0]: # if x is greater than goal x
+        if curr['loc'] == goal_loc: # if we reach goal location
             action_path, state_path, time_path = get_path(curr)
             #print('Trajectory found: ', action_path)
             return action_path, state_path, time_path
@@ -238,7 +238,7 @@ def a_star(env, start_loc, goal_loc, h_values, constraints=None, max_iter=10**10
                 else:
                     closed_list[(child_move['loc'], child_move['timestep'])] = child_move # if child is not in closed list, it is added
                     push_node(open_list, child_move) # we have to check for children, so we add it to open list
-    return None  # Failed to find solutions
+    return None, None, None  # Failed to find solutions
 
 
 
@@ -254,7 +254,9 @@ def perpendicular_distance(x, y, m, c):
         return 0  # Vertical line case
     return abs(-m * x + y - c) / np.sqrt(m**2 + 1)
 
-def generate_density_map(size, start, goal, scale=1):
+
+
+def generate_density_map(size, start, goal, scale=0):
     """
     Generates a density map that encourages paths diverging perpendicularly from the straight path.
     

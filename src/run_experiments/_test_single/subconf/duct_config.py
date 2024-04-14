@@ -7,7 +7,7 @@ config_dict = {
     # MCTS Parameters
     'c_param': np.sqrt(2),
     'k_samples': 1,
-    'num_iter': 1000,
+    'num_iter': 3100,
     'gamma_exp3': 0.1,
 
     # Engineering Parameters
@@ -43,7 +43,7 @@ config_dict = {
     'velocity_1': np.linspace(0, 1, 2).tolist(),
     'ang_velocity_1': np.linspace(-np.pi/2, np.pi/2, 3).tolist(),
 
-    'standard_dev_vel_0': 2,
+    'standard_dev_vel_0': 1,
     'standard_dev_ang_vel_0': np.pi/2,
     'standard_dev_vel_1': 1,
     'standard_dev_ang_vel_1':  np.pi/2,
@@ -52,7 +52,7 @@ config_dict = {
         'run_mode': {'test': True, 'exp': False, 'live-plot': True},
         'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
         'collision_handling': {'punishing': True, 'pruning': False},
-        'selection_policy': {'uct-decoupled': False, 'regret-matching': False, 'exp3': True},
+        'selection_policy': {'uct-decoupled': True, 'regret-matching': False, 'exp3': False},
         'rollout_policy': {'random-uniform': False, 'random-informed': True},
         'expansion_policy': {'every-child': True, 'random-informed': False},
         'strategy': {'pure': True, 'mixed': False},

@@ -286,11 +286,11 @@ def get_final_payoffs(Game, final_state_obj, discount_factor=1):
     if Game.config.weight_final_lead > 0:
         #progress_0 = get_env_progress(Game, final_state_obj.get_state(agent=0))
         #progress_1 = get_env_progress(Game, final_state_obj.get_state(agent=1))
-        advancem_0 = get_agent_advancement(Game.env.centerlines[0], final_state_obj.get_state(agent=0))
-        advancem_1 = get_agent_advancement(Game.env.centerlines[1], final_state_obj.get_state(agent=1))
+        progress_0 = get_agent_advancement(Game.env.centerlines[0], final_state_obj.get_state(agent=0))
+        progress_1 = get_agent_advancement(Game.env.centerlines[1], final_state_obj.get_state(agent=1))
         
-        lead_0 = advancem_0-advancem_1
-        lead_1 = advancem_1-advancem_0
+        lead_0 = progress_0-progress_1
+        lead_1 = progress_1-progress_0
 
         weight_lead_0 = Game.config.weight_final_lead
         weight_lead_1 = Game.config.weight_final_lead
@@ -300,10 +300,10 @@ def get_final_payoffs(Game, final_state_obj, discount_factor=1):
         #min_lead_1 = -Game.env.env_centerline[-1][-1]
         #max_lead_0 = Game.env.env_centerline[-1][-1]
         #max_lead_1 = Game.env.env_centerline[-1][-1]
-        min_lead_0 = -Game.env.env_centerline[-1][-1]
-        min_lead_1 = -Game.env.env_centerline[-1][-1]
-        max_lead_0 = Game.env.env_centerline[-1][-1]
-        max_lead_1 = Game.env.env_centerline[-1][-1]
+        min_lead_0 = -Game.env.centerlines[1][-1][-1]
+        min_lead_1 = -Game.env.centerlines[0][-1][-1]
+        max_lead_0 = Game.env.centerlines[0][-1][-1]
+        max_lead_1 = Game.env.centerlines[1][-1][-1]
 
         # payoff calculation
         lead_payoff_0 = (lead_0-min_lead_0)/(max_lead_0-min_lead_0)

@@ -4,10 +4,13 @@ from .kinodynamic_utilities import *
 
 import numpy as np
 
-def get_intermediate_payoffs(Game, prev_state_obj, next_state_obj, discount_factor=1):
+def get_intermediate_payoffs(Game, prev_state_obj, next_state_obj, discount_factor=1, start_timestep=0):
     #print("prev_state_obj: {}".format(prev_state_obj.get_state_together()))
     #print("next_state_obj: {}".format(next_state_obj.get_state_together()))
-    discount = discount_factor**prev_state_obj.timestep
+    discount = discount_factor**(prev_state_obj.timestep-start_timestep) # to ensure that the discount factor is applied correctly
+    
+    #discount = 1
+    
     epsilon = 1e-10  # small constant to prevent division by zero
     
     weights_0 = {}
@@ -237,9 +240,10 @@ def get_intermediate_payoffs(Game, prev_state_obj, next_state_obj, discount_fact
 
     return interm_payoffs_sum, interm_payoffs_each
 
-def get_final_payoffs(Game, final_state_obj, discount_factor=1):
+def get_final_payoffs(Game, final_state_obj, discount_factor=1, start_timestep=0):
     
-    discount = discount_factor**final_state_obj.timestep
+    discount = discount_factor**(final_state_obj.timestep-start_timestep) # to ensure that the discount factor is applied correctly
+    #discount = 1
     
     # WEIGHTING FINAL VALUES
     epsilon = 1e-10  # small constant to prevent division by zero

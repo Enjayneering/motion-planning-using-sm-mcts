@@ -291,7 +291,7 @@ class MCTSNode:
         #print("Tree policy current node: {}".format(current_node.state.get_state_together()))
         return current_node
     
-    def rollout(self, Game, max_timestep):
+    def rollout(self, Game, max_timestep, start_timestep):
         # rollout policy: random action selection
         current_rollout_node = self
 
@@ -350,7 +350,7 @@ class MCTSNode:
             next_rollout_node = MCTSNode(Game, next_rollout_state, parent=current_rollout_node, parent_action=action)
 
             # updating intermediate payoffs
-            intermediate_payoff_sum_incr, intermediate_payoff_each_incr = get_intermediate_payoffs(Game, current_rollout_node.state, next_rollout_node.state, discount_factor=Game.config.discount_factor)
+            intermediate_payoff_sum_incr, intermediate_payoff_each_incr = get_intermediate_payoffs(Game, current_rollout_node.state, next_rollout_node.state, discount_factor=Game.config.discount_factor, start_timestep=start_timestep)
             interm_payoff_list_sum.append(intermediate_payoff_sum_incr)
 
             current_rollout_node = next_rollout_node
@@ -359,7 +359,7 @@ class MCTSNode:
         # updating final payoffs
             
         if is_terminal(Game, current_rollout_node.state, max_timestep=max_timestep):
-            final_payoff_sum_incr, final_payoff_each_incr = get_final_payoffs(Game, current_rollout_node.state, discount_factor=Game.config.discount_factor)
+            final_payoff_sum_incr, final_payoff_each_incr = get_final_payoffs(Game, current_rollout_node.state, discount_factor=Game.config.discount_factor, start_timestep=start_timestep)
             final_payoff_list_sum.append(final_payoff_sum_incr)
 
         #print("Interm Payoff List Sum: {}".format(interm_payoff_list_sum))
@@ -451,8 +451,10 @@ class MCTSNode:
         max_indices_1 = np.where(weights_1 == max_weight_1)[0]
 
         # Randomly select among the actions with the maximum weight
-        action_0 = np.random.choice(moves_0[max_indices_0])
-        action_1 = np.random.choice(moves_1[max_indices_1])
+        action_0 = moves_0[random.choice(max_indices_0)]
+        action_1 = moves_1[random.choice(max_indices_1)]
+        #action_0 = np.random.choice(moves_0[max_indices_0])
+        #action_1 = np.random.choice(moves_1[max_indices_1])
 
         # get closest terminal state and the angle to it
 
@@ -573,6 +575,7 @@ def run_mcts(Game, root_state, max_timestep):
                         theta1=root_state.theta1,
                         timestep=0)"""
     current_node = MCTSNode(Game=Game, state=root_state)
+    start_timestep = root_state.timestep
     
     # TREE POLICY
     for iter in range(int(Game.MCTS_params['num_iter'])):
@@ -583,7 +586,7 @@ def run_mcts(Game, root_state, max_timestep):
         rollout_traj_accum = []
         payoff_accum = [0]*len(Game.Model_params["agents"])
         for k in range(Game.config.k_samples):
-            rollout_trajectory, rollout_payoff_list = walking_node.rollout(Game, max_timestep=max_timestep)
+            rollout_trajectory, rollout_payoff_list = walking_node.rollout(Game, max_timestep=max_timestep, start_timestep=start_timestep)
             payoff_accum = [x + y for x, y in zip(payoff_accum, rollout_payoff_list)]
             
             # write every x rollout trajectories
