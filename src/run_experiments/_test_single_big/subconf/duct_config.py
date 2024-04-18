@@ -43,9 +43,9 @@ config_dict = {
     'velocity_1': np.linspace(0, 2, 3).tolist(),
     'ang_velocity_1': np.linspace(-np.pi/2, np.pi/2, 10).tolist(),
 
-    'standard_dev_vel_0': 1,
+    'standard_dev_vel_0': 2,
     'standard_dev_ang_vel_0': np.pi/2,
-    'standard_dev_vel_1': 1,
+    'standard_dev_vel_1': 2,
     'standard_dev_ang_vel_1':  np.pi/2,
 
     'feature_flags': {

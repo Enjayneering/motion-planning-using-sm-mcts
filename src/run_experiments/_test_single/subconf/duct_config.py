@@ -49,7 +49,7 @@ config_dict = {
     'standard_dev_ang_vel_1':  np.pi/2,
 
     'feature_flags': {
-        'run_mode': {'test': True, 'exp': False, 'live-plot': True},
+        'run_mode': {'test': True, 'exp': False, 'live-plot': False},
         'final_move': {'robust-joint': False, 'robust-separate': True, 'max': False},
         'collision_handling': {'punishing': True, 'pruning': False},
         'selection_policy': {'uct-decoupled': True, 'regret-matching': False, 'exp3': False},

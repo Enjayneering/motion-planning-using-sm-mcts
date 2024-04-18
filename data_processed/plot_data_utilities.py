@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 from matplotlib.patches import Circle, Rectangle
+from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import pandas as pd
 import ast
@@ -78,12 +79,19 @@ def plot_visits_map(ax, config, result_file_path, env_timestep=None):
         position_counts = pd.Series(positions).value_counts().reset_index()
         position_counts.columns = ['position', 'count']
         position_counts[['x', 'y']] = pd.DataFrame(position_counts['position'].tolist(), index=position_counts.index)
+
         
         #print(position_counts)
 
         # Plot the visited positions for this agent
         ax.scatter(position_counts['x'], position_counts['y'], 
                    s=position_counts['count'] * 100, alpha=0.6, edgecolors=colors[agent], facecolors=colors[agent], label=f'Agent {agent}')
+        
+        legend_elements = [Line2D([0], [0], marker='o', color='w', label='Frequency of visits Agent 0', markerfacecolor=colors[0], markersize=10),
+                        Line2D([0], [0], marker='o', color='w', label='Frequency of visits Agent 1', markerfacecolor=colors[1], markersize=10)]
+
+        ax.legend(handles=legend_elements)
+    
         
     # PLOT COLLISIONS
     def extract_collision_positions(data):
@@ -124,7 +132,7 @@ def plot_visits_map(ax, config, result_file_path, env_timestep=None):
                     s=200, c='red', edgecolor=colormap['darkred'], facecolor=colormap['darkred'], label='Collisions' if i == 0 else "", zorder=101)
             ax.text(row['x'], row['y'], str(row['count']), color='black', ha='center', va='center', zorder=101) 
 
-    ax.set_title('Visited Positions of Agents in 10 runs and occuring collisions')
+    ax.set_title('Visited positions in 10 simulations')
     ax.set_xlabel('X Coordinate')
     ax.set_ylabel('Y Coordinate')
 

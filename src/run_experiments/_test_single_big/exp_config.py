@@ -1,6 +1,6 @@
 from subconf import default_config, duct_config
 from subconf.config_utilities import copy_new_dict
-from environments import curve as env
+from environments import track2 as env
 
 # SETTING EXPERIMENT UP
 def build_experiments():

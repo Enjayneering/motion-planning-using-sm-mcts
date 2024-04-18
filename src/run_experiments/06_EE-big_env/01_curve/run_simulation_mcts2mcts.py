@@ -123,4 +123,7 @@ def run_simulation_mcts2mcts(sim_name, experiment, num_simulations):
 
 
 if __name__ == '__main__':
-    run_simulation_mcts2mcts(sim_name = "02_EE-EE", experiment = exp_config, num_simulations = 10)
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
+    parent_dir = os.path.abspath(os.path.join(curr_dir, os.pardir))
+    parent_dir_foldername = os.path.basename(parent_dir)
+    run_simulation_mcts2mcts(sim_name = parent_dir_foldername, experiment = exp_config, num_simulations = 10)

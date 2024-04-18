@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 curr_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Load the image
-image_path = os.path.join(curr_dir, 'track1.png')
+image_path = os.path.join(curr_dir, 'track2.png')
 image = Image.open(image_path)
 
 # Resize the image to 2000x2000
