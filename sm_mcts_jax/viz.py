@@ -1,0 +1,106 @@
+"""Matplotlib visualization: static plots and animations of episodes."""
+
+from __future__ import annotations
+
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import animation
+from matplotlib.patches import Circle
+
+from .environment import GridWorld
+from .planner import Trajectory
+
+_COLORS = plt.cm.tab10.colors
+
+
+def _draw_map(ax, env: GridWorld):
+    occ = np.asarray(env.occupancy, dtype=float)
+    height, width = occ.shape
+    ax.imshow(
+        occ,
+        cmap="gray_r",
+        origin="lower",
+        extent=(-0.5, width - 0.5, -0.5, height - 0.5),
+        vmin=0.0,
+        vmax=1.4,
+    )
+    ax.set_xlim(-0.5, width - 0.5)
+    ax.set_ylim(-0.5, height - 0.5)
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+
+def plot_trajectory(env: GridWorld, traj: Trajectory, path: str | None = None):
+    """Static overview: full paths of all agents."""
+    fig, ax = plt.subplots(figsize=(7, 7))
+    _draw_map(ax, env)
+    goals = np.asarray(env.goals)
+    for i in range(env.n_agents):
+        color = _COLORS[i % len(_COLORS)]
+        xy = traj.states[:, i, :2]
+        ax.plot(xy[:, 0], xy[:, 1], "-o", color=color, markersize=3,
+                linewidth=1.5, label=f"agent {i}")
+        ax.plot(*xy[0], "s", color=color, markersize=10)
+        ax.plot(*goals[i], "*", color=color, markersize=16,
+                markeredgecolor="black")
+    ax.legend(loc="upper right", fontsize=8)
+    ax.set_title(traj.summary(), fontsize=9)
+    fig.tight_layout()
+    if path:
+        fig.savefig(path, dpi=130)
+        plt.close(fig)
+    return fig
+
+
+def animate_trajectory(env: GridWorld, traj: Trajectory, path: str,
+                       fps: int = 4, agent_radius: float | None = None):
+    """Render the episode as a GIF (or MP4 if ffmpeg is available)."""
+    fig, ax = plt.subplots(figsize=(7, 7))
+    _draw_map(ax, env)
+    goals = np.asarray(env.goals)
+    radius = agent_radius or float(env.collision_radius) / 2.0
+
+    bodies, headings, trails = [], [], []
+    for i in range(env.n_agents):
+        color = _COLORS[i % len(_COLORS)]
+        ax.plot(*goals[i], "*", color=color, markersize=16,
+                markeredgecolor="black", zorder=3)
+        body = Circle(traj.states[0, i, :2], radius, color=color,
+                      alpha=0.9, zorder=4)
+        ax.add_patch(body)
+        (heading,) = ax.plot([], [], "-", color="black", linewidth=1.5, zorder=5)
+        (trail,) = ax.plot([], [], "--", color=color, linewidth=1.2,
+                           alpha=0.7, zorder=2)
+        bodies.append(body)
+        headings.append(heading)
+        trails.append(trail)
+    title = ax.set_title("", fontsize=10)
+
+    def update(t):
+        for i in range(env.n_agents):
+            x, y, th = traj.states[t, i]
+            bodies[i].center = (x, y)
+            headings[i].set_data(
+                [x, x + radius * np.cos(th)], [y, y + radius * np.sin(th)]
+            )
+            trails[i].set_data(traj.states[: t + 1, i, 0],
+                               traj.states[: t + 1, i, 1])
+        title.set_text(f"t = {t} / {traj.states.shape[0] - 1}")
+        return bodies + headings + trails + [title]
+
+    anim = animation.FuncAnimation(
+        fig, update, frames=traj.states.shape[0], blit=False
+    )
+    writer = (
+        animation.FFMpegWriter(fps=fps)
+        if path.endswith(".mp4")
+        else animation.PillowWriter(fps=fps)
+    )
+    anim.save(path, writer=writer)
+    plt.close(fig)
+    return path
