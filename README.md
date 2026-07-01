@@ -143,6 +143,39 @@ supported by passing a per-agent action array (`actions[n_agents, n_actions, 2]`
 to `build_world`. Agents that reach their goal stop and stay there
 ("start–stop" tasks); the episode ends when everyone has arrived.
 
+## Centralized vs. decentralized planning
+
+`Planner` runs **one** search that recommends the full joint action — a
+central coordinator, useful as an upper-bound baseline. The scientifically
+interesting mode is `DecentralizedPlanner`: **every agent runs its own
+independent search** from the same observed state (own RNG stream, batched
+into one XLA call via `vmap`), simulates the others inside its tree, and
+executes only its *own* action component. Coordination is not imposed — it
+has to emerge from the agents solving the same game.
+
+```python
+from sm_mcts_jax import DecentralizedPlanner
+
+planner = DecentralizedPlanner(env, MCTSParams(num_simulations=512))
+traj = planner.run_episode(max_steps=40)
+print(traj.summary())                  # includes prediction consistency
+print(traj.predictions.shape)          # [T, n, n]: i's expectation of j
+```
+
+`traj.prediction_consistency` measures how often agent i's search correctly
+anticipated agent j's executed action — direct evidence of equilibrium
+agreement (0.67–0.73 in our scenarios, against a 1/6 uniform baseline).
+
+`examples/experiment_decentralized.py` runs the full comparison (20 seeds x
+2 modes x 3 scenarios, Wilson CIs, Fisher exact tests). Headline result:
+decentralized planning matches the centralized coordinator's 100% success
+rate on all three scenarios at a small coordination cost (~+0.7 steps per
+episode); one episode in 60 showed a transient both-dodge-the-same-way
+conflict that replanning resolved within three steps
+(`docs/media/head_on_conflict.gif`). See `docs/THEORY.md` for what can and
+cannot be proven about collision- and deadlock-freedom, and how to phrase
+the empirical claims.
+
 ## Measured performance (this repo's CI-class CPU, 2 agents, 36 joint actions)
 
 | simulations | plan step | rate |
@@ -159,14 +192,17 @@ XLA program, so there is no Python overhead in the loop.
 
 ```
 sm_mcts_jax/
-  dynamics.py      unicycle model + discrete action sets
-  environment.py   grid worlds, ASCII parser, vectorized free-space checks
-  rewards.py       per-agent transition payoffs (progress/collision/goal)
-  mcts.py          array-based decoupled-UCT SM-MCTS (single jitted search)
-  planner.py       receding-horizon loop + episode recording
-  viz.py           static plots and GIF/MP4 animations
-examples/          runnable scenarios + benchmark
-tests/             unit + closed-loop integration tests (pytest)
+  dynamics.py        unicycle model + discrete action sets
+  environment.py     grid worlds, ASCII parser, dynamic frames, free-space
+                     checks, time-expanded steps-to-goal fields
+  rewards.py         per-agent transition payoffs (progress/collision/goal)
+  mcts.py            array-based decoupled-UCT SM-MCTS (single jitted search)
+  planner.py         centralized receding-horizon loop + episode recording
+  decentralized.py   one independent search per agent + consistency metrics
+  viz.py             static plots and GIF/MP4 animations
+examples/            runnable scenarios, benchmark, statistical experiment
+tests/               unit + closed-loop integration tests (pytest)
+docs/THEORY.md       provable vs. empirical claims (collisions, deadlocks)
 ```
 
 ## Limitations / research directions
