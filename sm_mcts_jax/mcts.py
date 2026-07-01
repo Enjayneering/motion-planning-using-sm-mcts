@@ -37,12 +37,19 @@ from .environment import (
     GridWorld,
     goal_potential,
     legal_action_mask,
-    segment_is_free,
     step_world,
 )
 from .rewards import RewardParams, transition_rewards
+from .safety import safe_action_mask
 
 UNVISITED = jnp.int32(-1)
+
+
+def _action_mask(env, params, states, reached, t):
+    """Obstacle mask, or the provably collision-free mask when enabled."""
+    if params.safety_filter:
+        return safe_action_mask(env, states, reached, t)
+    return legal_action_mask(env, states, t)
 
 
 @dataclass(frozen=True)
@@ -56,6 +63,8 @@ class MCTSParams:
     c_uct: float = 1.4           # UCT exploration constant
     discount: float = 0.95       # payoff discount per timestep
     rollout_temperature: float = 0.5  # Gumbel noise scale of the rollout policy
+    safety_filter: bool = False  # provably collision-free action masking
+                                 # (maximin filter, see docs/SAFETY.md)
 
     @property
     def max_nodes(self) -> int:
@@ -127,7 +136,9 @@ def _init_tree(env: GridWorld, params: MCTSParams, root_state, root_reached,
     return tree._replace(
         states=tree.states.at[0].set(root_state),
         reached=tree.reached.at[0].set(root_reached),
-        legal=tree.legal.at[0].set(legal_action_mask(env, root_state, root_time)),
+        legal=tree.legal.at[0].set(
+            _action_mask(env, params, root_state, root_reached, root_time)
+        ),
     )
 
 
@@ -201,7 +212,7 @@ def _expand(env, params, reward_params, tree: Tree, parent, joint_action,
         action_from_parent=tree.action_from_parent.at[idx].set(joint_action),
         children=tree.children.at[parent, joint_action].set(idx),
         legal=tree.legal.at[idx].set(
-            legal_action_mask(env, next_states, child_time)
+            _action_mask(env, params, next_states, next_reached, child_time)
         ),
         reward_to_node=tree.reward_to_node.at[idx].set(reward),
         num_nodes=tree.num_nodes + 1,
@@ -213,8 +224,7 @@ def _rollout_policy_step(env: GridWorld, params: MCTSParams, states, reached,
                          t, rng):
     """Goal-directed stochastic policy: Gumbel-perturbed greedy progress."""
     next_all = unicycle_step(states[:, None, :], env.actions, env.dt)  # [n, A, 3]
-    p0 = jnp.broadcast_to(states[:, None, :2], next_all[..., :2].shape)
-    legal = segment_is_free(env, p0, next_all[..., :2], t)             # [n, A]
+    legal = _action_mask(env, params, states, reached, t)              # [n, A]
 
     # steps-to-goal progress per candidate action (departure vs. arrival)
     phi_now = goal_potential(env, states, t)[:, None]                  # [n, 1]

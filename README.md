@@ -176,6 +176,37 @@ conflict that replanning resolved within three steps
 cannot be proven about collision- and deadlock-freedom, and how to phrase
 the empirical claims.
 
+## Provably collision-free mode: the safety filter
+
+```python
+planner = DecentralizedPlanner(env, MCTSParams(num_simulations=512,
+                                               safety_filter=True))
+```
+
+With `safety_filter=True` the search may only pick actions from a
+**maximin-filtered set**: an action must (1) keep clear of every other
+agent's current position and (2) be collision-free against *every*
+filtered action of higher-priority agents. Under mild assumptions (mutual
+initial separation, a stop action, common observability — see
+`docs/SAFETY.md` for the exact statement and the one-page proof) this
+guarantees:
+
+- **No agent–agent collision, ever** — by induction, independent of search
+  quality, simulation budget, or whether planning is centralized or
+  decentralized. Zero is exact, not statistical.
+- **No agent is ever left without a safe action** — standing still always
+  survives the filter (Lemma 1), so the filter itself cannot cause a
+  stuck state.
+
+What it does *not* guarantee is liveness (arrival); that remains with the
+search and the stochastic symmetry breaking (docs/THEORY.md). The cost of
+the guarantee is mild conservatism (convoys keep a one-cell headway;
+~1–3 extra steps per episode) and roughly 2x planning time. The theorem is
+also checked mechanically: `tests/test_safety.py` enumerates the entire
+product of filtered action sets in an adversarial configuration and
+asserts the simulator's collision check never fires.
+`examples/experiment_safety.py` measures the end-to-end effect.
+
 ## Measured performance (this repo's CI-class CPU, 2 agents, 36 joint actions)
 
 | simulations | plan step | rate |

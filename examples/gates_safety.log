@@ -1,0 +1,4 @@
+gates filter_off seed=0: steps=26 all_reached=True collisions=0 avg_plan_time=1126.6ms (0.9 plans/s) consistency=0.57
+gates filter_off seed=1: steps=22 all_reached=True collisions=0 avg_plan_time=1005.5ms (1.0 plans/s) consistency=0.69
+gates filter_off seed=2: steps=30 all_reached=True collisions=0 avg_plan_time=1241.8ms (0.8 plans/s) consistency=0.63
+gates filter_off seed=3: steps=22 all_reached=True collisions=0 avg_plan_time=1127.4ms (0.9 plans/s) consistency=0.74

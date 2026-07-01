@@ -88,6 +88,9 @@ class DecentralizedPlanner:
         self.mcts_params = mcts_params or MCTSParams()
         self.reward_params = reward_params or RewardParams()
         self._rng = jax.random.PRNGKey(seed)
+        if self.mcts_params.safety_filter:
+            from .safety import check_initial_separation
+            check_initial_separation(env)
         self._search_all = jax.jit(
             jax.vmap(
                 partial(search, env, self.mcts_params, self.reward_params),

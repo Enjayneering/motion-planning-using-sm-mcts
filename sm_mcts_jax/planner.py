@@ -67,6 +67,9 @@ class Planner:
         self.mcts_params = mcts_params or MCTSParams()
         self.reward_params = reward_params or RewardParams()
         self._rng = jax.random.PRNGKey(seed)
+        if self.mcts_params.safety_filter:
+            from .safety import check_initial_separation
+            check_initial_separation(env)
 
     def _next_key(self) -> jax.Array:
         self._rng, key = jax.random.split(self._rng)
