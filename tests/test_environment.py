@@ -21,7 +21,7 @@ INTERSECTION = """
 def test_ascii_parsing():
     env = ascii_world(INTERSECTION)
     assert env.n_agents == 2
-    assert env.occupancy.shape == (5, 5)
+    assert env.occupancy.shape == (1, 5, 5)  # [n_frames, H, W]
     # agent 0: left -> right along the middle row (y = 2)
     assert np.allclose(np.asarray(env.starts)[0, :2], [0.0, 2.0])
     assert np.allclose(np.asarray(env.goals)[0], [4.0, 2.0])
@@ -56,6 +56,37 @@ def test_legal_mask_blocks_walls():
     # driving forward into the wall is illegal (actions with v=1)
     forward = np.asarray(env.actions[0][:, 0]) > 0
     assert not mask[0, forward].any()
+
+
+def test_dynamic_world_frames():
+    open_frame = """
+        #####
+        #0.a#
+        #...#
+        #1.b#
+        #####
+    """
+    closed_frame = """
+        #####
+        #.#.#
+        #.#.#
+        #.#.#
+        #####
+    """
+    env = ascii_world([open_frame, closed_frame], frame_duration=2, cycle=True)
+    assert env.n_frames == 2
+    # frames alternate every 2 timesteps: open, open, closed, closed, open...
+    mid = jnp.array([[2.0, 2.0]])
+    assert bool(points_are_free(env, mid, t=0)[0])
+    assert bool(points_are_free(env, mid, t=1)[0])
+    assert not bool(points_are_free(env, mid, t=2)[0])
+    assert not bool(points_are_free(env, mid, t=3)[0])
+    assert bool(points_are_free(env, mid, t=4)[0])
+    # the legal mask must anticipate the closing wall
+    states = jnp.array([[1.0, 2.0, 0.0], [1.0, 1.0, 0.0]])
+    mask_open = np.asarray(legal_action_mask(env, states, t=0))
+    mask_closed = np.asarray(legal_action_mask(env, states, t=2))
+    assert mask_open[0].sum() > mask_closed[0].sum()
 
 
 def test_reached_agents_freeze():

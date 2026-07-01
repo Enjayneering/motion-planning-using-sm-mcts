@@ -17,10 +17,17 @@ from .planner import Trajectory
 _COLORS = plt.cm.tab10.colors
 
 
-def _draw_map(ax, env: GridWorld):
-    occ = np.asarray(env.occupancy, dtype=float)
+def _frame_at(env: GridWorld, t: int) -> np.ndarray:
+    occ = np.asarray(env.occupancy, dtype=float)  # [T, H, W]
+    idx = t // int(env.frame_duration)
+    idx = idx % occ.shape[0] if bool(env.cycle) else min(idx, occ.shape[0] - 1)
+    return occ[idx]
+
+
+def _draw_map(ax, env: GridWorld, t: int = 0):
+    occ = _frame_at(env, t)
     height, width = occ.shape
-    ax.imshow(
+    image = ax.imshow(
         occ,
         cmap="gray_r",
         origin="lower",
@@ -33,6 +40,7 @@ def _draw_map(ax, env: GridWorld):
     ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
+    return image
 
 
 def plot_trajectory(env: GridWorld, traj: Trajectory, path: str | None = None):
@@ -61,7 +69,7 @@ def animate_trajectory(env: GridWorld, traj: Trajectory, path: str,
                        fps: int = 4, agent_radius: float | None = None):
     """Render the episode as a GIF (or MP4 if ffmpeg is available)."""
     fig, ax = plt.subplots(figsize=(7, 7))
-    _draw_map(ax, env)
+    map_image = _draw_map(ax, env)
     goals = np.asarray(env.goals)
     radius = agent_radius or float(env.collision_radius) / 2.0
 
@@ -82,6 +90,7 @@ def animate_trajectory(env: GridWorld, traj: Trajectory, path: str,
     title = ax.set_title("", fontsize=10)
 
     def update(t):
+        map_image.set_data(_frame_at(env, t))
         for i in range(env.n_agents):
             x, y, th = traj.states[t, i]
             bodies[i].center = (x, y)

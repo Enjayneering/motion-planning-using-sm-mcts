@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 import jax.numpy as jnp
 
-from .environment import GridWorld, agents_collide, goal_distances
+from .environment import GridWorld, agents_collide, goal_potential
 
 
 @dataclass(frozen=True)
@@ -30,15 +30,20 @@ def transition_rewards(
     next_states: jnp.ndarray,   # [n_agents, 3]
     prev_reached: jnp.ndarray,  # [n_agents] bool
     next_reached: jnp.ndarray,  # [n_agents] bool
+    t_next=0,                   # world timestep at which next_states holds
 ) -> jnp.ndarray:
     """Reward vector [n_agents] for one joint transition."""
     v_max = jnp.max(jnp.abs(env.actions[..., 0]), axis=-1)  # [n_agents]
     max_step = jnp.maximum(v_max * env.dt, 1e-6)
 
-    # progress towards the own goal, normalized to [-1, 1] per step
+    # progress in time-expanded steps-to-goal, roughly [-1, 1] per step;
+    # departure and arrival potential are taken at their own timesteps, so
+    # waiting for a scheduled opening counts as progress
     progress = (
-        goal_distances(env, prev_states) - goal_distances(env, next_states)
+        goal_potential(env, prev_states, t_next - 1)
+        - goal_potential(env, next_states, t_next)
     ) / max_step
+    progress = jnp.clip(progress, -2.0, 2.0)  # robust to field jumps
 
     # hard collision along the swept transition
     collided = agents_collide(env, prev_states, next_states)

@@ -81,16 +81,17 @@ class Planner:
             self.reward_params,
             self.env.starts,
             jnp.zeros((self.env.n_agents,), bool),
+            jnp.int32(0),
             self._next_key(),
         )
         jax.block_until_ready(result.action_idx)
         return time.perf_counter() - t0
 
-    def plan(self, states: jnp.ndarray, reached: jnp.ndarray):
-        """One SM-MCTS search from the given joint state."""
+    def plan(self, states: jnp.ndarray, reached: jnp.ndarray, t: int = 0):
+        """One SM-MCTS search from the given joint state at world time t."""
         result = search(
             self.env, self.mcts_params, self.reward_params, states, reached,
-            self._next_key(),
+            jnp.int32(t), self._next_key(),
         )
         jax.block_until_ready(result.action_idx)
         return result
@@ -111,7 +112,7 @@ class Planner:
                 break
 
             t0 = time.perf_counter()
-            result = self.plan(states, reached)
+            result = self.plan(states, reached, t=step)
             plan_time = time.perf_counter() - t0
 
             next_states, next_reached = step_world(

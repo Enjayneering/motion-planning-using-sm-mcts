@@ -35,7 +35,7 @@ import jax.numpy as jnp
 from .dynamics import unicycle_step
 from .environment import (
     GridWorld,
-    goal_distances,
+    goal_potential,
     legal_action_mask,
     segment_is_free,
     step_world,
@@ -105,7 +105,8 @@ def decode_joint(joint_idx: jnp.ndarray, n_agents: int, n_actions: int) -> jnp.n
 # Search building blocks
 # ---------------------------------------------------------------------------
 
-def _init_tree(env: GridWorld, params: MCTSParams, root_state, root_reached) -> Tree:
+def _init_tree(env: GridWorld, params: MCTSParams, root_state, root_reached,
+               root_time) -> Tree:
     n_agents, n_actions = env.actions.shape[0], env.actions.shape[1]
     n_joint = n_actions ** n_agents
     N = params.max_nodes
@@ -126,7 +127,7 @@ def _init_tree(env: GridWorld, params: MCTSParams, root_state, root_reached) -> 
     return tree._replace(
         states=tree.states.at[0].set(root_state),
         reached=tree.reached.at[0].set(root_reached),
-        legal=tree.legal.at[0].set(legal_action_mask(env, root_state)),
+        legal=tree.legal.at[0].set(legal_action_mask(env, root_state, root_time)),
     )
 
 
@@ -179,15 +180,18 @@ def _select(env, params, tree: Tree, rng):
     return node, ja, child
 
 
-def _expand(env, params, reward_params, tree: Tree, parent, joint_action):
+def _expand(env, params, reward_params, tree: Tree, parent, joint_action,
+            root_time):
     """Materialize the child of (parent, joint_action) as a new node."""
     idx = tree.num_nodes
     action_idx = decode_joint(joint_action, env.n_agents, env.n_actions)
     prev_states = tree.states[parent]
     prev_reached = tree.reached[parent]
     next_states, next_reached = step_world(env, prev_states, prev_reached, action_idx)
+    child_time = root_time + tree.depth[parent] + 1
     reward = transition_rewards(
-        env, reward_params, prev_states, next_states, prev_reached, next_reached
+        env, reward_params, prev_states, next_states, prev_reached, next_reached,
+        child_time,
     )
     tree = tree._replace(
         states=tree.states.at[idx].set(next_states),
@@ -196,25 +200,28 @@ def _expand(env, params, reward_params, tree: Tree, parent, joint_action):
         parent=tree.parent.at[idx].set(parent),
         action_from_parent=tree.action_from_parent.at[idx].set(joint_action),
         children=tree.children.at[parent, joint_action].set(idx),
-        legal=tree.legal.at[idx].set(legal_action_mask(env, next_states)),
+        legal=tree.legal.at[idx].set(
+            legal_action_mask(env, next_states, child_time)
+        ),
         reward_to_node=tree.reward_to_node.at[idx].set(reward),
         num_nodes=tree.num_nodes + 1,
     )
     return tree, idx
 
 
-def _rollout_policy_step(env: GridWorld, params: MCTSParams, states, reached, rng):
+def _rollout_policy_step(env: GridWorld, params: MCTSParams, states, reached,
+                         t, rng):
     """Goal-directed stochastic policy: Gumbel-perturbed greedy progress."""
     next_all = unicycle_step(states[:, None, :], env.actions, env.dt)  # [n, A, 3]
     p0 = jnp.broadcast_to(states[:, None, :2], next_all[..., :2].shape)
-    legal = segment_is_free(env, p0, next_all[..., :2])                # [n, A]
+    legal = segment_is_free(env, p0, next_all[..., :2], t)             # [n, A]
 
-    dist_now = goal_distances(env, states)[:, None]                    # [n, 1]
-    dist_next = jnp.linalg.norm(
-        next_all[..., :2] - env.goals[:, None, :], axis=-1
-    )                                                                  # [n, A]
+    # steps-to-goal progress per candidate action (departure vs. arrival)
+    phi_now = goal_potential(env, states, t)[:, None]                  # [n, 1]
+    phi_next = goal_potential(env, next_all.swapaxes(0, 1), t + 1).T   # [n, A]
     v_max = jnp.max(jnp.abs(env.actions[..., 0]), axis=-1, keepdims=True)
-    progress = (dist_now - dist_next) / jnp.maximum(v_max * env.dt, 1e-6)
+    progress = (phi_now - phi_next) / jnp.maximum(v_max * env.dt, 1e-6)
+    progress = jnp.clip(progress, -2.0, 2.0)
 
     gumbel = jax.random.gumbel(rng, progress.shape)
     score = progress + params.rollout_temperature * gumbel
@@ -223,21 +230,22 @@ def _rollout_policy_step(env: GridWorld, params: MCTSParams, states, reached, rn
     return jnp.where(reached, env.null_action, action_idx)
 
 
-def _rollout(env, params, reward_params, states, reached, rng) -> jnp.ndarray:
+def _rollout(env, params, reward_params, states, reached, t0, rng) -> jnp.ndarray:
     """Simulate `rollout_depth` steps; returns discounted per-agent payoff."""
 
     def step(carry, rng):
-        states, reached, disc = carry
-        action_idx = _rollout_policy_step(env, params, states, reached, rng)
+        states, reached, t, disc = carry
+        action_idx = _rollout_policy_step(env, params, states, reached, t, rng)
         next_states, next_reached = step_world(env, states, reached, action_idx)
         reward = transition_rewards(
-            env, reward_params, states, next_states, reached, next_reached
+            env, reward_params, states, next_states, reached, next_reached, t + 1
         )
-        carry = (next_states, next_reached, disc * params.discount)
+        carry = (next_states, next_reached, t + 1, disc * params.discount)
         return carry, disc * reward
 
     keys = jax.random.split(rng, params.rollout_depth)
-    _, rewards = jax.lax.scan(step, (states, reached, jnp.float32(1.0)), keys)
+    init = (states, reached, jnp.asarray(t0, jnp.int32), jnp.float32(1.0))
+    _, rewards = jax.lax.scan(step, init, keys)
     return jnp.sum(rewards, axis=0)  # [n_agents]
 
 
@@ -279,10 +287,12 @@ def search(
     reward_params: RewardParams,
     root_state: jnp.ndarray,    # [n_agents, 3]
     root_reached: jnp.ndarray,  # [n_agents] bool
+    root_time: jnp.ndarray,     # scalar int, world timestep of the root
     rng: jax.Array,
 ) -> SearchResult:
     """Run one full SM-MCTS search and pick per-agent robust actions."""
-    tree = _init_tree(env, params, root_state, root_reached)
+    root_time = jnp.asarray(root_time, jnp.int32)
+    tree = _init_tree(env, params, root_state, root_reached, root_time)
 
     def one_simulation(_, carry):
         tree, rng = carry
@@ -293,15 +303,19 @@ def search(
 
         tree, leaf = jax.lax.cond(
             expand_needed,
-            lambda t: _expand(env, params, reward_params, t, node, joint_action),
+            lambda t: _expand(
+                env, params, reward_params, t, node, joint_action, root_time
+            ),
             lambda t: (t, jnp.where(child == UNVISITED, node, child)),
             tree,
         )
 
+        leaf_time = root_time + tree.depth[leaf]
         rollout_keys = jax.random.split(k_rollout, params.k_rollouts)
         returns = jax.vmap(
             lambda k: _rollout(
-                env, params, reward_params, tree.states[leaf], tree.reached[leaf], k
+                env, params, reward_params,
+                tree.states[leaf], tree.reached[leaf], leaf_time, k,
             )
         )(rollout_keys)
         value = jnp.mean(returns, axis=0)

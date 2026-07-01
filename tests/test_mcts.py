@@ -32,7 +32,7 @@ def test_search_returns_legal_actions():
     env = ascii_world(INTERSECTION)
     result = search(
         env, SMALL_PARAMS, RewardParams(), env.starts,
-        jnp.zeros((env.n_agents,), bool), jax.random.PRNGKey(0),
+        jnp.zeros((env.n_agents,), bool), jnp.int32(0), jax.random.PRNGKey(0),
     )
     assert result.action_idx.shape == (env.n_agents,)
     legal = np.asarray(

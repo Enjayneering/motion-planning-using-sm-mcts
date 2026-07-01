@@ -15,13 +15,17 @@ closed-loop planning** and **N agents** instead of two.
 | hardware | CPU only | CPU / GPU / TPU without code changes |
 
 <p align="center">
-  <img src="docs/media/intersection.gif" width="330" alt="two agents crossing an intersection"/>
-  <img src="docs/media/four_agents.gif" width="330" alt="four agents swapping positions"/>
+  <img src="docs/media/intersection.gif" width="270" alt="two agents crossing an intersection"/>
+  <img src="docs/media/four_agents.gif" width="270" alt="four agents swapping positions"/>
+  <img src="docs/media/dynamic_gates.gif" width="270" alt="four agents crossing alternating gates"/>
 </p>
 
 Left: two agents negotiating a narrow intersection — the search converges to
-an equilibrium where one agent yields. Right: four agents swapping positions
-around a central obstacle, collision-free at ~15 planning steps per second on CPU.
+an equilibrium where one agent yields. Middle: four agents swapping positions
+around a central obstacle, collision-free at ~15 planning steps per second on
+CPU. Right: a **dynamic environment** — four agents crossing a wall whose two
+gates open and close on a schedule; the planner times its crossings to the
+gate windows.
 
 ## How it works
 
@@ -50,6 +54,13 @@ What makes it real-time is the implementation, not a different algorithm
   `lax.scan` + `vmap` for batched rollouts).
 - Collision checks (agent–agent swept-segment tests and occupancy-grid line
   search) are fully vectorized.
+
+Payoffs and rollouts are guided by a **time-expanded steps-to-goal field**
+per agent: a reverse BFS over (time, cell, heading) with the discrete
+unicycle action set, computed once at world construction. It replaces the
+original centerline-progress heuristic, cannot trap agents in local minima
+behind walls, accounts for turn steps, and — in dynamic environments —
+correctly values *waiting for a scheduled opening* as progress.
 
 ## Installation
 
@@ -81,12 +92,23 @@ print(traj.summary())                  # steps, collisions, ms per plan step
 animate_trajectory(env, traj, "demo.gif")
 ```
 
+Dynamic environments are a list of ASCII frames (the first one defines
+starts and goals); each frame is active for `frame_duration` timesteps and
+the schedule repeats with `cycle=True`:
+
+```python
+env = ascii_world([gate_left_open, gate_right_open], frame_duration=4, cycle=True)
+```
+
 Or run the ready-made scenarios:
 
 ```bash
-python examples/intersection.py   # 2 agents, narrow crossing
-python examples/four_agents.py    # 4 agents, obstacle avoidance
-python examples/benchmark.py      # latency table for several budgets
+python examples/intersection.py       # 2 agents, narrow crossing
+python examples/head_on_corridor.py   # 2 agents, symmetric head-on encounter
+python examples/bottleneck.py         # 2 agents, single shared gap
+python examples/four_agents.py        # 4 agents, obstacle avoidance
+python examples/dynamic_gates.py      # 4 agents, alternating gates (dynamic env)
+python examples/benchmark.py          # latency table for several budgets
 ```
 
 ## Configuration
@@ -155,8 +177,9 @@ tests/             unit + closed-loop integration tests (pytest)
 - Selection policy is decoupled UCT; the original repo's Exp3 and
   regret-matching variants are natural extensions (all statistics are
   already stored decoupled per agent).
-- Static environments only (no closing doors yet) — time-indexed occupancy
-  grids fit the array layout naturally.
+- Dynamic environments must follow a periodic (or eventually constant)
+  schedule known in advance; unpredictably moving obstacles would need
+  replanning-only handling.
 - Tree reuse between planning steps (warm starts) is not implemented;
   each step searches from scratch.
 
