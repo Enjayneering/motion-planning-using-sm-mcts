@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SM-MCTS Live — Interaktive Multi-Agenten-Planung</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <h1>Emergente sichere Koordination durch interaktive Suche</h1>
+  <p class="sub">Simultaneous-Move MCTS als Echtzeit-Planer für dezentrale
+  Fahrzeugflotten — erlebbar im Simulator, austauschbar über eine
+  versionierte Planner-Schnittstelle.</p>
+</header>
+
+<section class="explainer">
+  <details open>
+    <summary>Forschungshypothesen &amp; Annahmen (Fachpublikum)</summary>
+    <div class="cols">
+      <div>
+        <h3>Die Kernwette</h3>
+        <p><b>Vereinfachung ist der Mechanismus, nicht der Kompromiss:</b>
+        Grobe Diskretisierung (Aktionen, Grid, Zeit) macht tiefe
+        <i>interaktive</i> Suche (Decoupled-UCT SM-MCTS, ein einziger
+        XLA-Call) in Echtzeit bezahlbar; eine feinere taktische Ebene
+        (hier: Pure-Pursuit-Regler auf Ackermann-Kinematik) holt die
+        Präzision zurück. Ein Suchprinzip, teleskopiert über
+        Zeithorizonte — im Gegensatz zu „predict-then-plan"-Stacks, deren
+        taktische Ebenen andere Agenten als ballistische Hindernisse
+        behandeln (→ Frozen-Robot-Problem).</p>
+        <h3>Hypothesen</h3>
+        <ul>
+          <li><b>RQ1</b> Interaktive Suche auf vereinfachten Welten ist
+          echtzeitfähig <i>(bestätigt: ms-Bereich/Replan auf CPU)</i></li>
+          <li><b>RQ2</b> Unabhängige Planer koordinieren sich, wenn
+          Commitments beobachtbar sind — Timing allein genügt nicht
+          <i>(experimentell gestützt)</i></li>
+          <li><b>RQ3</b> Sicherheit ist ein Dial: beweisbare Maximin-Hülle
+          ↔ emergente Sicherheit aus Vorhersage + Replan-Frequenz</li>
+          <li><b>RQ4</b> Strategisch-grob + taktisch-fein desselben
+          interaktiven Prinzips schlägt Einzelauflösung
+          <i>(diese Seite ist der erste Prüfstand)</i></li>
+          <li><b>RQ5</b> Ziel-/Payoff-Inferenz für nicht-konforme Agenten
+          (Menschen) <i>(hier bewusst primitiv: Heading-Projektion)</i></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Annahmen dieser Demo</h3>
+        <ul>
+          <li>Alle KI-Fahrzeuge planen mit demselben SM-MCTS
+          (aktuell: eine gemeinsame Suche, entkoppelte Statistiken);
+          Payoffs sind gemeinsames Wissen.</li>
+          <li>Der Mensch wird als <i>strategischer Agent</i> mitsimuliert —
+          sein Ziel wird aus der Fahrtrichtung geschätzt (RQ5-Platzhalter),
+          nicht als Hindernis extrapoliert.</li>
+          <li>Kollisionvermeidung über Payoffs (Soft); die beweisbare
+          harte Hülle (docs/SAFETY.md) ist per Konfiguration zuschaltbar.</li>
+          <li>Planer-Grid 2 m, Replan alle 0,8 s; Regler 20 Hz —
+          die Zahlen im HUD sind echte Rechenzeiten dieser Maschine.</li>
+        </ul>
+        <h3>Schnittstelle</h3>
+        <p>Simulation ↔ Planer kommunizieren ausschließlich über
+        <code>PlannerAdapter</code> (Szenario rein, Wegpunkt-Routen raus,
+        Zeitbudget, Fehlerisolation) — der Algorithmus ist austauschbar,
+        ohne die Umgebung anzufassen. Details: <code>docs/SIM_INTERFACE.md</code>.</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<section class="sim">
+  <div class="toolbar">
+    <div class="modes">
+      <button data-mode="build" class="active">🏗️ Bauen</button>
+      <button data-mode="agents">🤖 KI-Autos</button>
+      <button data-mode="human">🧑 Mein Auto</button>
+      <button id="btn-run">▶ Start</button>
+      <button id="btn-clear" title="Karte leeren">🗑</button>
+      <button id="btn-demo" title="Demo-Szenario laden">✨ Demo</button>
+    </div>
+    <div id="panel-build" class="panel">
+      <span class="hint">Klick platziert · R dreht · Rechtsklick löscht</span>
+      <button data-item="road" class="item active">🛣 Straße</button>
+      <button data-item="tree" class="item">🌳 Baum</button>
+      <button data-item="house" class="item">🏠 Haus</button>
+      <button data-item="wall" class="item">🧱 Mauer</button>
+      <button data-item="parked_car" class="item">🚙 Parkendes Auto</button>
+    </div>
+    <div id="panel-agents" class="panel hidden">
+      <span class="hint" id="agent-hint">„+ KI-Auto“, dann Start und Ziel klicken</span>
+      <button id="btn-add-agent">+ KI-Auto</button>
+      <label>Verhalten
+        <select id="sel-behavior">
+          <option value="cautious">vorsichtig</option>
+          <option value="normal" selected>normal</option>
+          <option value="aggressive">aggressiv</option>
+        </select>
+      </label>
+      <label>Tempo <input id="rng-speed" type="range" min="3" max="10"
+        step="0.5" value="6"> <span id="lbl-speed">6&nbsp;m/s</span></label>
+      <span id="agent-chips"></span>
+    </div>
+    <div id="panel-human" class="panel hidden">
+      <span class="hint">Klick platziert dich · zweiter Klick setzt die
+      Blickrichtung · Fahren mit WASD/Pfeilen</span>
+      <button id="btn-remove-human">Mein Auto entfernen</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <canvas id="world" width="960" height="600"></canvas>
+    <div id="hud" class="hud"></div>
+  </div>
+  <div id="status" class="status">Baue eine Welt, setze Autos, drücke Start.</div>
+</section>
+
+<footer>
+  <p>Forschungscode: <code>sm_mcts_jax</code> (JAX, ein XLA-Call pro
+  Replan) · Fahrzeuge: kinematisches Einspurmodell (Ackermann) ·
+  Vision &amp; Beweise: docs/VISION.md, SAFETY.md, THEORY.md, ASYNC.md</p>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

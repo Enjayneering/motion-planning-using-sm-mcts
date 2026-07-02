@@ -19,9 +19,13 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=7"]
 cuda = ["jax[cuda12]>=0.4.30"]
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 
 [tool.setuptools.packages.find]
-include = ["sm_mcts_jax*"]
+include = ["sm_mcts_jax*", "sm_mcts_web*"]
+
+[tool.setuptools.package-data]
+sm_mcts_web = ["static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

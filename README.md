@@ -236,6 +236,31 @@ random (jittered) clocks are the worst variant in discrete time. Full
 analysis and the refined thesis — asynchrony helps iff commitments are
 observable — in `docs/ASYNC.md`.
 
+## Interactive web simulation (continuous world, Ackermann cars)
+
+```bash
+pip install -e ".[web]"
+python -m sm_mcts_web          # -> http://localhost:8008
+```
+
+A Sims-style scenario editor in the browser: build a world from a catalog
+(roads, trees, houses, walls, parked cars), click start and goal positions
+for AI cars, pick per-car behavior (cautious/normal/aggressive), place
+*yourself* in a car and drive with WASD while the AI negotiates around
+you. Underneath, the discrete SM-MCTS planner replans in real time on a
+rasterized 2 m grid (strategic layer) and a pure-pursuit controller tracks
+the committed waypoints with kinematic Ackermann vehicles at 20 Hz
+(tactical layer) — the first built instance of the multi-horizon
+architecture (RQ4, docs/VISION.md). Human-driven cars enter the game as
+strategic agents with a heading-projected goal estimate (the deliberately
+primitive RQ5 placeholder).
+
+The environment talks to the planner exclusively through a **versioned,
+algorithm-agnostic interface** (`PlannerAdapter`: scenario in, metric
+waypoint routes out, time-budgeted, exception-isolated) so the research
+object stays swappable — see `docs/SIM_INTERFACE.md`. The research framing
+behind all of this is `docs/VISION.md`.
+
 ## Measured performance (this repo's CI-class CPU, 2 agents, 36 joint actions)
 
 | simulations | plan step | rate |

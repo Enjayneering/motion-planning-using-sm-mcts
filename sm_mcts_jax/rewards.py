@@ -16,11 +16,15 @@ from .environment import GridWorld, agents_collide, goal_potential
 
 @dataclass(frozen=True)
 class RewardParams:
-    weight_progress: float = 1.0    # reward for moving towards the own goal
-    weight_collision: float = 4.0   # penalty for violating the collision radius
-    weight_proximity: float = 0.5   # soft penalty for getting close to others
-    weight_goal: float = 3.0        # one-time bonus for reaching the goal
-    weight_time: float = 0.05       # per-step cost while not at the goal
+    """Payoff weights. Each weight is either a scalar (shared by all agents)
+    or a tuple with one entry per agent — heterogeneous "personalities"
+    (cautious/aggressive) while staying hashable/static for the jit."""
+
+    weight_progress: float | tuple = 1.0   # moving towards the own goal
+    weight_collision: float | tuple = 4.0  # violating the collision radius
+    weight_proximity: float | tuple = 0.5  # soft penalty for closeness
+    weight_goal: float | tuple = 3.0       # one-time bonus at the goal
+    weight_time: float | tuple = 0.05      # per-step cost until arrival
 
 
 def transition_rewards(
@@ -58,11 +62,12 @@ def transition_rewards(
     arrived_now = next_reached & ~prev_reached
     active = ~prev_reached  # frozen agents collect no further payoff
 
+    w = lambda value: jnp.asarray(value, dtype=jnp.float32)  # scalar or [n]
     reward = (
-        params.weight_progress * progress
-        - params.weight_collision * collided.astype(jnp.float32)
-        - params.weight_proximity * proximity
-        + params.weight_goal * arrived_now.astype(jnp.float32)
-        - params.weight_time
+        w(params.weight_progress) * progress
+        - w(params.weight_collision) * collided.astype(jnp.float32)
+        - w(params.weight_proximity) * proximity
+        + w(params.weight_goal) * arrived_now.astype(jnp.float32)
+        - w(params.weight_time)
     )
     return jnp.where(active, reward, 0.0)
