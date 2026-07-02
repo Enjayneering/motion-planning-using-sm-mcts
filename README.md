@@ -199,9 +199,14 @@ guarantees:
   stuck state.
 
 What it does *not* guarantee is liveness (arrival); that remains with the
-search and the stochastic symmetry breaking (docs/THEORY.md). The cost of
-the guarantee is mild conservatism (convoys keep a one-cell headway;
-~1–3 extra steps per episode) and roughly 2x planning time. The theorem is
+search and the stochastic symmetry breaking (docs/THEORY.md). The measured
+cost of the guarantee is roughly 2x planning time — and, perhaps
+surprisingly, *no* extra steps: in all three benchmark scenarios the
+filtered episodes were slightly **shorter** (e.g. head-on 9.4 vs. 10.1
+steps) with **higher** prediction consistency (0.74–0.77 vs. 0.67–0.73),
+because pruning the conflicting branches also simplifies equilibrium
+selection. The structural conservatism (convoys keep a one-cell headway)
+would only show in tighter maps. The theorem is
 also checked mechanically: `tests/test_safety.py` enumerates the entire
 product of filtered action sets in an adversarial configuration and
 asserts the simulator's collision check never fires.

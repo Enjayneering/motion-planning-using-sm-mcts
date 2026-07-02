@@ -106,9 +106,14 @@ precise about them:
   that argument only has to carry liveness, no longer safety).
 - **Conservatism.** Condition (1) forbids moving into a cell that another
   agent is *currently* occupying, even if that agent is about to leave it.
-  Convoys therefore keep a one-cell headway, and tight swaps cost an extra
-  step or two. This is the price of one-step worst-case reasoning; the
-  experiments quantify it (≈ 1–3 extra steps per episode).
+  Convoys therefore keep a one-cell headway, and tight swaps can cost an
+  extra step. Empirically this cost did not materialize in the three
+  benchmark scenarios — filtered episodes were slightly *shorter* (head-on
+  9.4 vs. 10.1 steps, bottleneck 14.3 vs. 15.8, gates 23.0 vs. 24.5) with
+  higher prediction consistency, because removing the conflicting branches
+  also removes the coordination ambiguity the searches otherwise have to
+  resolve. Expect the headway cost to appear in narrower maps (single-lane
+  convoys). Planning time roughly doubles.
 
 ## Where this sits in the literature
 
