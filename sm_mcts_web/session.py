@@ -218,4 +218,12 @@ class SimSession:
                 "all_ai_reached": self.stats.all_ai_reached,
                 "planner_ready": self._reset_done,
             },
+            "debug": self._safe_debug_info(),
         }
+
+    def _safe_debug_info(self) -> dict:
+        try:
+            return self.adapter.debug_info() or {}
+        except Exception:
+            logger.exception("debug_info failed")
+            return {}

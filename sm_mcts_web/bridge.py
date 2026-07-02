@@ -88,6 +88,65 @@ def rasterize(scenario: ScenarioSpec, resolution: float,
     return occ
 
 
+class GoalInference:
+    """Bayesian goal inference for non-conforming agents (humans) — RQ5.
+
+    Candidate goals are K landmark cells spread over the free space
+    (farthest-point sampling). The likelihood is noisy-rational: observed
+    motion that reduces the time-expanded steps-to-goal of candidate g by
+    Δφ steps is exp(beta·Δφ) more likely under g. A forgetting factor lets
+    the posterior track changing intent. The MAP candidate (when confident
+    enough) becomes the human's assumed goal inside the game.
+    """
+
+    def __init__(self, occ: np.ndarray, n_candidates: int = 12,
+                 beta: float = 0.9, forget: float = 0.9):
+        self.beta = beta
+        self.forget = forget
+        free = np.argwhere(~occ)                      # [(row, col)]
+        if len(free) == 0:
+            raise ValueError("no free cells for goal candidates")
+        k = min(n_candidates, len(free))
+        picks = [free[0]]                             # farthest-point sampling
+        dists = np.linalg.norm(free - free[0], axis=1)
+        for _ in range(k - 1):
+            picks.append(free[int(np.argmax(dists))])
+            dists = np.minimum(
+                dists, np.linalg.norm(free - picks[-1], axis=1)
+            )
+        self.candidates = [(int(c), int(r)) for r, c in picks]  # (col, row)
+        self.fields = np.stack([
+            _time_expanded_field(occ[None], 1, True, (c, r))
+            for c, r in self.candidates
+        ])                                            # [K, 1, H, W, 4]
+        self.log_w = np.zeros(len(self.candidates))
+        self._last_state = None                       # (col, row, heading)
+
+    def _phi(self, k: int, cell) -> float:
+        col, row, heading = cell
+        return float(self.fields[k, 0, row, col, heading])
+
+    def observe(self, cell) -> None:
+        """cell = (col, row, heading_index) of the observed agent."""
+        if self._last_state is not None and cell != self._last_state:
+            for k in range(len(self.candidates)):
+                delta = self._phi(k, self._last_state) - self._phi(k, cell)
+                self.log_w[k] = self.forget * self.log_w[k] \
+                    + self.beta * np.clip(delta, -6.0, 6.0)
+            self.log_w -= self.log_w.max()            # normalize for stability
+        self._last_state = cell
+
+    def posterior(self) -> np.ndarray:
+        w = np.exp(self.log_w)
+        return w / w.sum()
+
+    def map_goal(self):
+        """-> ((col, row), probability) of the most likely candidate."""
+        p = self.posterior()
+        k = int(np.argmax(p))
+        return self.candidates[k], float(p[k])
+
+
 def nearest_free_cell(occ: np.ndarray, col: int, row: int) -> tuple:
     """BFS to the closest unblocked cell (col, row)."""
     height, width = occ.shape
@@ -170,6 +229,8 @@ class SMMCTSAdapter(PlannerAdapter):
             collision_radius=min(1.9, 2.0 * max_radius / self._res),
         )
         self._human_goal_cells = {i: tuple(goals[i]) for i in self._human_ix}
+        self._inference = {i: GoalInference(self._occ) for i in self._human_ix}
+        self._beliefs = {}
         self._rng = jax.random.PRNGKey(self._seed)
         self._steps = 0
         # trigger JIT compilation so the first live replan is fast
@@ -186,11 +247,31 @@ class SMMCTSAdapter(PlannerAdapter):
         return result
 
     def _estimate_human_goal(self, index: int, state) -> tuple:
-        """Project the human's heading ahead and snap to a free cell — the
-        deliberately primitive intent model (RQ5 placeholder)."""
-        col = state.x / self._res + math.cos(state.theta) * _HUMAN_LOOKAHEAD_CELLS
-        row = state.y / self._res + math.sin(state.theta) * _HUMAN_LOOKAHEAD_CELLS
-        return nearest_free_cell(self._occ, round(col), round(row))
+        """Bayesian goal inference over landmark candidates (RQ5); falls
+        back to heading projection while the posterior is still flat."""
+        agent_id = self._agents[index].id
+        quarter = math.pi / 2
+        col, row = nearest_free_cell(
+            self._occ, round(state.x / self._res), round(state.y / self._res)
+        )
+        heading = int(round(state.theta / quarter)) % 4
+        inference = self._inference[index]
+        inference.observe((col, row, heading))
+        goal, prob = inference.map_goal()
+        confident = prob >= 1.5 / len(inference.candidates)
+        if not confident:
+            fx = state.x / self._res + math.cos(state.theta) * _HUMAN_LOOKAHEAD_CELLS
+            fy = state.y / self._res + math.sin(state.theta) * _HUMAN_LOOKAHEAD_CELLS
+            goal = nearest_free_cell(self._occ, round(fx), round(fy))
+        self._beliefs[agent_id] = {
+            "goal_m": [goal[0] * self._res, goal[1] * self._res],
+            "p": round(prob, 3),
+            "source": "bayes" if confident else "heading",
+        }
+        return goal
+
+    def debug_info(self) -> dict:
+        return {"beliefs": self._beliefs}
 
     def _update_human_goals(self, snapshot: WorldSnapshot) -> None:
         """Swap in new assumed goals; only the changed agents' distance

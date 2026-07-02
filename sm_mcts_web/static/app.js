@@ -190,6 +190,27 @@ function render() {
   // goals
   state.agents.forEach(a => drawFlag(a.goal[0], a.goal[1], a.color));
 
+  // inferred human goal (Bayesian belief of the planner, RQ5)
+  if (state.running && state.tick && state.tick.debug
+      && state.tick.debug.beliefs) {
+    Object.values(state.tick.debug.beliefs).forEach(b => {
+      const [px, py] = toCanvas(b.goal_m[0], b.goal_m[1]);
+      ctx.globalAlpha = 0.35 + 0.6 * Math.min(b.p * 3, 1);
+      ctx.strokeStyle = HUMAN_COLOR; ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.arc(px, py, 14, 0, 7); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = HUMAN_COLOR; ctx.font = "bold 13px system-ui";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("?", px, py + 1);
+      ctx.font = "10px ui-monospace";
+      ctx.fillText(
+        (b.source === "bayes" ? (b.p * 100).toFixed(0) + "%" : "…"),
+        px, py + 24);
+      ctx.globalAlpha = 1.0;
+    });
+  }
+
   // cars
   if (state.running && state.tick) {
     state.tick.agents.forEach(a => {
@@ -391,10 +412,59 @@ function buildScenario() {
     version: 1, width_m: WORLD_W, height_m: WORLD_H,
     obstacles: state.obstacles,
     agents,
-    planner: { resolution_m: 2.0, num_simulations: 384,
-               replan_period_s: 0.8, commit_depth: 6 },
+    planner: {
+      resolution_m: 2.0,
+      num_simulations: parseInt(document.getElementById("sel-sims").value),
+      replan_period_s: 0.8, commit_depth: 6,
+      safety_filter: document.getElementById("chk-safety").checked,
+    },
   };
 }
+
+/* ---------- save / load ---------- */
+function editorToJson() {
+  return {
+    obstacles: state.obstacles, human: state.human,
+    agents: state.agents.map(a => ({
+      id: a.id, label: a.label, color: a.color, start: a.start,
+      goal: a.goal, behavior: a.behavior, max_speed: a.max_speed,
+    })),
+    agentSeq: state.agentSeq,
+  };
+}
+function editorFromJson(data) {
+  state.obstacles = data.obstacles || [];
+  state.agents = data.agents || [];
+  state.human = data.human || null;
+  state.agentSeq = data.agentSeq || state.agents.length;
+  refreshChips(); render();
+}
+document.getElementById("btn-save").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(editorToJson(), null, 2)],
+                        { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "szenario.json";
+  a.click(); URL.revokeObjectURL(a.href);
+  setStatus("Szenario gespeichert (Download).");
+});
+document.getElementById("btn-load").addEventListener("click",
+  () => document.getElementById("file-load").click());
+document.getElementById("file-load").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  file.text().then(text => {
+    try { stopSim(); editorFromJson(JSON.parse(text));
+          setStatus(`Szenario „${file.name}" geladen.`); }
+    catch (err) { setStatus("❌ Ungültige Szenario-Datei: " + err.message); }
+    e.target.value = "";
+  });
+});
+// autosave the editor between visits
+setInterval(() => {
+  if (!state.running)
+    localStorage.setItem("smmcts_scenario", JSON.stringify(editorToJson()));
+}, 3000);
 
 function startSim() {
   if (!state.agents.length) { setStatus("⚠️ Mindestens ein KI-Auto setzen."); return; }
@@ -478,6 +548,12 @@ function loadDemo() {
   refreshChips();
 }
 
-loadDemo();
+const saved = localStorage.getItem("smmcts_scenario");
+if (saved) {
+  try { editorFromJson(JSON.parse(saved)); setStatus("Letztes Szenario wiederhergestellt — oder ✨ Demo laden."); }
+  catch (e) { loadDemo(); }
+} else {
+  loadDemo();
+  setStatus("Demo geladen — bauen, Autos setzen, dich platzieren (🧑), dann ▶ Start.");
+}
 render();
-setStatus("Demo geladen — bauen, Autos setzen, dich platzieren (🧑), dann ▶ Start.");

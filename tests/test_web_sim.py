@@ -82,6 +82,36 @@ def test_full_episode_ai_reaches_goal_and_human_drives():
     assert state["stats"]["plans"] > 3
 
 
+def test_goal_inference_concentrates_on_pursued_landmark():
+    from sm_mcts_web.bridge import GoalInference
+    occ = np.zeros((12, 20), dtype=bool)
+    inference = GoalInference(occ, n_candidates=8, beta=1.0, forget=1.0)
+    # walk straight east along row 6, i.e. towards the east side landmarks
+    for col in range(2, 18):
+        inference.observe((col, 6, 0))
+    goal, prob = inference.map_goal()
+    assert prob > 0.3, f"posterior stayed flat: {inference.posterior()}"
+    assert goal[0] >= 14, f"MAP goal should lie east, got {goal}"
+
+
+def test_safety_filter_scenario_runs():
+    data = {**SCENARIO,
+            "agents": [a for a in SCENARIO["agents"] if a["kind"] == "ai"],
+            "planner": {**SCENARIO["planner"], "safety_filter": True,
+                        "num_simulations": 96}}
+    scenario = scenario_from_json(data)
+    session = SimSession(scenario, SMMCTSAdapter(seed=0))
+    session.reset_planner()
+    for _ in range(200):  # 10 sim-seconds
+        session.tick(0.05)
+        if session._plan_future is not None:
+            session._plan_future.result(timeout=60)
+    stats = session.state_json()["stats"]
+    session.close()
+    assert stats["planner_errors"] == 0
+    assert stats["plans"] > 3
+
+
 def test_planner_exception_degrades_gracefully():
     scenario = scenario_from_json(SCENARIO)
 

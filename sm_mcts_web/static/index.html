@@ -79,6 +79,18 @@
       <button id="btn-run">▶ Start</button>
       <button id="btn-clear" title="Karte leeren">🗑</button>
       <button id="btn-demo" title="Demo-Szenario laden">✨ Demo</button>
+      <button id="btn-save" title="Szenario als JSON speichern">💾</button>
+      <button id="btn-load" title="Szenario laden">📂</button>
+      <input id="file-load" type="file" accept=".json" style="display:none">
+      <label title="Beweisbar kollisionsfreie Aktionsmaske (docs/SAFETY.md).
+Garantie gilt unter den KI-Fahrzeugen; gegenüber dem Menschen defensiv, aber nicht bewiesen.">
+        <input type="checkbox" id="chk-safety"> Safety-Filter</label>
+      <label>Suchbudget
+        <select id="sel-sims">
+          <option value="256">256</option>
+          <option value="384" selected>384</option>
+          <option value="512">512</option>
+        </select></label>
     </div>
     <div id="panel-build" class="panel">
       <span class="hint">Klick platziert · R dreht · Rechtsklick löscht</span>

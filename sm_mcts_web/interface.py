@@ -118,6 +118,11 @@ class PlannerAdapter(ABC):
         """Return {agent_id: Route} for every AI agent (humans excluded).
         Missing entries mean 'keep the previous route'."""
 
+    def debug_info(self) -> dict:
+        """Optional, JSON-serializable introspection shown in the UI
+        (e.g. inferred goals, beliefs). Never required for correctness."""
+        return {}
+
 
 def scenario_from_json(data: dict) -> ScenarioSpec:
     """Parse and validate the wire format (see docs/SIM_INTERFACE.md)."""
