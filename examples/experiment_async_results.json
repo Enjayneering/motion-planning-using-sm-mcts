@@ -1,0 +1,3613 @@
+{
+  "n_seeds": 100,
+  "conditions": {
+    "sync_fast": [
+      {
+        "seed": 0,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 1,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 2,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 3,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 4,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 5,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 6,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 7,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 8,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 9,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 10,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 11,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 12,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 13,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 14,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 15,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 16,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 17,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 18,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 19,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 20,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 21,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 22,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 23,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 24,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 25,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 26,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 27,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 28,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 29,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 30,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 31,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 32,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 33,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 34,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 35,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 36,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 37,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 38,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 39,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 40,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 41,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 42,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 43,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 44,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 45,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 46,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 47,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 48,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 49,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 50,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 51,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 52,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 53,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 54,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 55,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 56,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 57,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 58,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 59,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 60,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 61,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 62,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 63,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 64,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 65,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 66,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 67,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 68,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 69,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 70,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 71,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 72,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 73,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 74,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 75,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 76,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 77,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 78,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 79,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 80,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 81,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 82,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 83,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 84,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 85,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 86,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 87,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 88,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 89,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 90,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      },
+      {
+        "seed": 91,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 92,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 93,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 22,
+        "coincidences": 10
+      },
+      {
+        "seed": 94,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 95,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 96,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 20,
+        "coincidences": 9
+      },
+      {
+        "seed": 97,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 98,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 18,
+        "coincidences": 8
+      },
+      {
+        "seed": 99,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 24,
+        "coincidences": 11
+      }
+    ],
+    "sync_slow": [
+      {
+        "seed": 0,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 1,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 2,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 3,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 4,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 5,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 8,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 6,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 7,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 8,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 9,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 10,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 11,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 12,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 13,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 14,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 15,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 16,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 17,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 18,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 19,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 20,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 21,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 22,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 23,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 24,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 25,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 26,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 27,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 28,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 29,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 30,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 31,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 32,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 33,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 34,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 35,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 36,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 37,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 38,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 39,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 40,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 41,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 42,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 43,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 44,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 45,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 46,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 47,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 15,
+        "searches": 16,
+        "coincidences": 7
+      },
+      {
+        "seed": 48,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 49,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 50,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 51,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 52,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 53,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 54,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 55,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 56,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 57,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 58,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 59,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 60,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 61,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 62,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 63,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 64,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 65,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 66,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 67,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 68,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 69,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 70,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 71,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 72,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 73,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 74,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 75,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 12,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 76,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 77,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 78,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 79,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 80,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 81,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 82,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 83,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 84,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 85,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 86,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 87,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 88,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 89,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 90,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 91,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 92,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 93,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 94,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 95,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 5
+      },
+      {
+        "seed": 96,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 97,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 98,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 99,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 10,
+        "coincidences": 4
+      }
+    ],
+    "async": [
+      {
+        "seed": 0,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 1,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 2,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 3,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 4,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 5,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 6,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 7,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 8,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 9,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 10,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 11,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 12,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 13,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 14,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 15,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 16,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 17,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 18,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 19,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 20,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 21,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 22,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 23,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 24,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 25,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 26,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 27,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 28,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 29,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 30,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 31,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 32,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 33,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 34,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 35,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 36,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 37,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 38,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 39,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 40,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 41,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 42,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 43,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 44,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 45,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 46,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 47,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 48,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 49,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 50,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 51,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 52,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 53,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 54,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 55,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 56,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 57,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 3,
+        "steps": 12,
+        "searches": 13,
+        "coincidences": 0
+      },
+      {
+        "seed": 58,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 59,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 60,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 61,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 62,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 63,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 13,
+        "searches": 14,
+        "coincidences": 0
+      },
+      {
+        "seed": 64,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 65,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 66,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 67,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 68,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 69,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 70,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 71,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 72,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 73,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 74,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 75,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 76,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 77,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 78,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 79,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 80,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 81,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 82,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 12,
+        "coincidences": 0
+      },
+      {
+        "seed": 83,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 84,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 85,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 86,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 87,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 88,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 89,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 90,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 91,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 92,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 93,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 94,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 95,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 8,
+        "searches": 9,
+        "coincidences": 0
+      },
+      {
+        "seed": 96,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 97,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      },
+      {
+        "seed": 98,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 99,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 11,
+        "coincidences": 0
+      }
+    ],
+    "jitter": [
+      {
+        "seed": 0,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 1,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 8,
+        "searches": 7,
+        "coincidences": 0
+      },
+      {
+        "seed": 2,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 3,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 11,
+        "coincidences": 1
+      },
+      {
+        "seed": 4,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 5,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 10,
+        "coincidences": 1
+      },
+      {
+        "seed": 6,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 7,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 9,
+        "coincidences": 3
+      },
+      {
+        "seed": 8,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 9,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 10,
+        "coincidences": 1
+      },
+      {
+        "seed": 10,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 11,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 2
+      },
+      {
+        "seed": 12,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 0
+      },
+      {
+        "seed": 13,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 14,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 15,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 16,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 17,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 3
+      },
+      {
+        "seed": 18,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 0
+      },
+      {
+        "seed": 19,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 20,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 1
+      },
+      {
+        "seed": 21,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 1
+      },
+      {
+        "seed": 22,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 23,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 24,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 25,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 2
+      },
+      {
+        "seed": 26,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 27,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 28,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 29,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 7,
+        "coincidences": 0
+      },
+      {
+        "seed": 30,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 31,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 32,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 33,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 34,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 11,
+        "coincidences": 2
+      },
+      {
+        "seed": 35,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 36,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 37,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 38,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 39,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 40,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 11,
+        "coincidences": 3
+      },
+      {
+        "seed": 41,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 13,
+        "searches": 11,
+        "coincidences": 3
+      },
+      {
+        "seed": 42,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 43,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 16,
+        "searches": 13,
+        "coincidences": 4
+      },
+      {
+        "seed": 44,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 45,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 46,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 11,
+        "coincidences": 3
+      },
+      {
+        "seed": 47,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 0
+      },
+      {
+        "seed": 48,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 49,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 10,
+        "coincidences": 4
+      },
+      {
+        "seed": 50,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 51,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 3
+      },
+      {
+        "seed": 52,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 53,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 54,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 55,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 7,
+        "searches": 6,
+        "coincidences": 2
+      },
+      {
+        "seed": 56,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 57,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 58,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 12,
+        "searches": 10,
+        "coincidences": 1
+      },
+      {
+        "seed": 59,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 60,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 2
+      },
+      {
+        "seed": 61,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 13,
+        "searches": 11,
+        "coincidences": 2
+      },
+      {
+        "seed": 62,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 63,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 64,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 65,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 66,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 13,
+        "searches": 10,
+        "coincidences": 3
+      },
+      {
+        "seed": 67,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 2
+      },
+      {
+        "seed": 68,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 14,
+        "searches": 11,
+        "coincidences": 2
+      },
+      {
+        "seed": 69,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 70,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 71,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 14,
+        "searches": 11,
+        "coincidences": 2
+      },
+      {
+        "seed": 72,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 10,
+        "coincidences": 1
+      },
+      {
+        "seed": 73,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 13,
+        "searches": 11,
+        "coincidences": 3
+      },
+      {
+        "seed": 74,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 7,
+        "coincidences": 0
+      },
+      {
+        "seed": 75,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 0
+      },
+      {
+        "seed": 76,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 77,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 3,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 78,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 79,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 80,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 81,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 3
+      },
+      {
+        "seed": 82,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 83,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 84,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 85,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 12,
+        "searches": 10,
+        "coincidences": 2
+      },
+      {
+        "seed": 86,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 87,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 88,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 89,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 1,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 90,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 1
+      },
+      {
+        "seed": 91,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 92,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 2
+      },
+      {
+        "seed": 93,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 3
+      },
+      {
+        "seed": 94,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 10,
+        "searches": 9,
+        "coincidences": 2
+      },
+      {
+        "seed": 95,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 11,
+        "searches": 11,
+        "coincidences": 3
+      },
+      {
+        "seed": 96,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 7,
+        "coincidences": 2
+      },
+      {
+        "seed": 97,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 0
+      },
+      {
+        "seed": 98,
+        "success": true,
+        "collision_episode": false,
+        "collision_steps": 0,
+        "steps": 9,
+        "searches": 8,
+        "coincidences": 1
+      },
+      {
+        "seed": 99,
+        "success": true,
+        "collision_episode": true,
+        "collision_steps": 2,
+        "steps": 9,
+        "searches": 7,
+        "coincidences": 2
+      }
+    ]
+  }
+}

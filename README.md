@@ -220,6 +220,22 @@ animations covering all scenario/mode/filter combinations live in
 measured planning step, so watching them conveys the actual CPU speed of
 every configuration.
 
+## Asynchronous replanning (research branch)
+
+`AsyncDecentralizedPlanner` gives every agent its own replanning clock
+(period, phase, optional random jitter); between replans an agent executes
+the committed action plan of its last search (`SearchResult.action_plan`).
+This models real robot control loops, which are neither sequential nor
+simultaneous. The experiment (`examples/experiment_async.py`, 100 seeds x
+4 clock configurations on the symmetric head-on corridor) refined the
+initial hypothesis: conflict risk is dominated by *commitment duration*
+(replanning every step: 0/100 conflict episodes; committing for two steps:
+6–12/100, p <= 0.03), deterministic interleaving removes simultaneous
+revisions but not the conflicts caused by unobserved commitments, and
+random (jittered) clocks are the worst variant in discrete time. Full
+analysis and the refined thesis — asynchrony helps iff commitments are
+observable — in `docs/ASYNC.md`.
+
 ## Measured performance (this repo's CI-class CPU, 2 agents, 36 joint actions)
 
 | simulations | plan step | rate |

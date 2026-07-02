@@ -65,6 +65,9 @@ class MCTSParams:
     rollout_temperature: float = 0.5  # Gumbel noise scale of the rollout policy
     safety_filter: bool = False  # provably collision-free action masking
                                  # (maximin filter, see docs/SAFETY.md)
+    commit_depth: int = 4        # length of the returned action plan, used
+                                 # for committed execution between
+                                 # asynchronous replans (docs/ASYNC.md)
 
     @property
     def max_nodes(self) -> int:
@@ -89,6 +92,9 @@ class Tree(NamedTuple):
 
 class SearchResult(NamedTuple):
     action_idx: jnp.ndarray    # [n_agents] chosen action per agent (robust)
+    action_plan: jnp.ndarray   # [commit_depth, n_agents] robust actions along
+                               # the principal variation (action_plan[0] ==
+                               # action_idx); used for committed execution
     root_visits: jnp.ndarray   # [n_agents, n_actions] decoupled visit counts
     root_q: jnp.ndarray        # [n_agents, n_actions] decoupled mean payoffs
     num_nodes: jnp.ndarray     # scalar, expanded tree size
@@ -339,14 +345,28 @@ def search(
 
     # final move: robust-separate (most visited action per agent), as in the
     # original implementation's 'robust-separate' feature flag
+    def robust_actions(node):
+        masked = jnp.where(tree.legal[node], tree.action_visits[node], -1)
+        actions = jnp.argmax(masked, axis=-1).astype(jnp.int32)
+        return jnp.where(tree.reached[node], env.null_action, actions)
+
+    # walk the principal variation to get a committable action plan; if the
+    # tree runs out, the last node's robust action simply repeats
+    node = jnp.int32(0)
+    plan = []
+    for _ in range(params.commit_depth):
+        actions = robust_actions(node)
+        plan.append(actions)
+        child = tree.children[node, encode_joint(actions, env.n_actions)]
+        node = jnp.where(child == UNVISITED, node, child)
+    action_plan = jnp.stack(plan)  # [commit_depth, n_agents]
+
     root_visits = tree.action_visits[0]
     root_q = tree.action_qsum[0] / jnp.maximum(root_visits, 1)
-    masked_visits = jnp.where(tree.legal[0], root_visits, -1)
-    action_idx = jnp.argmax(masked_visits, axis=-1).astype(jnp.int32)
-    action_idx = jnp.where(root_reached, env.null_action, action_idx)
 
     return SearchResult(
-        action_idx=action_idx,
+        action_idx=action_plan[0],
+        action_plan=action_plan,
         root_visits=root_visits,
         root_q=root_q,
         num_nodes=tree.num_nodes,
