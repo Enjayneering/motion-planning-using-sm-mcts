@@ -66,8 +66,20 @@ def plot_trajectory(env: GridWorld, traj: Trajectory, path: str | None = None):
 
 
 def animate_trajectory(env: GridWorld, traj: Trajectory, path: str,
-                       fps: int = 4, agent_radius: float | None = None):
-    """Render the episode as a GIF (or MP4 if ffmpeg is available)."""
+                       fps: float = 4, agent_radius: float | None = None,
+                       realtime: bool = False):
+    """Render the episode as a GIF (or MP4 if ffmpeg is available).
+
+    With ``realtime=True`` every frame is shown for the episode's *maximum
+    measured planning time*, so watching the animation gives an honest live
+    feeling for how fast the planner runs on the machine that produced the
+    trajectory (worst-case step, no cherry-picking). The per-step planning
+    time is displayed in the title.
+    """
+    max_plan_s = None
+    if realtime and traj.plan_times.size:
+        max_plan_s = float(traj.plan_times.max())
+        fps = 1.0 / max(max_plan_s, 1e-3)
     fig, ax = plt.subplots(figsize=(7, 7))
     map_image = _draw_map(ax, env)
     goals = np.asarray(env.goals)
@@ -99,7 +111,13 @@ def animate_trajectory(env: GridWorld, traj: Trajectory, path: str,
             )
             trails[i].set_data(traj.states[: t + 1, i, 0],
                                traj.states[: t + 1, i, 1])
-        title.set_text(f"t = {t} / {traj.states.shape[0] - 1}")
+        label = f"t = {t} / {traj.states.shape[0] - 1}"
+        if 1 <= t <= traj.plan_times.size:
+            label += f"   ·   plan: {1e3 * traj.plan_times[t - 1]:.0f} ms"
+        if max_plan_s is not None:
+            label += (f"\nplayback = real time on CPU "
+                      f"(worst step: {1e3 * max_plan_s:.0f} ms)")
+        title.set_text(label)
         return bodies + headings + trails + [title]
 
     anim = animation.FuncAnimation(

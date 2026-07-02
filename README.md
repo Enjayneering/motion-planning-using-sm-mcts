@@ -212,6 +212,14 @@ product of filtered action sets in an adversarial configuration and
 asserts the simulator's collision check never fires.
 `examples/experiment_safety.py` measures the end-to-end effect.
 
+A beginner-friendly German explanation of the filter (assumptions, proof
+idea, results) is in `docs/SICHERHEITSFILTER_EINFACH.md`. Eleven showcase
+animations covering all scenario/mode/filter combinations live in
+`docs/media/showcase/` — rendered by `examples/render_showcase.py` in
+**real-time playback**: each frame is shown for the episode's slowest
+measured planning step, so watching them conveys the actual CPU speed of
+every configuration.
+
 ## Measured performance (this repo's CI-class CPU, 2 agents, 36 joint actions)
 
 | simulations | plan step | rate |
